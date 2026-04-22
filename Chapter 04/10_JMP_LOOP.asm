@@ -51,7 +51,7 @@ main PROC
 
     ; 간단한 JMP 예시 - 아래 구간을 건너뜀
     jmp skip_section        ; skip_section 레이블로 무조건 점프
-
+    
     ; 이 코드는 실행되지 않음 (JMP가 건너뜀)
     mov eax, 0FFFFFFFFh     ; 절대 실행 안 됨
 
@@ -145,8 +145,8 @@ sumLoop:
     add eax, [esi]                  ; EAX += intArray[i]
 
     ; [6] 다음 원소로 이동 (DWORD = 4바이트)
-    add esi, TYPE intArray          ; ESI += 4
-
+    add esi, TYPE intArray          ; ESI += 4 
+    
     ; [7] 반복
     loop sumLoop                    ; ECX-- , ECX != 0이면 sumLoop로
 

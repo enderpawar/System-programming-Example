@@ -12,7 +12,7 @@ main PROC
     INVOKE ExitProcess,0
 ENDP PORC 
 
-ArraySum PROC ; 하지만! 여기서 USES esi ecx를 하면 push pop을 알아서 해준다!
+ArraySum PROC USES esi ecx; 하지만! 여기서 USES esi ecx를 하면 push pop을 알아서 해준다!
     push esi
     push ecx
     mov eax,0

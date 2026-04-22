@@ -33,7 +33,7 @@ ExitProcess PROTO, dwExitCode:DWORD
 
     ; 2진수 리터럴
     bin1    DWORD 1101b         ; 2진수 1101 = 십진수 13
-
+    
     ; 음수 리터럴 (선택적 부호)
     negVal  SDWORD -26          ; 부호 있는 32비트 정수 -26
 

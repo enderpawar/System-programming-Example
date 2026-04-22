@@ -101,6 +101,7 @@ main PROC
     ; 기본 뺄셈
     mov eax, 100
     sub eax, 30         ; EAX = 70, CF=0 (정상)
+    
 
     ; CF=1 예시: 작은 값에서 큰 값을 뺌
     mov al, 10
