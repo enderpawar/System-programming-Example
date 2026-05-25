@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시스템 프로그래밍 중간고사 실습 타이핑</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Malgun Gothic',sans-serif;background:#1e1e1e;color:#d4d4d4;display:flex;height:100vh;overflow:hidden}
+
+/* ── Sidebar ── */
+#sidebar{width:230px;min-width:230px;background:#252526;border-right:1px solid #3c3c3c;overflow-y:auto;display:flex;flex-direction:column}
+#sidebar-head{padding:12px 14px 8px;font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #3c3c3c;flex-shrink:0}
+.ch-label{padding:8px 14px 3px;font-size:11px;color:#569cd6;font-weight:bold}
+.sec-btn{display:block;width:100%;padding:5px 14px 5px 22px;text-align:left;background:none;border:none;color:#ccc;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Malgun Gothic',sans-serif}
+.sec-btn:hover{background:#2a2d2e}
+.sec-btn.active{background:#094771;color:#fff}
+.sec-btn.done{color:#4ec94e}
+.sec-btn .star{color:#f1c40f;font-size:10px}
+#progress-wrap{padding:10px 14px;border-top:1px solid #3c3c3c;font-size:11px;color:#888;flex-shrink:0}
+#progress-bar{height:4px;background:#3c3c3c;border-radius:2px;margin-top:5px}
+#progress-fill{height:100%;background:#4ec94e;border-radius:2px;width:0;transition:width .3s}
+
+/* ── Main ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{background:#2d2d30;padding:9px 18px;border-bottom:1px solid #3c3c3c;display:flex;align-items:center;gap:10px;flex-shrink:0}
+#sec-title{font-size:15px;font-weight:bold;color:#eee;flex:1}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.b-star{background:#2d2a00;color:#f1fa8c;border:1px solid #f1c40f}
+.b-ch{background:#0d2137;color:#569cd6;border:1px solid #264f78}
+#nav-btns{display:flex;gap:6px}
+.nav-btn{padding:4px 10px;background:#3c3c3c;border:none;border-radius:3px;color:#ccc;cursor:pointer;font-size:12px;font-family:'Malgun Gothic',sans-serif}
+.nav-btn:hover{background:#555}
+
+/* ── Content ── */
+#content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+#concept-box{background:#1a1a2e;border-left:3px solid #569cd6;padding:10px 18px;font-size:12.5px;line-height:1.75;white-space:pre-wrap;color:#c8c8c8;flex-shrink:0}
+.panel-hd{padding:5px 18px;background:#2d2d30;border-top:1px solid #3c3c3c;border-bottom:1px solid #3c3c3c;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#888;flex-shrink:0}
+.tog-btn{padding:2px 8px;background:#3c3c3c;border:none;border-radius:3px;color:#ccc;cursor:pointer;font-size:11px;font-family:'Malgun Gothic',sans-serif}
+.tog-btn:hover{background:#4a4a4a}
+#ref-wrap{flex-shrink:0;overflow:hidden;transition:max-height .2s}
+#ref-code{background:#141414;font-family:'Courier New',Consolas,monospace;font-size:12.5px;line-height:1.6;padding:10px 18px;white-space:pre;overflow-x:auto;color:#d4d4d4;max-height:260px;overflow-y:auto}
+#quiz-box{background:#1a2a1a;border-left:3px solid #4ec94e;padding:8px 18px;font-size:12px;white-space:pre-wrap;color:#a8d8a8;flex-shrink:0;display:none}
+
+/* ── Practice ── */
+#practice{flex-shrink:0;padding:10px 18px;background:#1e1e1e;border-top:1px solid #3c3c3c;display:flex;flex-direction:column;gap:7px}
+#practice-lbl{font-size:11px;color:#888}
+#typing{width:100%;min-height:170px;background:#0d0d0d;color:#d4d4d4;font-family:'Courier New',Consolas,monospace;font-size:12.5px;line-height:1.6;padding:8px 12px;border:1px solid #3c3c3c;border-radius:4px;resize:vertical;outline:none;tab-size:4}
+#typing:focus{border-color:#569cd6}
+#actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#match-disp{font-size:13px;font-weight:bold;color:#4ec94e;min-width:70px}
+#char-disp{font-size:11px;color:#666}
+.abtn{padding:5px 13px;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-family:'Malgun Gothic',sans-serif}
+.btn-chk{background:#0e639c;color:#fff}.btn-chk:hover{background:#1177bb}
+.btn-rst{background:#444;color:#ccc}.btn-rst:hover{background:#555}
+.btn-ok{background:#1a5c1a;color:#4ec94e;border:1px solid #4ec94e}.btn-ok:hover{background:#236b23}
+.btn-nxt{background:#373737;color:#ccc}.btn-nxt:hover{background:#454545}
+#diff-box{display:none;background:#0d0d0d;border:1px solid #444;border-radius:4px;padding:8px 12px;font-family:'Courier New',Consolas,monospace;font-size:12.5px;line-height:1.6;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.d-ok{color:#4ec94e}.d-err{color:#ff6b6b;background:#3a0000}.d-mis{color:#666;background:#2a2a00;text-decoration:underline}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#1e1e1e}
+::-webkit-scrollbar-thumb{background:#555;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-head">📋 섹션 목록</div>
+  <div id="sec-list"></div>
+  <div id="progress-wrap">
+    <span id="prog-text">0 / 0 완료</span>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <span id="sec-title">섹션을 선택하세요</span>
+    <span id="badge-ch" class="badge b-ch" style="display:none"></span>
+    <span id="badge-star" class="badge b-star" style="display:none">★ 시험 단골</span>
+    <div id="nav-btns">
+      <button class="nav-btn" onclick="navigate(-1)">◀ 이전</button>
+      <button class="nav-btn" onclick="navigate(1)">다음 ▶</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="concept-box">← 왼쪽에서 섹션을 선택하면 개념 설명이 여기에 나타납니다.</div>
+
+    <div class="panel-hd">
+      <span>📄 참고 코드 (따라 칠 대상)</span>
+      <button class="tog-btn" id="tog-ref" onclick="toggleRef()">숨기기</button>
+    </div>
+    <div id="ref-wrap"><pre id="ref-code"></pre></div>
+
+    <div id="quiz-box"></div>
+
+    <div class="panel-hd">
+      <span>⌨️ 직접 타이핑 실습</span>
+      <span style="font-size:11px;color:#555">Tab키 = 4칸 들여쓰기</span>
+    </div>
+    <div id="practice">
+      <div id="practice-lbl">아래에 위 코드를 직접 타이핑하세요 (띄어쓰기·대소문자 정확히)</div>
+      <textarea id="typing" spellcheck="false" placeholder="여기에 코드를 타이핑하세요..." oninput="onType()"></textarea>
+      <div id="actions">
+        <span id="match-disp">0%</span>
+        <span id="char-disp">0 / 0 자</span>
+        <button class="abtn btn-chk" onclick="checkDiff()">🔍 비교하기</button>
+        <button class="abtn btn-rst" onclick="resetTyping()">↺ 다시 쓰기</button>
+        <button class="abtn btn-ok" onclick="markDone()">✓ 완료 표시</button>
+        <button class="abtn btn-nxt" onclick="navigate(1)">다음 섹션 →</button>
+      </div>
+      <div id="diff-box"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// 섹션 데이터
+// ─────────────────────────────────────────────────────────────────
+const SECTIONS = [
+{
+  id:"CH3-0", ch:"3장", star:false,
+  title:"AddTwoProgram — 교재 첫 예제",
+  concept:
+`교재에서 처음 등장하는 최소 MASM 프로그램 구조입니다.
+
+어셈블-링크-실행 사이클:
+  .asm → [Assembler] → .obj → [Linker + .lib] → .exe → OS Loader → 실행
+
+디렉티브 vs 명령어:
+  디렉티브 → 어셈블 시간만 처리, 기계어 생성 없음  (예: .DATA, DWORD, PROC)
+  명령어   → 기계어로 번역, 런타임에 CPU가 실행      (예: mov, add, loop)
+
+★ 세 변수 합산 패턴 핵심:
+  x86은 메모리↔메모리 직접 연산 불가 → 반드시 레지스터를 중간에 사용!`,
+  code:
+`.386
+.MODEL flat, stdcall
+.STACK 4096
+ExitProcess PROTO, dwExitCode:DWORD
+
+.DATA
+    val1 DWORD 10000h
+    val2 DWORD 40000h
+    val3 DWORD 20000h
+    sum  DWORD 0
+
+.CODE
+main PROC
+    ; 5 + 6 = 11
+    mov eax, 5
+    add eax, 6           ; EAX = 11
+
+    ; 세 변수 합산 (레지스터 경유 필수)
+    mov eax, val1        ; EAX = 10000h
+    add eax, val2        ; EAX = 50000h
+    add eax, val3        ; EAX = 70000h
+    mov sum, eax         ; sum = 70000h
+
+    INVOKE ExitProcess, 0
+main ENDP
+END main`,
+  quiz: null
+},
+{
+  id:"CH3-2", ch:"3장", star:false,
+  title:"정수 리터럴 / 상수 표현식 / 문자열 리터럴",
+  concept:
+`★ 정수 리터럴 진법 표기
+  10진수: 26  또는  26d
+  16진수: 1Ah,  0FFh  ← A~F로 시작하면 반드시 앞에 0 붙임!
+  2진수:  1101b
+  8진수:  36o
+
+  오류 예) FFh, A3h   올바름) 0FFh, 0A3h
+
+★ 상수 정수 표현식 (어셈블 시간에만 평가)
+  연산자 우선순위: () > 단항 +/- > * / MOD > 이항 +/-
+  expr1 DWORD  16 * 20          ; = 320
+  expr2 DWORD  (5 + 3) * 2 - 1  ; = 15
+  expr3 DWORD  17 MOD 5          ; = 2  (나머지)
+
+★ 문자열 리터럴
+  str2 BYTE "ABCD", 0           ; 널 종료 (5바이트)
+  str3 BYTE "Hello", 0Dh, 0Ah, 0  ; CR(0Dh)+LF(0Ah) = 줄바꿈
+  줄 연속 문자 (\): 소스 두 줄을 하나로 합침 — \뒤에 공백/문자 없어야 함`,
+  code:
+`.DATA
+    ; 정수 리터럴 진법
+    dec1    DWORD 26             ; 10진수 (접미사 생략)
+    hex1    DWORD 26h            ; 16진수 = 38
+    hex2    DWORD 0A3h           ; A로 시작 → 앞에 0 필수
+    bin1    DWORD 1101b          ; 2진수 = 13
+    negVal  SDWORD -26           ; 부호 있는 정수
+
+    ; 상수 정수 표현식 (어셈블 시간 평가)
+    expr1   DWORD 16 * 20        ; = 320
+    expr2   DWORD (5 + 3) * 2 - 1 ; = 15
+    expr3   DWORD 17 MOD 5       ; = 2
+
+    ; 실수 리터럴
+    r4val   REAL4  3.14          ; 단정밀도 4바이트
+    r8val   REAL8  2.71828       ; 배정밀도 8바이트
+    r4exp   REAL4  3.14E2        ; 지수 표기 = 314.0
+
+    ; 문자 / 문자열
+    charA   BYTE   'A'           ; ASCII 41h = 65
+    str1    BYTE   "ABCD"        ; 4바이트
+    str2    BYTE   "ABCD", 0     ; 5바이트 (널 종료)
+    str3    BYTE   "Hello", 0Dh, 0Ah, 0  ; CR+LF+널
+    str4    BYTE   "First part ",\
+                   "second part", 0      ; 줄 연속 문자`,
+  quiz: `☑ 퀴즈: 다음 중 오류인 것은?
+  (A) hex DWORD 0FFh
+  (B) hex DWORD FFh     ← 오류! F로 시작 → 앞에 0 필수
+  (C) hex DWORD 0F0h
+  답: (B)`
+},
+{
+  id:"CH3-3", ch:"3장", star:true,
+  title:"데이터 타입 & 리틀 엔디안 ★",
+  concept:
+`내장 데이터 타입:
+  BYTE  1B  0~255          SBYTE  1B  -128~127
+  WORD  2B  0~65535        SWORD  2B  -32768~32767
+  DWORD 4B  0~4294967295   SDWORD 4B  -2147483648~2147483647
+  QWORD 8B  64비트         REAL4 4B  REAL8 8B  REAL10 10B
+
+레거시: DB=BYTE  DW=WORD  DD=DWORD/REAL4  DQ=QWORD/REAL8
+
+★ 리틀 엔디안 (Little-Endian) — x86의 다중바이트 저장 방식 ★
+  최하위 바이트(LSB)를 가장 낮은 주소에 먼저 저장
+
+  예) DWORD 12345678h 를 주소 100h에 저장:
+    주소 100h: 78h  ← LSB (최하위 바이트) 먼저
+    주소 101h: 56h
+    주소 102h: 34h
+    주소 103h: 12h  ← MSB (최상위 바이트) 나중
+
+  예) WORD 0AB12h, 0CD34h 연달아 저장:
+    +0: 12h  +1: ABh  +2: 34h  +3: CDh`,
+  code:
+`.DATA
+    ; 기본 변수 선언
+    val1     BYTE    10h          ; 1바이트, 값 = 16
+    sval     SBYTE   -128         ; 부호 있는 8비트 최솟값
+    wval     WORD    1000h        ; 2바이트
+    dval     DWORD   12345678h    ; 4바이트 (리틀 엔디안으로 저장)
+    undef    DWORD   ?            ; 미초기화
+
+    ; 배열 선언
+    byteArr  BYTE    10h, 20h, 30h, 40h, 50h
+    wordArr  WORD    100h, 200h, 300h, 400h
+    dwordArr DWORD   1000h, 2000h, 3000h
+
+    ; 리틀 엔디안 확인
+    ; leDemo = 12345678h → 메모리: [78][56][34][12]
+    leDemo   DWORD   12345678h
+    leWord1  WORD    0AB12h       ; 메모리: [12][AB]
+    leWord2  WORD    0CD34h       ; 메모리: [34][CD]`,
+  quiz:
+`☑ 퀴즈: DWORD 12345678h 가 주소 200h에 저장될 때
+  200h: ?  201h: ?  202h: ?  203h: ?
+  답: 200h=78h  201h=56h  202h=34h  203h=12h  (LSB 먼저)
+
+☑ SBYTE 범위: -128 ~ 127  /  BYTE 범위: 0 ~ 255`
+},
+{
+  id:"CH3-4", ch:"3장", star:false,
+  title:"DUP 연산자 & .DATA?",
+  concept:
+`★ DUP 연산자: 횟수 DUP(초기값)
+  BYTE  10  DUP(0)           → 0이 10개 (10바이트)
+  BYTE   5  DUP(?)           → 미초기화 5바이트
+  BYTE   4  DUP(0ABh)        → ABh가 4개
+  BYTE   2  DUP(3 DUP(0FFh)) → 중첩 DUP: FF × 6개 (2×3)
+  WORD   8  DUP(0)           → WORD 8개 = 16바이트
+  DWORD  4  DUP(?)           → DWORD 4개 = 16바이트
+
+★ .DATA?  → 미초기화 전용 세그먼트 (실행 파일 크기 절약)
+  .DATA   bigBuf BYTE 10000 DUP(0)  → 파일에 0이 10000바이트 포함 (낭비)
+  .DATA?  bigBuf BYTE 10000 DUP(?)  → 크기 정보만 기록 (파일 크기 절약)
+
+★ CR+LF 줄바꿈 패턴:
+  welcome BYTE "Welcome!", 0Dh, 0Ah, 0   ; 문자열 + CR + LF + 널`,
+  code:
+`.DATA
+    ; DUP 패턴
+    dupA    BYTE    5  DUP(0FFh)    ; FF FF FF FF FF
+    zeroBuf BYTE    10 DUP(0)       ; 0이 10개
+    undefB  BYTE    5  DUP(?)       ; 미초기화 5바이트
+    nested  BYTE    2  DUP(3 DUP(0FFh))  ; FF x 6 (중첩)
+    wBuf    WORD    8  DUP(0)       ; WORD 8개 = 16바이트
+    dBuf    DWORD   4  DUP(?)       ; DWORD 4개 미초기화
+
+    ; CR+LF 패턴
+    welcome BYTE "Welcome!", 0Dh, 0Ah, 0
+    result  DWORD ?
+
+.DATA?
+    bigBuf  BYTE    4096 DUP(?)     ; 파일 크기에 영향 없음`,
+  quiz: null
+},
+{
+  id:"CH3-5", ch:"3장", star:true,
+  title:"심볼릭 상수 — = / EQU / TEXTEQU / $ ★",
+  concept:
+`디렉티브 비교표 (★ 암기 필수):
+  =        정수 표현식만  재정의 가능 ✓
+  EQU      정수 또는 텍스트  재정의 불가 ✗
+  TEXTEQU  텍스트만       재정의 가능 ✓
+
+☑ 퀴즈: COUNT EQU 10 / COUNT EQU 20  → 오류! EQU는 재정의 불가
+
+★ $ 연산자 (현재 위치 카운터):
+  list     BYTE  10,20,30,40,50
+  ListSize = ($ - list)          ; = 5  (바이트 수)
+
+  wList    WORD  100, 200, 300
+  wSize    = ($ - wList) / 2     ; = 3  (TYPE=2 이므로 /2)
+
+  dList    DWORD 1000, 2000, 3000
+  dSize    = ($ - dList) / 4     ; = 3  (TYPE=4 이므로 /4)`,
+  code:
+`; = 디렉티브 (재정의 가능)
+COUNT       = 10
+LIMIT       = COUNT * 4          ; = 40
+LIMIT       = 200                ; 재정의 가능 (합법)
+
+; $ 연산자 (현재 위치 카운터)
+list        BYTE    10, 20, 30, 40, 50
+ListSize    = ($ - list)         ; = 5
+wList       WORD    100, 200, 300
+wListSize   = ($ - wList) / 2   ; = 3
+dList       DWORD   1000, 2000, 3000
+dListSize   = ($ - dList) / 4   ; = 3
+
+; EQU 디렉티브 (재정의 불가)
+ROWS        EQU 5
+COLS        EQU 10
+MATRIX_SIZE EQU ROWS * COLS     ; = 50
+PI          EQU <3.14159>
+; ROWS EQU 999    ← 이 줄 활성화 시 어셈블 오류!
+
+; TEXTEQU (재정의 가능)
+moveVal     TEXTEQU <mov eax>
+myMsg       TEXTEQU <"Hello",0>
+myMsg       TEXTEQU <"Updated",0>  ; 재정의 가능`,
+  quiz:
+`☑ 퀴즈: 아래 중 오류 발생하는 줄?
+  (A) COUNT = 10  / COUNT = 20        → 합법 (= 재정의 가능)
+  (B) SIZE EQU 50 / SIZE EQU 100     → 오류! (EQU 재정의 불가)
+  (C) MSG TEXTEQU <"Hi"> / MSG TEXTEQU <"Bye">  → 합법 (TEXTEQU 재정의 가능)`
+},
+{
+  id:"CH4-1", ch:"4장", star:true,
+  title:"MOV 규칙 & 겹치는 레지스터 ★",
+  concept:
+`MOV 규칙 (위반 시 어셈블 오류):
+  MOV reg, imm   ✓    MOV reg, reg   ✓    MOV reg, mem   ✓
+  MOV mem, reg   ✓    MOV mem, imm   ✓
+  MOV mem, mem   ✗ 불가!
+  MOV reg(다른크기), reg  ✗ 불가!
+  MOV EIP, reg   ✗ 불가! (EIP는 목적지 안 됨)
+  MOV DS, imm    ✗ 불가! (세그먼트에 즉치 안 됨)
+
+겹치는 레지스터:
+  EAX(32) ⊃ AX(16) ⊃ AH(8 상위) / AL(8 하위)
+  작은 서브레지스터를 써도 나머지 비트는 그대로 유지됨!
+  예) EAX=12345678h → mov AL, 0AAh → EAX=123456AAh`,
+  code:
+`.CODE
+main PROC
+    ; ✓ 올바른 MOV
+    mov eax, 10          ; 즉치 → 레지스터
+    mov ebx, eax         ; 레지스터 → 레지스터
+    mov al, [ebx]        ; 메모리 → 레지스터
+    mov [ebx], al        ; 레지스터 → 메모리
+
+    ; ✗ 메모리→메모리 불가 → 레지스터 경유
+    ; mov mem2, mem1     ← 오류!
+    mov eax, leDemo
+    mov var3, eax        ; 올바른 방법
+
+    ; 겹치는 레지스터 예제
+    mov eax, 12345678h   ; EAX = 12345678h
+    mov al, 0AAh         ; EAX = 123456AAh (상위 3B 유지)
+    mov ax, 0BBBBh       ; EAX = 1234BBBBh (상위 2B 유지)
+    mov ax, 0            ; EAX = 12340000h (하위 16비트만 클리어)
+
+    INVOKE ExitProcess, 0
+main ENDP`,
+  quiz:
+`☑ 퀴즈: EAX = 12345678h 일 때
+  mov AH, 0AAh 실행 후 EAX = ?
+  답: 1234AA78h  (AL=78h 유지, AH=AAh, 상위 2B 유지)`
+},
+{
+  id:"CH4-2", ch:"4장", star:true,
+  title:"MOVZX / MOVSX — 크기 불일치 해결 ★",
+  concept:
+`MOV는 크기가 다른 피연산자 간에 사용 불가!
+→ 작은 → 큰 복사: MOVZX 또는 MOVSX 사용
+
+MOVZX (Zero-Extend): 상위 비트를 0으로 채움
+  부호 없는(양수) 정수에 사용
+  BL = 0A0h → movzx eax, bl → EAX = 000000A0h (+160, 올바름)
+
+MOVSX (Sign-Extend): 상위 비트를 소스의 MSB(부호비트)로 채움
+  부호 있는 정수에 사용
+  BL = 0A0h (-96) → movsx eax, bl → EAX = FFFFFFA0h (-96, 올바름)
+
+★ 핵심 비교 (BL = F0h):
+  movzx eax, bl → EAX = 000000F0h (+240, 상위=00)
+  movsx eax, bl → EAX = FFFFFFF0h (-16,  상위=FF)`,
+  code:
+`    ; MOVZX (부호 없는 확장 — 상위 0으로 채움)
+    mov bl, 0A0h
+    movzx eax, bl        ; EAX = 000000A0h
+    movzx ax, val1       ; AX  = 0010h  (8→16비트)
+    movzx eax, val1      ; EAX = 00000010h (8→32비트)
+    movzx eax, wval      ; EAX = 00001000h (16→32비트)
+
+    ; MOVSX (부호 있는 확장 — 상위 MSB로 채움)
+    mov bl, 0F0h         ; BL = F0h = -16
+    movsx eax, bl        ; EAX = FFFFFFF0h (MSB=1이므로 상위=FF)
+    movsx ax, bl         ; AX  = FFF0h
+
+    ; 양수는 MOVZX와 같은 결과
+    mov bl, 05h          ; BL = +5
+    movsx eax, bl        ; EAX = 00000005h (MSB=0이므로 상위=00)`,
+  quiz:
+`☑ 퀴즈: BL = 80h 일 때
+  movzx eax, bl → EAX = ?    답: 00000080h (+128)
+  movsx eax, bl → EAX = ?    답: FFFFFF80h (-128)
+
+☑ 퀴즈: BL = 7Fh 일 때
+  movzx eax, bl → EAX = ?    답: 0000007Fh (+127)
+  movsx eax, bl → EAX = ?    답: 0000007Fh (+127) ← MSB=0이므로 동일`
+},
+{
+  id:"CH4-3", ch:"4장", star:true,
+  title:"CPU 플래그 & INC/DEC/ADD/SUB/NEG ★",
+  concept:
+`CPU 플래그:
+  CF  부호 없는 오버플로: MSB에서 올림(Carry out) 발생
+  OF  부호 있는 오버플로: 양+양=음  또는  음+음=양
+  ZF  결과 = 0
+  SF  결과의 MSB = 1 (음수)
+
+★ INC/DEC는 CF에 영향을 주지 않음! (시험 자주 출제)
+
+OF 판정 규칙:
+  양수 + 양수 = 음수 MSB(1)  → OF = 1
+  음수 + 음수 = 양수 MSB(0)  → OF = 1
+  양수 + 음수 (반대 부호)    → OF = 0 (절대)
+
+퀴즈 패턴:
+  AL = 7Fh(127), add al,1 → AL = 80h(-128): OF=1, CF=0  (양+양=음)
+  AL = FFh(255), add al,1 → AL = 0:          CF=1, ZF=1, OF=0`,
+  code:
+`    ; INC / DEC (CF에 영향 없음!)
+    mov eax, 5
+    inc eax              ; EAX = 6  (CF 변화 없음)
+    dec eax              ; EAX = 5
+
+    mov al, 0FFh
+    inc al               ; AL=0, ZF=1, OF=1  ★CF는 변화 없음
+
+    ; ADD / SUB
+    mov al, 0FFh
+    add al, 1            ; AL=0, CF=1(부호없는 오버), ZF=1, OF=0
+
+    mov al, 127          ; AL = 7Fh
+    add al, 1            ; AL=80h=-128, OF=1 (양+양=음!)
+
+    mov al, 10
+    sub al, 20           ; AL=-10=F6h, CF=1 (언더플로)
+
+    ; NEG (2의 보수 부호 반전)
+    ; 0이 아닌 값 → CF=1 (항상)
+    ; -128에 NEG  → OF=1
+    mov eax, -24
+    neg eax              ; EAX = +24, CF = 1
+
+    mov eax, 0
+    neg eax              ; EAX = 0, CF=0, ZF=1
+
+    ; 산술 표현식: rval = -Xval + (Yval - Zval)
+    ; Xval=26, Yval=30, Zval=40 → rval = -36
+    mov eax, Xval        ; EAX = 26
+    neg eax              ; EAX = -26
+    mov ebx, Yval        ; EBX = 30
+    sub ebx, Zval        ; EBX = -10
+    add eax, ebx         ; EAX = -36
+    mov rval, eax`,
+  quiz:
+`☑ 퀴즈: AL = 80h(-128) 일 때 neg al → ?
+  AL = 80h, CF=1, OF=1  (−128의 양수 = +128은 SBYTE 범위 초과!)
+
+☑ LAHF/SAHF: 플래그 레지스터를 AH로 백업/복원할 때 사용
+  lahf    ; AH = EFLAGS 하위 8비트
+  sahf    ; AH → EFLAGS 복원`
+},
+{
+  id:"CH4-4", ch:"4장", star:true,
+  title:"OFFSET / PTR / TYPE / LENGTHOF / SIZEOF ★",
+  concept:
+`OFFSET   변수의 메모리 주소(오프셋) 반환
+PTR      선언 크기를 재정의해 다른 크기로 접근 (리틀 엔디안과 함께!)
+TYPE     변수 한 원소의 바이트 크기
+LENGTHOF 배열의 원소 개수 (첫 번째 선언 줄만 카운트)
+SIZEOF   배열 전체 바이트 수 = LENGTHOF × TYPE
+
+예시 (arr DWORD 1,2,3,4,5):
+  TYPE=4   LENGTHOF=5   SIZEOF=20
+
+★ PTR + 리틀 엔디안:
+  dval DWORD 12345678h → 메모리: [78][56][34][12]
+  WORD PTR dval        → 5678h (하위 WORD)
+  BYTE PTR dval        → 78h   (최하위 바이트)
+  BYTE PTR [dval+1]    → 56h   (두 번째 바이트)
+  BYTE PTR [dval+3]    → 12h   (최상위 바이트)
+
+ALIGN n: 다음 변수를 n바이트 경계에 정렬 (CPU 성능 향상)`,
+  code:
+`    ; OFFSET 사용
+    mov esi, OFFSET byteArr  ; ESI = byteArr 주소
+    mov al, [esi]            ; AL = byteArr[0]
+
+    ; PTR 사용 (dval = 12345678h → 메모리: 78 56 34 12)
+    mov ax, WORD PTR dval    ; AX = 5678h (하위 WORD)
+    mov al, BYTE PTR dval    ; AL = 78h   (최하위 바이트)
+    mov al, BYTE PTR [dval+1] ; AL = 56h
+    mov al, BYTE PTR [dval+3] ; AL = 12h  (최상위)
+    movzx eax, WORD PTR dval  ; EAX = 00005678h
+
+    ; TYPE / LENGTHOF / SIZEOF 활용 루프
+    ; byteArr BYTE  10h,20h,30h,40h,50h
+    ;   TYPE=1  LENGTHOF=5  SIZEOF=5
+    ; dwordArr DWORD 1000h,2000h,3000h
+    ;   TYPE=4  LENGTHOF=3  SIZEOF=12
+    mov ecx, LENGTHOF dwordArr  ; ECX = 3
+    mov esi, OFFSET dwordArr
+    mov eax, 0
+typeLoop:
+    add eax, [esi]
+    add esi, TYPE dwordArr   ; +4 (DWORD 크기)
+    loop typeLoop            ; EAX = 6000h
+
+    ; LABEL 디렉티브 (같은 주소를 다른 크기로 접근)
+    ; val16 LABEL WORD
+    ; val32 DWORD 0ABCD1234h  ← val16과 같은 주소
+    mov ax, val16            ; AX = 1234h (하위 WORD)
+    mov eax, val32           ; EAX = 0ABCD1234h`,
+  quiz:
+`☑ 퀴즈: arr WORD 10,20,30,40,50 일 때
+  TYPE=?   LENGTHOF=?   SIZEOF=?
+  답: TYPE=2  LENGTHOF=5  SIZEOF=10
+
+☑ dval DWORD 0AABBCCDD h, BYTE PTR [dval+2] = ?
+  메모리: [DD][CC][BB][AA] → +2 위치 = BB h`
+},
+{
+  id:"CH4-5", ch:"4장", star:false,
+  title:"간접 주소지정 & 스케일 팩터",
+  concept:
+`직접(Direct)  : mov al, myVar     (주소 고정, 컴파일 시 결정)
+간접(Indirect): mov esi, OFFSET arr / mov al, [esi]  (배열 순회에 유용)
+
+★ 배열 순회 시 ESI 증가량:
+  BYTE  배열 → add esi, 1  (또는 inc esi)
+  WORD  배열 → add esi, 2
+  DWORD 배열 → add esi, 4
+  일반화:      add esi, TYPE 배열이름
+
+인덱스 피연산자 두 가지 표기:
+  형식A: [byteArr + esi]  또는  byteArr[esi]
+  형식B: [esi + 2]   (레지스터=배열시작, 상수=오프셋)
+
+스케일 팩터: [배열 + 인덱스 * 스케일]  (WORD=2, DWORD=4, QWORD=8)
+  mov esi, 2
+  mov eax, [dwordArr + esi * 4]   ; dwordArr[2]`,
+  code:
+`    ; 간접 피연산자
+    mov esi, OFFSET byteArr  ; ESI = 배열 시작 주소
+    mov al, [esi]            ; AL = byteArr[0]
+    mov bl, 0BBh
+    mov [esi], bl            ; byteArr[0] = BBh
+    inc BYTE PTR [esi]       ; PTR 필수 (크기 명시)
+
+    ; BYTE 배열 순회
+    mov esi, OFFSET byteArr
+    mov al, [esi]            ; [0]
+    inc esi
+    mov al, [esi]            ; [1]
+
+    ; WORD 배열 순회
+    mov esi, OFFSET wordArr
+    mov ax, [esi]            ; wordArr[0]
+    add esi, 2               ; 다음 WORD
+    mov ax, [esi]            ; wordArr[1]
+
+    ; 인덱스 피연산자 (형식A)
+    mov esi, 0
+    mov al, byteArr[esi]     ; byteArr[0]
+    mov al, [byteArr + esi]  ; 위와 동일
+
+    ; 인덱스 피연산자 (형식B)
+    mov esi, OFFSET byteArr
+    mov al, [esi + 1]        ; [1]
+    mov al, [esi + 4]        ; [4]
+
+    ; 스케일 팩터
+    mov esi, 2
+    mov eax, [dwordArr + esi * 4]  ; dwordArr[2] = 3000h
+    mov esi, 1
+    mov ax, [wordArr + esi * 2]    ; wordArr[1]`,
+  quiz: null
+},
+{
+  id:"CH4-6", ch:"4장", star:true,
+  title:"JMP / LOOP — 배열 합산 & 문자열 복사 ★",
+  concept:
+`JMP 레이블 → 무조건 EIP = 목적지
+
+LOOP 레이블:
+  ① ECX -= 1
+  ② ECX ≠ 0 이면 레이블로 점프 (반복)
+     ECX = 0 이면 다음 명령어로 (종료)
+
+★ 치명적 실수: ECX = 0으로 시작 → ECX−1 = FFFFFFFFh (약 42억 회!)
+
+배열 합산 7단계 패턴 (★ 암기):
+  ① mov esi, OFFSET 배열        ← 배열 주소
+  ② mov ecx, LENGTHOF 배열      ← 루프 카운터
+  ③ mov eax, 0                  ← 누적 합 초기화
+  ④ (루프 레이블):
+  ⑤   add eax, [esi]            ← 원소 누적
+  ⑥   add esi, TYPE 배열        ← 다음 원소
+  ⑦   loop (루프 레이블)`,
+  code:
+`    ; LOOP 기본 (5회 반복, EAX = 1+2+3+4+5 = 15)
+    mov ecx, 5
+    mov eax, 0
+loopDemo:
+    add eax, ecx         ; EAX += 5,4,3,2,1
+    loop loopDemo        ; ECX-- ; 0이면 탈출
+
+    ; 배열 합산 7단계 패턴
+    ; intArray DWORD 1,2,3,4,5,6,7,8,9,10
+    mov esi, OFFSET intArray     ; ① 배열 주소
+    mov ecx, LENGTHOF intArray   ; ② 카운터 = 10
+    mov eax, 0                   ; ③ 합 초기화
+sumLoop:
+    add eax, [esi]               ; ⑤ 원소 누적
+    add esi, TYPE intArray       ; ⑥ 다음 원소 (+4)
+    loop sumLoop                 ; ⑦ ECX-- 반복
+    mov arraySum, eax            ; = 55
+
+    ; 문자열 복사 (AL 경유 — 메모리↔메모리 직접 불가)
+    ; source BYTE "Hello, Assembly!", 0
+    ; target BYTE SIZEOF source DUP(0)
+    mov esi, 0
+    mov ecx, SIZEOF source       ; 널 포함 전체 바이트
+copyLoop:
+    mov al, source[esi]          ; AL = source[i]
+    mov target[esi], al          ; target[i] = AL
+    inc esi
+    loop copyLoop`,
+  quiz:
+`☑ 퀴즈: ECX = 0 으로 LOOP 진입 시 어떻게 되나?
+  답: ECX = 0 - 1 = FFFFFFFFh → 약 42억 번 반복 (버그!)
+
+☑ 중첩 루프 핵심: 외부 루프 ECX를 메모리 변수에 백업했다가 복원
+  mov outerCnt, ecx  → 내부 루프 → mov ecx, outerCnt`
+},
+{
+  id:"CH5-1", ch:"5장", star:true,
+  title:"런타임 스택 — PUSH / POP / PUSHFD / PUSHAD ★",
+  concept:
+`스택 핵심 개념:
+  · LIFO (Last-In, First-Out)
+  · 높은 주소 → 낮은 주소 방향으로 성장 (top이 낮은 주소)
+  · ESP(Extended Stack Pointer)가 스택의 최상단을 가리킴
+
+PUSH 동작:  ① ESP -= 4   ② [ESP] = 값
+POP  동작:  ① 목적지 = [ESP]   ② ESP += 4
+  ※ POP은 메모리를 지우지 않음 — ESP만 이동!
+
+스택 4가지 용도 (★ 암기):
+  ① 레지스터 임시 보존
+  ② CALL 명령어의 복귀 주소 저장
+  ③ 프로시저에 인수(argument) 전달
+  ④ 프로시저 내 지역 변수 저장
+
+★ PUSHAD/POPAD: 8개 범용 레지스터 일괄 저장/복원
+  반환값이 EAX인 프로시저에서 POPAD 금지! (EAX가 덮어써짐)`,
+  code:
+`    ; PUSH / POP 기본
+    push 10h             ; ESP-=4, [ESP]=10h
+    push 20h             ; ESP-=4, [ESP]=20h
+    push 30h             ; ESP-=4, [ESP]=30h
+    pop  eax             ; EAX=30h, ESP+=4
+    pop  ebx             ; EBX=20h, ESP+=4
+    pop  ecx             ; ECX=10h, ESP+=4
+
+    ; 레지스터 보존 패턴 (PUSH 역순으로 POP)
+    push eax
+    push ebx
+    mov  eax, 9999
+    mov  ebx, 8888
+    pop  ebx             ; 역순! EBX 복원
+    pop  eax             ; EAX 복원
+
+    ; PUSHFD / POPFD (EFLAGS 보존)
+    pushfd               ; EFLAGS → 스택
+    mov  al, 0FFh
+    add  al, 1           ; 플래그 변경
+    popfd                ; 원래 EFLAGS 복원
+
+    ; PUSHAD / POPAD (8개 레지스터 일괄)
+    pushad               ; EAX,ECX,EDX,EBX,ESP*,EBP,ESI,EDI → 스택
+    mov  eax, 1111h
+    mov  ebx, 2222h
+    popad                ; 스택 → 레지스터 (원상복구)`,
+  quiz:
+`☑ 퀴즈: 다음 실행 후 EAX, EBX는?
+  push 10 / push 20 / pop eax / pop ebx
+  답: EAX=20 (나중에 push, 먼저 pop), EBX=10
+
+☑ PUSH/POP 균형 법칙: PUSH 횟수 = POP 횟수
+  불균형 시 RET가 엉뚱한 주소로 → 프로그램 충돌!`
+},
+{
+  id:"CH5-2", ch:"5장", star:false,
+  title:"스택 응용 — 문자열 뒤집기",
+  concept:
+`알고리즘: "ABCDE" → "EDCBA"
+
+1단계: 문자열 앞→뒤 순으로 PUSH
+  → 스택 top에 마지막 문자(E)가 위치
+
+2단계: 스택에서 POP하며 원래 배열에 덮어씀
+  → POP 순서: E, D, C, B, A → 역순!
+
+push 순서: A→B→C→D→E
+pop  순서: E→D→C→B→A → "EDCBA"
+
+※ movzx eax, myStr[esi] 사용 이유:
+  문자를 push할 때 상위 비트를 0으로 클리어해야 안전`,
+  code:
+`    ; myStr BYTE "ABCDE", 0  / strLen = 5
+
+    ; 1단계: 앞→뒤 순으로 PUSH
+    mov ecx, strLen
+    mov esi, 0
+pushLoop:
+    movzx eax, myStr[esi]  ; EAX = 문자 (상위 비트 클리어)
+    push  eax              ; 스택에 저장
+    inc   esi
+    loop  pushLoop
+
+    ; 2단계: POP으로 역순 덮어쓰기
+    mov ecx, strLen
+    mov esi, 0
+popLoop:
+    pop   eax              ; top: E,D,C,B,A 순
+    mov   myStr[esi], al   ; 원래 위치에 덮어씀
+    inc   esi
+    loop  popLoop
+    ; 결과: myStr = "EDCBA\0"`,
+  quiz: null
+},
+{
+  id:"CH5-3", ch:"5장", star:true,
+  title:"CALL / RET & 프로시저 정의 ★",
+  concept:
+`CALL 명령어 동작 (3단계):
+  ① ESP -= 4
+  ② [ESP] = CALL 다음 명령어 주소 (복귀 주소)
+  ③ EIP = 피호출 프로시저 시작 주소
+
+RET 명령어 동작:
+  ① EIP = [ESP]   (복귀 주소 POP)
+  ② ESP += 4
+
+★ 퀴즈: CALL 전 ESP = 0000FF00h 이면 CALL 직후 ESP = ?
+  → ESP = 0000FEFCh (FF00h - 4)
+  → [ESP] = CALL 다음 명령어 주소
+
+프로시저 구조:
+  이름 PROC
+      ...
+      ret
+  이름 ENDP
+
+레이블 범위:
+  기본: 해당 프로시저 내에서만 유효
+  전역: 이름:: (콜론 두 개) → 다른 프로시저에서도 JMP 가능`,
+  code:
+`main PROC
+    ; SumOfThree 호출
+    mov  eax, 10           ; 첫 번째 인수
+    mov  ebx, 20           ; 두 번째 인수
+    mov  ecx, 30           ; 세 번째 인수
+    call SumOfThree        ; EAX = 60
+    ; CALL 후: [ESP]=복귀주소, EIP=SumOfThree 시작
+
+    ; ArraySum 호출
+    mov  esi, OFFSET intArr2
+    mov  ecx, LENGTHOF intArr2
+    call ArraySum          ; EAX = 합계
+    mov  theSum, eax
+
+    INVOKE ExitProcess, 0
+main ENDP
+
+; SumOfThree 프로시저
+; Receives: EAX, EBX, ECX  /  Returns: EAX = 합계
+SumOfThree PROC
+    add eax, ebx           ; EAX = EAX + EBX
+    add eax, ecx           ; EAX = EAX + EBX + ECX
+    ret                    ; 복귀 주소 POP → EIP
+SumOfThree ENDP`,
+  quiz:
+`☑ CALL MySub 전 ESP = 0100h 라면:
+  CALL 직후 ESP = 00FCh  (0100h - 4)
+  [00FCh] = CALL 다음 명령어 주소
+  EIP = MySub 시작 주소
+
+  RET 실행 후:
+  EIP = [00FCh] = CALL 다음 명령어 주소
+  ESP = 0100h  (원래대로)`
+},
+{
+  id:"CH5-4", ch:"5장", star:true,
+  title:"ArraySum & USES 연산자 ★",
+  concept:
+`USES 연산자:
+  이름 PROC USES reg1 reg2 ...
+  → 프로시저 시작 시 자동 PUSH, 종료 시 자동 POP 코드를 어셈블러가 삽입
+
+★★★ USES 함정 ★★★
+  반환값 레지스터(보통 EAX)를 USES에 절대 넣으면 안 됨!
+  이유: RET 직전에 pop eax가 자동 삽입되어 반환값을 덮어씀!
+
+  Bad: ArraySum PROC USES esi ecx eax
+    → ret 직전에 pop eax 삽입 → EAX(반환값) 파괴됨!
+  Good: ArraySum PROC USES esi ecx
+    → EAX는 USES에 없으므로 반환값 유지됨
+
+PUSHAD/POPAD를 쓰는 프로시저도 마찬가지 이유로 EAX 반환 불가`,
+  code:
+`; ArraySum (수동 PUSH/POP)
+; Receives: ESI = 배열 주소, ECX = 원소 개수
+; Returns:  EAX = 합계
+ArraySum PROC
+    push esi               ; 호출자 ESI 보존
+    push ecx               ; 호출자 ECX 보존
+    mov  eax, 0            ; 합 초기화
+sumL:
+    add  eax, [esi]        ; EAX += 현재 원소
+    add  esi, 4            ; 다음 DWORD
+    loop sumL              ; ECX-- 반복
+    pop  ecx               ; ECX 복원 (역순!)
+    pop  esi               ; ESI 복원
+    ret
+ArraySum ENDP
+
+; ArraySumUSES (USES로 자동 보존, 동일 동작)
+ArraySumUSES PROC USES esi ecx
+    ; ★ EAX는 반환값이므로 USES에서 제외!
+    mov  eax, 0
+sumLU:
+    add  eax, [esi]
+    add  esi, 4
+    loop sumLU
+    ret                    ; pop ecx / pop esi 자동 삽입 후 복귀
+ArraySumUSES ENDP`,
+  quiz:
+`☑ 퀴즈: 다음 코드의 문제점?
+  BadProc PROC USES eax
+      mov eax, 42          ; 반환값 설정
+      ret
+  BadProc ENDP
+  → USES eax 때문에 RET 직전에 pop eax 삽입
+  → EAX = 호출 전 값으로 복원됨 → 반환값 42가 사라짐!
+  → 해결: USES 목록에서 eax 제거`
+},
+{
+  id:"CH5-5", ch:"5장", star:false,
+  title:"중첩 호출 & 전역 레이블",
+  concept:
+`중첩 호출 (Nested Calls):
+  main → Sub1 → Sub2
+  · CALL마다 복귀 주소가 스택에 쌓임
+  · RET마다 역순으로 꺼내서 복귀 (LIFO)
+  · 스택이 올바른 복귀 순서를 자동 보장
+
+전역 레이블:
+  기본 레이블: 선언된 프로시저 내에서만 유효
+  전역 레이블: 이름:: (콜론 두 개) → 파일 어디서든 JMP 가능
+  주의: 외부 JMP는 스택 정합성을 깨뜨릴 수 있음`,
+  code:
+`; Sub2
+Sub2 PROC
+    mov ecx, 10            ; Sub2의 작업
+    ret                    ; Sub1으로 복귀
+Sub2 ENDP
+
+; Sub1 (Sub2를 호출)
+Sub1 PROC
+    push eax               ; EAX 보존
+    call Sub2              ; Sub2 호출 (복귀주소 = Sub1 내)
+    pop  eax               ; EAX 복원
+    ret                    ; main으로 복귀
+Sub1 ENDP
+
+; 전역 레이블 데모
+GlobalDemo PROC
+    jmp  MyGlobal          ; 전역 레이블로 점프
+    mov  eax, 0            ; 실행되지 않음
+
+MyGlobal::                 ; :: = 전역 레이블
+    mov  eax, 1
+    ret
+GlobalDemo ENDP`,
+  quiz: null
+},
+{
+  id:"CH5-6", ch:"5장", star:true,
+  title:"Irvine32 라이브러리 입출력 ★",
+  concept:
+`★ 핵심 프로시저 입력/반환 암기:
+  WriteString  → EDX = 널종료 문자열 OFFSET  (OFFSET 필수!)
+  WriteChar    → AL  = ASCII 문자 코드
+  WriteInt     → EAX = 부호 있는 정수
+  WriteDec     → EAX = 부호 없는 정수
+  ReadString   → EDX=버퍼 OFFSET, ECX=버퍼크기  → EAX=입력수
+  ReadInt      → EAX = 부호 정수  (범위초과: OF=1)
+  ReadDec      → EAX = 무부호 정수  (오류: CF=1)
+  RandomRange  → EAX=상한 n 입력  → EAX=0~n-1 난수
+  Randomize    → 시드 초기화 (프로그램당 1회만!)
+
+★ WriteString 흔한 실수:
+  mov edx, myStr          ← 오류! EDX = 첫 바이트 값(H=48h)
+  mov edx, OFFSET myStr   ← 올바름: EDX = 문자열 주소
+
+SetTextColor: EAX = (배경색 × 16) + 전경색
+  파란 배경 + 흰 글씨 = (1×16)+15 = 31`,
+  code:
+`    ; WriteString
+    mov edx, OFFSET myMsg
+    call WriteString       ; myMsg 출력 (OFFSET 필수!)
+
+    ; WriteInt (부호 있는)
+    mov eax, -500
+    call WriteInt          ; "-500" 출력
+
+    ; WriteDec (부호 없는)
+    mov eax, 255
+    call WriteDec          ; "255" 출력
+
+    ; WriteHex
+    mov eax, 0AFFEh
+    call WriteHex          ; "0000AFFE" 출력
+
+    ; 0~49 범위 난수 출력
+    call Randomize         ; 프로그램당 1회만!
+    mov  eax, 50
+    call RandomRange       ; EAX = 0~49
+    call WriteDec
+
+    ; DumpMem (배열 덤프)
+    mov esi, OFFSET demoArray
+    mov ecx, LENGTHOF demoArray  ; = 5
+    mov ebx, TYPE demoArray      ; = 4 (DWORD)
+    call DumpMem
+
+    ; SetTextColor (파란 배경 + 흰 글씨)
+    mov eax, 1 * 16 + 15   ; (blue*16) + white = 31
+    call SetTextColor
+
+    ; Gotoxy (커서 이동)
+    mov dh, 10             ; 행 = 10
+    mov dl, 5              ; 열 = 5
+    call Gotoxy
+
+    ; IsDigit (숫자 판별)
+    mov al, '5'
+    call IsDigit           ; ZF=1 ('5'는 숫자)
+    mov al, 'A'
+    call IsDigit           ; ZF=0 ('A'는 숫자 아님)`,
+  quiz:
+`☑ WriteInt vs WriteDec 차이:
+  mov eax, -500
+  call WriteInt   → "-500"         (부호 있는 출력)
+  call WriteDec   → "4294966796"   (FFFFFFFFh-500+1, 부호 없는 출력)
+
+☑ 색상 상수: black=0 blue=1 green=2 red=4 yellow=14 white=15
+  노란 글씨 + 검은 배경 = (0×16)+14 = 14`
+}
+];
+
+// ─────────────────────────────────────────────────────────────────
+// 상태
+// ─────────────────────────────────────────────────────────────────
+let currentIdx = -1;
+let done = new Set(JSON.parse(localStorage.getItem('asm_done') || '[]'));
+let refVisible = true;
+
+// ─────────────────────────────────────────────────────────────────
+// 사이드바 렌더링
+// ─────────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const list = document.getElementById('sec-list');
+  list.innerHTML = '';
+  let ch = '';
+  SECTIONS.forEach((s, i) => {
+    if (s.ch !== ch) {
+      ch = s.ch;
+      const lbl = document.createElement('div');
+      lbl.className = 'ch-label';
+      lbl.textContent = ch;
+      list.appendChild(lbl);
+    }
+    const btn = document.createElement('button');
+    btn.className = 'sec-btn' + (done.has(s.id) ? ' done' : '');
+    btn.dataset.idx = i;
+    btn.innerHTML = s.star
+      ? `<span class="star">★</span> ${s.id}: ${s.title}`
+      : `${s.id}: ${s.title}`;
+    btn.title = s.title;
+    btn.onclick = () => loadSection(i);
+    list.appendChild(btn);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = SECTIONS.length;
+  const cnt = SECTIONS.filter(s => done.has(s.id)).length;
+  document.getElementById('prog-text').textContent = `${cnt} / ${total} 완료`;
+  document.getElementById('progress-fill').style.width = `${(cnt/total)*100}%`;
+  document.querySelectorAll('.sec-btn').forEach((btn, i) => {
+    btn.className = 'sec-btn'
+      + (i === currentIdx ? ' active' : '')
+      + (done.has(SECTIONS[i].id) ? ' done' : '');
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 섹션 로드
+// ─────────────────────────────────────────────────────────────────
+function loadSection(idx) {
+  currentIdx = idx;
+  const s = SECTIONS[idx];
+
+  document.getElementById('sec-title').textContent = `${s.id}: ${s.title}`;
+  const bch = document.getElementById('badge-ch');
+  bch.textContent = s.ch;
+  bch.style.display = '';
+  const bstar = document.getElementById('badge-star');
+  bstar.style.display = s.star ? '' : 'none';
+
+  document.getElementById('concept-box').textContent = s.concept;
+  document.getElementById('ref-code').textContent = s.code;
+
+  const qbox = document.getElementById('quiz-box');
+  if (s.quiz) { qbox.textContent = s.quiz; qbox.style.display = ''; }
+  else { qbox.style.display = 'none'; }
+
+  document.getElementById('typing').value = '';
+  document.getElementById('diff-box').style.display = 'none';
+  document.getElementById('diff-box').innerHTML = '';
+  document.getElementById('match-disp').textContent = '0%';
+  document.getElementById('char-disp').textContent = `0 / ${s.code.length} 자`;
+
+  // 참고 코드 기본 보이기
+  if (!refVisible) toggleRef();
+
+  updateProgress();
+  document.getElementById('typing').focus();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 참고 코드 토글
+// ─────────────────────────────────────────────────────────────────
+function toggleRef() {
+  refVisible = !refVisible;
+  const wrap = document.getElementById('ref-wrap');
+  const btn = document.getElementById('tog-ref');
+  wrap.style.display = refVisible ? '' : 'none';
+  btn.textContent = refVisible ? '숨기기' : '보이기';
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 타이핑 실시간 반영
+// ─────────────────────────────────────────────────────────────────
+function onType() {
+  if (currentIdx < 0) return;
+  const ref = SECTIONS[currentIdx].code;
+  const typed = document.getElementById('typing').value;
+  const match = calcMatch(ref, typed);
+  document.getElementById('match-disp').textContent = match + '%';
+  document.getElementById('char-disp').textContent = `${typed.length} / ${ref.length} 자`;
+  if (match >= 95) {
+    document.getElementById('match-disp').style.color = '#4ec94e';
+  } else if (match >= 70) {
+    document.getElementById('match-disp').style.color = '#f1c40f';
+  } else {
+    document.getElementById('match-disp').style.color = '#ff6b6b';
+  }
+}
+
+function calcMatch(ref, typed) {
+  if (!typed.length) return 0;
+  let ok = 0;
+  const len = Math.min(ref.length, typed.length);
+  for (let i = 0; i < len; i++) {
+    if (ref[i] === typed[i]) ok++;
+  }
+  return Math.round((ok / ref.length) * 100);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 비교
+// ─────────────────────────────────────────────────────────────────
+function checkDiff() {
+  if (currentIdx < 0) return;
+  const ref = SECTIONS[currentIdx].code;
+  const typed = document.getElementById('typing').value;
+  const box = document.getElementById('diff-box');
+  box.innerHTML = '';
+  box.style.display = '';
+
+  const maxLen = Math.max(ref.length, typed.length);
+  let html = '';
+  for (let i = 0; i < maxLen; i++) {
+    const r = ref[i];
+    const t = typed[i];
+    if (r === undefined) {
+      // 타이핑이 ref보다 길다 (불필요한 문자)
+      html += `<span class="d-err">${esc(t)}</span>`;
+    } else if (t === undefined) {
+      // 미입력 부분
+      html += `<span class="d-mis">${esc(r)}</span>`;
+    } else if (r === t) {
+      html += `<span class="d-ok">${esc(r)}</span>`;
+    } else {
+      html += `<span class="d-err">${esc(t)}</span>`;
+    }
+  }
+  box.innerHTML = html;
+  box.scrollTop = 0;
+}
+
+function esc(c) {
+  if (c === '<') return '&lt;';
+  if (c === '>') return '&gt;';
+  if (c === '&') return '&amp;';
+  if (c === '\n') return '\n';
+  return c;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 리셋 / 완료
+// ─────────────────────────────────────────────────────────────────
+function resetTyping() {
+  document.getElementById('typing').value = '';
+  document.getElementById('diff-box').style.display = 'none';
+  document.getElementById('diff-box').innerHTML = '';
+  document.getElementById('match-disp').textContent = '0%';
+  document.getElementById('match-disp').style.color = '#4ec94e';
+  if (currentIdx >= 0)
+    document.getElementById('char-disp').textContent =
+      `0 / ${SECTIONS[currentIdx].code.length} 자`;
+  document.getElementById('typing').focus();
+}
+
+function markDone() {
+  if (currentIdx < 0) return;
+  const id = SECTIONS[currentIdx].id;
+  done.add(id);
+  localStorage.setItem('asm_done', JSON.stringify([...done]));
+  updateProgress();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 이전/다음
+// ─────────────────────────────────────────────────────────────────
+function navigate(dir) {
+  const next = currentIdx + dir;
+  if (next >= 0 && next < SECTIONS.length) loadSection(next);
+}
+
+// Tab 키 → 4칸 들여쓰기
+document.getElementById('typing').addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = this.selectionStart;
+    const e2 = this.selectionEnd;
+    this.value = this.value.slice(0, s) + '    ' + this.value.slice(e2);
+    this.selectionStart = this.selectionEnd = s + 4;
+    onType();
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// 초기화
+// ─────────────────────────────────────────────────────────────────
+buildSidebar();
+loadSection(0);
+</script>
+</body>
+</html>

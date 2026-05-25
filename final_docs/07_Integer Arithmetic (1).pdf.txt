@@ -1,0 +1,1221 @@
+
+===== PAGE 1 =====
+System Programming
+Integer Arithmetic
+Dongwann
+Kang
+Associate
+Professor
+Department of Computer Science and Engineering
+===== PAGE 2 =====
+Shift and Rotate Instructions
+•
+ Bit shifting means to move bits right and left inside an operand
+•
+ x86 processors provide a particularly rich set of instructions in this area
+–
+ All affect the Overflow and Carry flags
+
+===== PAGE 3 =====
+Shift and Rotate Instructions
+•
+ 1. Logical Shifts and Arithmetic Shifts
+–
+ Two ways to shift an operand’s bits
+1.
+ Logical shift
+–
+ This shift fills the newly created bit position with zero
+–
+ A byte is logically shifted one position to the right
+–
+ Each bit is moved to the next lowest bit position
+–
+ Note that bit 7 is assigned 0
+–
+ E.g.) A single logical right shift on the binary value 11001111, producing 01100111
+»
+ The lowest bit is shifted into the Carry flag
+
+===== PAGE 4 =====
+Shift and Rotate Instructions
+•
+ 1. Logical Shifts and Arithmetic Shifts
+–
+ Two ways to shift an operand’s bits
+2.
+ Arithmetic shift
+–
+ The newly created bit position is filled with a copy of the original number’s sign bit
+–
+ E.g.) Binary 11001111 which has a 1 in the sign bit
+»
+ When shifted arithmetically 1 bit to the right, it becomes 11100111
+
+===== PAGE 5 =====
+Shift and Rotate Instructions
+•
+ 2. SHL (shift left) Instruction
+–
+ Performs a logical left shift on the destination operand, filling the lowest bit with 0
+–
+ The highest bit is moved to the Carry flag, and the bit that was in the Carry flag is discarded
+–
+ E.g.) If you shift 11001111 left by 1 bit, it becomes 10011110
+–
+ Instruction format
+•
+•
+–
+ x86 processors permit imm8 to be any integer between 0 and 255
+–
+ Alternatively, the CL register can contain a shift count
+
+===== PAGE 6 =====
+Shift and Rotate Instructions
+•
+ 2. SHL (shift left) Instruction
+–
+ Example
+•
+ BL is shifted once to the left
+•
+ The highest bit is copied into the Carry 
+flag
+and the lowest bit position is assigned zero
+•
+ When a value is shifted leftward multiple times, the CF contains the last bit to be shifted out of the MSB
+•
+ Bit 7 does not end up in the CF because it is replaced by bit 6 (a zero)
+•
+ Similarly, when a value is shifted rightward multiple times, the CF contains the last bit to be shifted out of the 
+LSB
+
+===== PAGE 7 =====
+Shift and Rotate Instructions
+•
+ 2. SHL (shift left) Instruction
+–
+ Bitwise Multiplication
+•
+ Bitwise multiplication is performed when you shift a number’s bits in a leftward direction (toward the MSB) 
+–
+ E.g.) SHL can perform multiplication by powers of 2
+•
+ Shifting any operand left by 𝑛
+ bits multiplies the operand by 2𝑛
+–
+ E.g.) Shifting the integer 5
+ left by 1
+ bit yields the product of 5 × 21 = 10
+–
+ E.g.) If binary 00001010 (decimal 10
+) is shifted left by two bits, the result is the same as multiplying 10
+ by 22
+
+===== PAGE 8 =====
+Shift and Rotate Instructions
+•
+ 3. SHR (shift right) Instruction
+–
+ performs a logical right shift on the destination operand, replacing the highest bit with a 0
+–
+ The lowest bit is copied into the Carry flag, and the bit that was previously in the Carry flag is lost
+–
+ SHR uses the same instruction formats as SHL
+–
+ Examples 
+•
+ The 0 from the lowest bit in AL is copied into the CF, and the highest bit in AL is filled with a zero
+•
+ In a multiple shift operation, the last bit to be shifted out of position 0 (the LSB) ends up in the Carry flag
+
+===== PAGE 9 =====
+Shift and Rotate Instructions
+•
+ 3. SHR (shift right) Instruction
+–
+ Bitwise Division
+•
+ Bitwise division is accomplished when you shift a number’s bits in a rightward direction (toward the LSB) 
+•
+ Shifting an unsigned integer right by 𝑛
+ bits divides the operand by 2𝑛
+•
+ E.g.) 32
+ is divided by 21
+, producing 16
+•
+ E.g.) 32
+ is divided by 23
+•
+ Division of signed numbers by shifting is accomplished using the SAR instruction because it preserves the 
+number’s sign bit
+
+===== PAGE 10 =====
+Shift and Rotate Instructions
+•
+ 4. SAL (shift arithmetic left) and SAR (shift arithmetic right) Instructions
+–
+ The SAL instruction works the same as the SHL instruction
+•
+ For each shift count, SAL shifts each bit in the destination operand to the next highest bit position
+•
+ The lowest bit is assigned 0
+•
+ The highest bit is moved to the Carry flag, and the bit that was in the Carry flag is discarded
+•
+ E.g.) If you shift binary 11001111 to the left by one bit, it becomes 10011110
+–
+ The SAR instruction performs a right arithmetic shift on its destination operand
+
+===== PAGE 11 =====
+Shift and Rotate Instructions
+•
+ 4. SAL (shift arithmetic left) and SAR (shift arithmetic right) Instructions
+–
+ Example
+•
+ This example shows how SAR duplicates the sign bit
+•
+ AL is negative before and after it is shifted to the right
+–
+ Signed Division 
+•
+ You can divide a signed operand by a power of 2
+, using the SAR instruction
+•
+ In the following example, −128
+ is divided by 23
+. The quotient is −16
+–
+ Sign
+-
+Extend AX into EAX 
+•
+ Suppose AX contains a signed integer and you want to extend its sign into EAX
+•
+ First shift EAX 16
+ bits to the left, then shift it arithmetically 16
+ bits to the right
+
+===== PAGE 12 =====
+Shift and Rotate Instructions
+•
+ 5. ROL (rotate left) Instruction
+–
+ Bitwise rotation occurs when you move the bits in a circular fashion
+•
+ In some versions, the bit leaving one end of the number is immediately copied into the other end
+•
+ Another type of rotation uses the Carry flag as an intermediate point for shifted bits
+–
+ The ROL instruction shifts each bit to the left
+–
+ The highest bit is copied into the Carry flag and the lowest bit position
+–
+ Bit rotation does not lose bits
+•
+ A bit rotated off one end of a number appears again at the other end
+–
+ The following example shows how the high bit is copied into both the Carry flag and bit position 0
+
+===== PAGE 13 =====
+Shift and Rotate Instructions
+•
+ 5. ROL (rotate left) Instruction
+–
+ Multiple Rotations
+•
+ When using a rotation count greater than 1, the CF contains the last bit rotated out of the MSB position
+–
+ Exchanging Groups of Bits
+•
+ You can use ROL to exchange the upper (bits 4
+–
+7) and lower (bits 0
+–
+3) halves of a byte
+–
+ E.g.) 26h rotated four bits in either direction becomes 62h
+•
+ When rotating a multibyte integer by four bits, the effect is to rotate each hexadecimal digit one position to the 
+right or left
+–
+ E.g.) Here, we repeatedly rotate 6A4Bh left four bits, eventually ending up with the original value
+
+===== PAGE 14 =====
+Shift and Rotate Instructions
+•
+ 6. ROR (rotate right) Instruction
+–
+ The ROR instruction shifts each bit to the right and copies the lowest bit into the Carry flag and the 
+highest bit position
+–
+ Example
+–
+ Multiple Rotations
+•
+ When using a rotation count greater than 1, the CF contains the last bit rotated out of the LSB position
+
+===== PAGE 15 =====
+Shift and Rotate Instructions
+•
+ 7. RCL (rotate carry left) and RCR (rotate carry right) Instructions
+–
+ RCL shifts each bit to the left, copies the CF to the LSB, and copies the MSB into the CF
+–
+ If we imagine the CF as an extra bit added to the high end of the operand, RCL looks like a rotate left 
+operation
+–
+ Example
+•
+ The CLC instruction clears the CF
+•
+ The first RCL instruction moves the high bit of BL into the CF and shifts the other bits left
+•
+ The second RCL instruction moves the CF into the lowest bit position and shifts the other bits left
+
+===== PAGE 16 =====
+Shift and Rotate Instructions
+•
+ 7. RCL (rotate carry left) and RCR (rotate carry right) Instructions
+–
+ Recover a Bit from the Carry Flag
+•
+ RCL can recover a bit that was previously shifted into the Carry flag
+•
+ The following example checks the lowest bit of 
+testval
+by shifting its lowest bit into the CF
+–
+ If the lowest bit of 
+testval
+is 1, a jump is taken
+–
+ If the lowest bit is 0, RCL restores the number to its original value
+–
+ RCR Instruction 
+•
+ The RCR instruction shifts each bit to the right, copies the CF into the MSB, and copies the LSB into the CF
+•
+ The following code example uses STC to set the CF; then, it performs a rotate carry right operation on the AH 
+register
+
+===== PAGE 17 =====
+Shift and Rotate Instructions
+•
+ 8. Signed Overflow
+–
+ The Overflow flag is set if the act of shifting or rotating a signed integer by one bit position generates a 
+value outside the signed integer range of the destination operand
+•
+ To put it another way, the number’s sign is reversed
+–
+ The value of the Overflow flag is undefined when the shift or rotation count is greater than 1
+–
+ Examples
+•
+ A positive integer (+127
+) stored in an 8
+-
+bit register becomes negative (−2
+) when rotated left
+•
+ Similarly, when – 128
+ is shifted one position to the right, the Overflow flag is set
+•
+ The result in AL (+64
+) has the opposite sign
+
+===== PAGE 18 =====
+Shift and Rotate Instructions
+•
+ 9. SHLD (shift left double) / SHRD (shift right double) Instructions
+–
+ The SHLD instruction 
+•
+ The SHLD shifts a destination operand a given number of bits to the left
+•
+ The bit positions 
+opened up
+by the shift are filled by the MSBs of the source operand
+•
+ The source operand is not affected, but the Sign, Zero, Auxiliary, Parity, and Carry flags are affected
+–
+ The illustration shows the execution of SHLD with a shift count of 1
+–
+ The highest bit of the source operand is copied into the lowest bit of the destination operand
+–
+ All the destination operand bits are shifted left
+
+===== PAGE 19 =====
+•
+ 9. SHLD (shift left double) / SHRD (shift right double) Instructions
+–
+ The SHRD instruction 
+•
+ The SHRD shifts a destination operand a given number of bits to the right
+•
+ The bit positions 
+opened up
+by the shift are filled by the LSBs of the source operand
+–
+ The illustration shows the execution of SHRD with a shift count of 1
+–
+ Instruction formats
+•
+ The destination operand can be a register or memory operand
+•
+ The source operand must be a register
+•
+ The count operand can be the CL register or an 8
+-
+bit immediate operand
+Shift and Rotate Instructions
+
+===== PAGE 20 =====
+Shift and Rotate Instructions
+•
+ 9. SHLD (shift left double) / SHRD (shift right double) Instructions
+–
+ Example 1
+•
+ The following statements shift 
+wval
+to the left 4 bits and insert the high 4 bits of AX into the low 
+4 bit
+positions of 
+wval
+–
+ Example 2 
+•
+ AX is shifted to the right 4 bits, and the low 4 bits of DX are shifted into the high 4 positions of AX
+
+===== PAGE 21 =====
+Shift and Rotate Instructions
+•
+ 9. SHLD (shift left double) / SHRD (shift right double) Instructions
+–
+ Applications
+•
+ SHLD and SHRD can be used to manipulate bit
+-
+mapped images, when groups of bits must be shifted left and right to 
+reposition images on the screen
+•
+ Another potential application is data encryption, in which the encryption algorithm involves the shifting of bits
+•
+ Finally, the two instructions can be used when performing fast multiplication and division with very long integers
+•
+ E.g.) shifting an array of doublewords to the right by 4 bits
+
+===== PAGE 22 =====
+Shift and Rotate Applications
+•
+ 1. Shifting Multiple Doublewords
+–
+ You can shift an extended
+-
+precision integer that has been divided into an array of bytes, words, or 
+doublewords
+–
+ A common way to store the integer (little
+-
+endian order)
+•
+ Place the low
+-
+order byte at the array’s starting address
+•
+ Then, working your way up from that byte to the high
+-
+order byte, store each in the next sequential memory 
+location
+•
+ Instead of storing the array as a series of bytes, you could store it as a series of words or doublewords
+•
+ If you did so, the individual bytes would still be in little
+-
+endian order, because x86 machines store words and 
+doublewords in little
+-
+endian order
+===== PAGE 23 =====
+Shift and Rotate Applications
+•
+ 1. Shifting Multiple Doublewords
+–
+ How to shift an array of bytes 1 bit to the right
+•
+ Step 1: Shift the highest byte at [ESI+2] to the right, automatically copying its lowest bit into the CF
+•
+ Step 2: Rotate the value at [ESI+1] to the right, filling the highest bit with the value of the CF, and shifting the 
+lowest bit into the CF
+
+===== PAGE 24 =====
+Shift and Rotate Applications
+•
+ 1. Shifting Multiple Doublewords
+–
+ How to shift an array of bytes 1 bit to the right
+•
+ Step 3: Rotate the value at [ESI] to the right, filling the highest bit with the value of the CF, and shifting the 
+lowest bit into the CF
+•
+ After Step 3 is complete, all bits have been shifted 1 position to the right
+
+===== PAGE 25 =====
+Shift and Rotate Applications
+•
+ 1. Shifting Multiple Doublewords
+–
+ Assembly language code
+•
+ Although this example only shifts 3 bytes, the example could easily be modified to shift an array of words or 
+doublewords
+•
+ Using a loop, you could shift an array of arbitrary size
+
+===== PAGE 26 =====
+Shift and Rotate Applications
+•
+ 2. Binary Multiplication
+–
+ Sometimes programmers squeeze every performance advantage they can into integer multiplication by 
+using bit shifting rather than the MUL instruction
+–
+ The SHL instruction performs unsigned multiplication when the multiplier is a power of 2
+•
+ Shifting an unsigned integer 𝑛
+ bits to the left multiplies it by 2𝑛
+•
+ Any other multiplier can be expressed as the sum of powers of 2
+•
+ E.g.) To multiply unsigned EAX by 36
+, we can write 36
+ as 25
+ + 22
+ and use the distributive property of 
+multiplication
+
+===== PAGE 27 =====
+Shift and Rotate Applications
+•
+ 2. Binary Multiplication
+–
+ The following example shows the multiplication 123 × 36
+, producing 4428
+•
+ Bits 2 and 5 are set in the multiplier (36), and the integers 2 and 5 are also the required shift counters
+•
+ Using this information, the following code multiplies 123 by 36, using SHL and ADD instructions
+
+===== PAGE 28 =====
+Shift and Rotate Applications
+•
+ 3. Displaying Binary Bits
+–
+ Converting a binary integer to an ASCII binary string, allowing the latter to be displayed
+•
+ The SHL instruction is useful in this regard because it copies the highest bit of an operand into the CF each time 
+the operand is shifted left
+•
+ The following procedure is a simple implementation
+
+===== PAGE 29 =====
+Shift and Rotate Applications
+•
+ 4. Extracting File Date Fields
+–
+ When storage space is at a premium, system
+-
+level software often packs multiple data fields into a single 
+integer
+–
+ To uncover this data, applications often need to extract sequences of bits called 
+bit strings
+–
+ E.g.) in real
+-
+address mode, MS
+-
+DOS function 57h returns the date stamp of a file in DX
+•
+ The date stamp shows the date on which the file was last modified
+•
+ Bits 0 through 4 represent a day number between 1 and 31
+•
+ Bits 5 through 8 are the month number
+•
+ Bits 9 through 15 hold the year number
+•
+ If a file was last modified on March 10, 1999, the file’s date stamp would appear as follows in the DX register (the 
+year number is relative to 1980)
+
+===== PAGE 30 =====
+Shift and Rotate Applications
+•
+ 4. Extracting File Date Fields
+–
+ E.g.) in real
+-
+address mode, MS
+-
+DOS function 57h returns the date stamp of a file in DX
+•
+ To extract a single bit string, shift its bits into the lowest part of a register and clear the irrelevant bits
+–
+ Extracting the day number field
+–
+ Extracting the month number field
+–
+ Extracting the year number field
+
+===== PAGE 31 =====
+Multiplication and Division Instructions
+•
+ 1. MUL (unsigned multiply) Instruction
+–
+ The MUL instruction comes in three versions
+•
+ The 1
+st
+ version multiplies an 8
+-
+bit operand by the AL register
+•
+ The 2
+nd
+ version multiplies a 16
+-
+bit operand by the AX register
+•
+ The 3
+rd
+ version multiplies a 32
+-
+bit operand by the EAX register
+–
+ The three formats accept register and memory operands, but not immediate operands
+–
+ The multiplier and multiplicand must always be the same size, and the product is twice their size
+•
+ So, overflow cannot occur
+–
+ MUL sets the Carry and Overflow flags if the upper half of the product is not equal to zero
+•
+ E.g.) When AX is multiplied by a 16
+-
+bit operand, the product is stored in the combined DX and AX registers
+–
+ The CF is set if DX is not equal to zero, which lets us know that the product will not fit into the lower half of the implied
+destination operand
+
+===== PAGE 32 =====
+Multiplication and Division Instructions
+•
+ 1. MUL (unsigned multiply) Instruction
+–
+ MUL Examples
+•
+ Multiplying AL by BL, storing the product in AX
+–
+ The Carry flag is clear (CF = 0) because AH (the upper half of the product) equals zero
+•
+ Multiplying the 16
+-
+bit value 2000h by 0100h
+–
+ The CF is set because the upper part of the product (located in DX) is not equal to zero
+•
+ Multiplying 12345h by 1000h, producing a 64
+-
+bit product in the combined EDX and EAX registers
+–
+ The Carry flag is clear because the upper half of the product in EDX equals zero
+
+===== PAGE 33 =====
+Multiplication and Division Instructions
+•
+ 2. IMUL (signed multiply) Instruction
+–
+ The IMUL instruction performs signed integer multiplication
+–
+ Unlike the MUL instruction, IMUL preserves the sign of the product
+•
+ It sign
+-
+extends the highest bit of the lower half of the product into the upper bits of the product
+–
+ The x86 instruction set supports three formats for the IMUL instruction
+•
+ One operand, two operands, and three operands
+•
+ In the one
+-
+operand format, the multiplier and multiplicand are the same size and the product is twice their size
+–
+ Single
+-
+Operand Formats
+•
+ The one
+-
+operand formats store the product in AX, DX:AX, or EDX:EAX
+•
+ The storage size of the product makes overflow impossible
+•
+ The CF and OF are set if the upper half of the product is not a sign extension of the lower half
+–
+ You can use this information to decide whether to ignore the upper half of the product
+
+===== PAGE 34 =====
+Multiplication and Division Instructions
+•
+ 2. IMUL (signed multiply) Instruction
+–
+ Two
+-
+Operand Formats
+•
+ The two
+-
+operand version stores the product in the first operand, which must be a register
+•
+ The second operand (the multiplier) can be a register, a memory operand, or an immediate value
+•
+ The two
+-
+operand formats truncate the product to the length of the destination
+•
+ If significant digits are lost, the OF and CF are set
+–
+ Be sure to check one of these flags after performing an IMUL operation with two operands
+–
+ Three
+-
+Operand Formats
+•
+ The three
+-
+operand formats store the product in the first operand
+•
+ The second operand can be a register or memory operand, which is multiplied by the third operand, an 
+immediate value
+•
+ If significant digits are lost when IMUL executes, the OF and CF are set
+–
+ Be sure to check one of these flags after performing an IMUL operation with three operands
+
+===== PAGE 35 =====
+Multiplication and Division Instructions
+•
+ 2. IMUL (signed multiply) Instruction
+–
+ Unsigned Multiplication
+•
+ The two
+-
+operand and three
+-
+operand IMUL formats may also be used for unsigned multiplication because the 
+lower half of the product is the same for signed and unsigned numbers
+•
+ A small disadvantage
+–
+ The Carry and Overflow flags will not indicate whether the upper half of the product equals zero
+–
+ IMUL Examples
+•
+ Multiplying 48
+ by 4
+, producing +192
+ in AX
+–
+ Although the product is correct, AH is not a sign extension of AL, so the Overflow flag is set
+•
+ Multiplying  −4
+ by 4
+, producing −16
+ in AX
+–
+ AH is a sign extension of AL, so the Overflow flag is clear
+
+===== PAGE 36 =====
+Multiplication and Division Instructions
+•
+ 2. IMUL (signed multiply) Instruction
+–
+ IMUL Examples
+•
+ 32
+-
+bit signed multiplication (−4,823,424 × −423
+), producing −2,040,308,352
+ in EDX:EAX
+–
+ The Overflow flag is clear because EDX is a sign extension of EAX
+•
+ Two
+-
+operand formats
+
+===== PAGE 37 =====
+Multiplication and Division Instructions
+•
+ 2. IMUL (signed multiply) Instruction
+–
+ IMUL Examples
+•
+ The two
+-
+operand and three
+-
+operand IMUL instructions use a destination operand that is the same size as the 
+multiplier
+–
+ Therefore, it is possible for signed overflow to occur
+–
+ Always check the OF after executing these types of IMUL instructions
+•
+ The following two
+-
+operand instructions demonstrate signed overflow because −64,000
+ cannot fit within the 16
+-
+bit destination operand
+•
+ The following instructions demonstrate three
+-
+operand formats, including an example of signed overflow
+
+===== PAGE 38 =====
+Multiplication and Division Instructions
+•
+ 3. Measuring Program Execution Times
+… 
+===== PAGE 39 =====
+Multiplication and Division Instructions
+•
+ 3. Measuring Program Execution Times
+–
+ Comparing MUL and IMUL to Bit Shifting
+•
+ In older x86 processors, there was a significant difference in performance between multiplication by bit shifting 
+vs. multiplication using the MUL and IMUL instructions
+•
+ The
+resulting
+timings
+on
+a
+ legacy
+4
+-
+GHz
+Pentium
+4
+ showed
+that
+the
+SHL
+approach
+executed
+in
+6
+.
+078
+ seconds
+and
+the
+ MUL
+ approach
+executed
+in
+20
+.
+718
+seconds
+•
+ However,
+when
+running
+the
+ same
+program
+on
+a
+ more
+recent
+processor,
+the
+ timings
+of
+both
+function
+calls
+were
+exactly
+the
+same
+•
+ This
+example
+shows
+that
+Intel
+has
+managed
+to
+greatly
+optimize
+the
+MUL
+ and
+IMUL
+instructions
+in
+recent
+processors
+===== PAGE 40 =====
+Multiplication and Division Instructions
+•
+ 4. DIV (unsigned divide) Instruction
+–
+ DIV instruction performs 8
+-
+bit, 16
+-
+bit, and 32
+-
+bit unsigned integer division
+–
+ The single register or memory operand is the divisor
+
+===== PAGE 41 =====
+Multiplication and Division Instructions
+•
+ 4. DIV (unsigned divide) Instruction
+–
+ DIV Examples
+•
+ 8
+-
+bit unsigned division (83h/2), producing a quotient of 41h and a remainder of 1
+•
+ 16
+-
+bit unsigned division (8003h/100h), producing a quotient of 80h and a remainder of 3
+–
+ DX contains the high part of the dividend, so it must be cleared before the DIV instruction executes
+
+===== PAGE 42 =====
+Multiplication and Division Instructions
+•
+ 4. DIV (unsigned divide) Instruction
+–
+ DIV Examples
+•
+ 32
+-
+bit unsigned division using a memory operand as the divisor
+
+===== PAGE 43 =====
+Multiplication and Division Instructions
+•
+ 5. Signed Integer Division
+–
+ Signed integer division is nearly identical to unsigned division, with one important difference:
+•
+ The dividend must be sign
+-
+extended before the division takes place
+–
+ Sign Extension Instructions (CBW, CWD, CDQ)
+•
+ The CBW (convert byte to word) extends the sign bit of AL into AH, preserving the number’s sign
+•
+ The CWD (convert word to doubleword) instruction extends the sign bit of AX into DX
+•
+ The CDQ (convert doubleword to quadword) instruction extends the sign bit of EAX into EDX
+
+===== PAGE 44 =====
+Multiplication and Division Instructions
+•
+ 5. Signed Integer Division
+–
+ The IDIV (signed divide) Instruction
+•
+ The IDIV instruction performs signed integer division, using the same operands as DIV
+•
+ Before executing 8
+-
+bit division, the dividend (AX) must be completely sign
+-
+extended
+•
+ The remainder always has the same sign as the dividend
+•
+ Example 1
+–
+ The following instructions divide 
+-
+48 by 5
+–
+ After IDIV executes, the quotient in AL is 
+-
+9 and the remainder in AH is 
+-
+3
+
+===== PAGE 45 =====
+Multiplication and Division Instructions
+•
+ 5. Signed Integer Division
+–
+ The IDIV (signed divide) Instruction
+•
+ Example 2
+–
+ 16
+-
+Bit division requires AX to be sign
+-
+extended into DX
+–
+ The next example divides 
+-
+5000 by 256
+•
+ Example 3
+–
+ 32
+-
+Bit division requires EAX to be sign
+-
+extended into EDX
+–
+ The next example divides 50,000 by 
+-
+256
+All arithmetic status flag values are undefined after executing DIV and IDIV
+===== PAGE 46 =====
+Multiplication and Division Instructions
+•
+ 5. Signed Integer Division
+–
+ Divide Overflow
+•
+ If a division operand produces a quotient that will not fit into the destination operand, a 
+divide overflow
+condition 
+results
+–
+ This causes a processor exception and halts the current program
+–
+ E.g.) A divide overflow: the quotient (100h) is too large for the 8
+-
+bit AL destination register
+
+===== PAGE 47 =====
+Multiplication and Division Instructions
+•
+ 5. Signed Integer Division
+–
+ Divide Overflow
+•
+ If a division operand produces a quotient that will not fit into the destination operand, a 
+divide overflow
+condition 
+results
+–
+ This causes a processor exception and halts the current program
+–
+ E.g.) A divide overflow: the quotient (100h) is too large for the 8
+-
+bit AL destination register
+•
+ A suggestion
+–
+ Use a 32
+-
+bit divisor and 64
+-
+bit dividend to reduce the probability of a divide overflow condition
+–
+ E.g.) The divisor is EBX, and the dividend is placed in the 64
+-
+bit combined EDX and EAX registers
+•
+ To prevent division by zero, test the divisor before dividing
+
+===== PAGE 48 =====
+Multiplication and Division Instructions
+•
+ 6. Implementing Arithmetic Expressions
+–
+ The benefits of implementing arithmetic expressions
+•
+ You can learn how compilers optimize code
+•
+ Also, you can implement better error checking than a typical compiler by checking the size of the product 
+following multiplication operations
+–
+ Most high
+-
+level language compilers ignore the upper 32 bits of the product when multiplying two 32
+-
+bit operands
+–
+ In assembly language, however, you can use the Carry and Overflow flags to tell you when the product does not fit into 32 
+bits
+–
+ Example 1 
+•
+ A C++ statement using unsigned 32
+-
+bit integers:
+
+===== PAGE 49 =====
+Multiplication and Division Instructions
+•
+ 6. Implementing Arithmetic Expressions
+–
+ Example 2 
+•
+ A C++ statement using unsigned 32
+-
+bit integers:
+–
+ Example 3 
+•
+ A C++ statement using signed 32
+-
+bit integers:
+
+===== PAGE 50 =====
+Extended Addition and Subtraction
+•
+ 1. ADC (add with carry) Instruction
+–
+ The ADC adds both a source operand and the contents of the Carry flag to a destination operand
+–
+ The instruction formats are the same as for the ADD instruction
+–
+ Operands must be the same size
+–
+ E.g.) Add two 8
+-
+bit integers (
+FFh
++ 
+FFh
+), producing a 16
+-
+bit sum in DL:AL, which is 01FEh
+
+===== PAGE 51 =====
+Extended Addition and Subtraction
+•
+ 1. ADC (add with carry) Instruction
+–
+ The ADC adds both a source operand and the contents of the Carry flag to a destination operand
+–
+ The instruction formats are the same as for the ADD instruction
+–
+ Operands must be the same size
+–
+ E.g.) add two 32
+-
+bit integers (
+FFFFFFFFh
++ 
+FFFFFFFFh
+), producing a 64
+-
+bit sum in EDX:EAX: 
+00000001FFFFFFFEh
+
+===== PAGE 52 =====
+Extended Addition and Subtraction
+•
+ 2. Extended Addition Example
+–
+ This procedure adds two extended integers of the same size
+•
+ Using a loop, it works its way through the two extended integers as if they were parallel arrays
+•
+ As it adds each matching pair of values in the arrays, it includes the value of the carry from the addition that was 
+performed during the previous iteration of the loop
+•
+ Our implementation assumes that the integers are stored as arrays of bytes
+
+===== PAGE 53 =====
+Extended Addition and Subtraction
+•
+ 2. Extended Addition Example
+–
+ This procedure adds two extended integers of the same size
+•
+ When lines 16 and 17 add the first two low
+-
+order bytes, the addition might set the Carry flag
+•
+ Therefore, it’s important to save the Carry flag by pushing it on the stack on line 18, because we will need it 
+when the loop repeats
+
+===== PAGE 54 =====
+Extended Addition and Subtraction
+•
+ 2. Extended Addition Example
+–
+ This procedure adds two extended integers of the same size
+•
+ Line 19 saves the first byte of the sum, and lines 20
+–
+22 advance all three pointers (for the two operands and the 
+sum array)
+•
+ Line 23 restores the Carry flag, and line 24 continues the loop back to line 16
+•
+ As the loop repeats, line 17 adds the next pair of bytes, and includes the value of the Carry flag
+–
+ So if a Carry had been generated during the first pass through the loop, that Carry would be included during the second 
+pass through the loop
+
+===== PAGE 55 =====
+Extended Addition and Subtraction
+•
+ 2. Extended Addition Example
+–
+ This procedure adds two extended integers of the same size
+•
+ Then, finally lines 26 and 27 look for any Carry that was generated when the two highest bytes of the operand 
+were added, and adds this Carry to the extra byte in the sum operand
+
+===== PAGE 56 =====
+Extended Addition and Subtraction
+•
+ 2. Extended Addition Example
+–
+ The following sample code calls the procedure we implemented, passing it two 8
+-
+byte integers
+–
+ We are careful to allocate an extra byte for the sum
+
+===== PAGE 57 =====
+Extended Addition and Subtraction
+•
+ 3. SBB (subtract with borrow) Instruction
+–
+ The SBB subtracts both a source operand and the value of the Carry flag from a destination operand
+–
+ The possible operands are the same as for the ADC instruction
+–
+ E.g.) The following example code carries out 64
+-
+bit subtraction with 32
+-
+bit operands

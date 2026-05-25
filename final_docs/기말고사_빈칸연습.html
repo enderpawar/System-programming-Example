@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템 프로그래밍 기말 — 빈칸 채우기 연습</title>
+<style>
+  :root{
+    --ink:#000; --paper:#fff; --line:#000;
+    --soft:#666; --rule:#ccc; --fill:#ececec;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; color:var(--ink); background:var(--paper);
+    font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* ── 상단 ── */
+  header{
+    border-bottom:2px solid var(--line);
+    padding:34px 24px 22px;
+    max-width:920px; margin:0 auto;
+  }
+  header h1{
+    font-size:24px; letter-spacing:-.01em; margin:0 0 6px;
+    font-weight:700;
+  }
+  header .sub{ color:var(--soft); font-size:14px; margin:0; }
+  header .scope{
+    margin-top:14px; font-size:13px; color:var(--ink);
+    display:flex; gap:18px; flex-wrap:wrap;
+  }
+  header .scope b{ font-weight:700; }
+  header .note{
+    margin-top:14px; font-size:12px; color:var(--soft);
+    border-left:3px solid var(--line); padding-left:10px;
+  }
+
+  /* ── 진행률 (sticky) ── */
+  .bar-wrap{
+    position:sticky; top:0; z-index:20;
+    background:var(--paper); border-bottom:1px solid var(--line);
+  }
+  .bar-inner{
+    max-width:920px; margin:0 auto; padding:10px 24px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .track{ flex:1; height:8px; border:1px solid var(--line); background:var(--paper); }
+  .fill{ height:100%; width:0%; background:var(--ink); transition:width .25s ease; }
+  .pct{ font-variant-numeric:tabular-nums; font-size:13px; min-width:118px; text-align:right; }
+  .bar-inner button{ flex:0 0 auto; }
+
+  /* ── 네비 ── */
+  nav.toc{
+    max-width:920px; margin:18px auto 0; padding:0 24px;
+    display:flex; flex-wrap:wrap; gap:8px;
+  }
+  nav.toc a{
+    text-decoration:none; font-size:12px; border:1px solid var(--line);
+    padding:4px 9px; color:var(--ink); white-space:nowrap;
+  }
+  nav.toc a:hover{ background:var(--ink); color:var(--paper); }
+  nav.toc .grp{ font-size:12px; color:var(--soft); align-self:center; margin-right:2px; }
+
+  main{ max-width:920px; margin:0 auto; padding:8px 24px 80px; }
+
+  h2.ch{
+    margin:46px 0 4px; font-size:18px; font-weight:700;
+    border-bottom:2px solid var(--line); padding-bottom:8px;
+  }
+  h2.ch span{ color:var(--soft); font-weight:400; font-size:13px; }
+
+  /* ── 문제 카드 ── */
+  .ex{ border:1px solid var(--line); margin-top:22px; }
+  .ex > h3{
+    margin:0; padding:12px 16px; font-size:15px; font-weight:700;
+    border-bottom:1px solid var(--line); display:flex; justify-content:space-between;
+    align-items:center; gap:12px; background:var(--paper);
+  }
+  .ex > h3 .stat{
+    font-size:12px; font-weight:400; color:var(--soft);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .ex pre{
+    margin:0; padding:16px; overflow-x:auto;
+    font-family:"Consolas","D2Coding","Courier New",monospace;
+    font-size:13.5px; line-height:1.95; white-space:pre-wrap; word-break:break-word;
+  }
+  .ex .toolbar{
+    display:flex; gap:8px; padding:0 16px 16px; flex-wrap:wrap;
+  }
+
+  /* ── 빈칸 입력 ── */
+  .bw{ display:inline-flex; align-items:baseline; gap:1px; }
+  input.bk{
+    font:inherit; font-family:"Consolas","D2Coding","Courier New",monospace;
+    border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    padding:0 5px; margin:0 1px; min-width:3.2ch; text-align:center;
+    line-height:1.5;
+  }
+  input.bk:focus{ outline:2px solid var(--ink); outline-offset:1px; }
+  .bw.correct input.bk{ background:var(--ink); color:var(--paper); }
+  .bw.wrong input.bk{ border-style:dashed; border-width:1px; }
+  .bw.revealed input.bk{ background:var(--fill); color:var(--ink); font-style:italic; }
+  .mk{ font-family:"Consolas","Courier New",monospace; font-size:12px; width:0; overflow:visible; }
+  .bw.correct .mk::after{ content:"✓"; }
+  .bw.wrong .mk::after{ content:"✗"; }
+
+  /* ── 버튼 ── */
+  button{
+    font-family:inherit; font-size:13px; cursor:pointer;
+    border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    padding:6px 14px;
+  }
+  button:hover{ background:var(--ink); color:var(--paper); }
+  button.solid{ background:var(--ink); color:var(--paper); }
+  button.solid:hover{ background:var(--paper); color:var(--ink); }
+
+  /* ── 범례 ── */
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap; font-size:12px; color:var(--soft);
+    max-width:920px; margin:16px auto 0; padding:0 24px;
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ display:inline-block; width:14px; height:14px; border:1px solid var(--line); }
+  .swatch.k{ background:var(--ink); }
+  .swatch.d{ border-style:dashed; }
+  .swatch.g{ background:var(--fill); }
+
+  footer{
+    max-width:920px; margin:0 auto; padding:24px; font-size:12px;
+    color:var(--soft); border-top:1px solid var(--rule);
+  }
+  @media(max-width:560px){
+    header,main,.bar-inner,nav.toc,.legend,footer{ padding-left:16px; padding-right:16px; }
+    .ex pre{ font-size:12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>시스템 프로그래밍 기말고사 — 빈칸 채우기 연습</h1>
+  <p class="sub">교재(Irvine x86) 표준 예제값 기준 · 어셈블 환경 없이 브라우저에서 바로 풀이</p>
+  <div class="scope">
+    <span><b>출제 범위</b></span>
+    <span>6장 — 조건 처리 (Conditional Processing)</span>
+    <span>7장 — 정수 산술 (Integer Arithmetic)</span>
+  </div>
+  <p class="note">빈칸에 답을 입력하고 <b>채점</b>을 누르세요. 대소문자·여백·괄호는 자동 무시되고, 동의어(예: JA / JNBE)도 정답 처리됩니다.</p>
+</header>
+
+<div class="bar-wrap">
+  <div class="bar-inner">
+    <div class="track"><div class="fill" id="globalFill"></div></div>
+    <div class="pct" id="globalPct">0 / 0 정답</div>
+    <button class="solid" onclick="checkAll()">전체 채점</button>
+    <button onclick="resetAll()">전체 지우기</button>
+  </div>
+</div>
+
+<nav class="toc" id="toc"></nav>
+
+<div class="legend">
+  <span><i class="swatch k"></i> 정답 ✓</span>
+  <span><i class="swatch d"></i> 오답 ✗</span>
+  <span><i class="swatch g"></i> 정답 보기(채점 제외)</span>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  연습용 학습 자료 · 6장·7장 예제 코드의 빈칸을 그대로 옮긴 것이며 모든 레지스터·플래그 값은 교재 예제와 일치합니다.
+</footer>
+
+<script>
+/* ───────── 문제 데이터 ─────────
+   body 안의 [[n]] 이 빈칸이 됩니다. ans[n][0] 이 '정답 보기'에 채워지는 값. */
+const EX = [
+/* ===== 6장 ===== */
+{
+  id:"e6_01", ch:6, title:"E6-01 · 불리언 &amp; 비교 명령어",
+  body:
+`[문제 1] 명령어별 플래그 영향
+
+  AND  → OF = [[1]] , CF = [[2]]
+  OR   → OF = 0     , CF = 0          (AND와 동일)
+  XOR  → OF = 0     , CF = 0          (AND와 동일)
+  NOT  → 플래그 영향 : [[3]]
+  TEST → 동작은 [[4]] 와 같지만 [[5]] 는 변하지 않음
+  CMP  → 동작은 [[6]] 과 같지만 피연산자는 변하지 않음
+
+[문제 2] 비트 마스킹 — 알맞은 명령어
+
+  · 특정 비트를 0으로 끄기(clear) → [[7]]
+  · 특정 비트를 1로 켜기(set)     → [[8]]
+  · 특정 비트를 토글(toggle)      → [[9]]
+
+[문제 3] 대문자 변환  ('a' 61h → 'A' 41h)
+
+  소문자와 대문자는 비트 [[10]] 만 다름
+  mov al, 'a'
+  and al, [[11]]b      ; 비트5를 끄는 8비트 마스크
+  ; → AL = [[12]]      ('A')
+
+[문제 4] 집합 연산
+
+  여집합(complement)   → [[13]]
+  교집합(intersection) → [[14]]
+  합집합(union)        → [[15]]
+
+  SetX = 80000007h, SetY = 00000101h 일 때
+  교집합 결과 EAX = [[16]]
+  합집합 결과 EAX = [[17]]
+
+[문제 5] XOR 가역성
+
+  (X XOR Y) XOR Y = [[18]]
+  → 같은 키로 [[19]] 번 XOR 하면 원래 값 복원
+  → 이 성질을 이용한 암호화 방식 : [[20]] 키 암호화
+
+[문제 6] CMP 결과 예측 (부호 없는)
+
+  mov ax, 5
+  cmp ax, 10     ; CF = [[21]]   ZF = [[22]]
+
+  mov ax, 1000
+  cmp ax, 1000   ; CF = [[23]]   ZF = [[24]]
+
+  mov ax, 105
+  cmp ax, 0      ; CF = [[25]]   ZF = [[26]]`,
+  ans:{
+    1:["0"], 2:["0"], 3:["영향 없음","없음","영향없음","none"],
+    4:["AND"], 5:["목적지 피연산자","목적지","목적지피연산자"], 6:["SUB","뺄셈","SUB(뺄셈)"],
+    7:["AND"], 8:["OR"], 9:["XOR"],
+    10:["5","비트5"], 11:["11011111","0DFh","DFh"], 12:["41h","041h"],
+    13:["NOT"], 14:["AND"], 15:["OR"], 16:["00000001h","1h","1"], 17:["80000107h"],
+    18:["X"], 19:["2","두","두번"], 20:["대칭","symmetric","대칭키"],
+    21:["1"], 22:["0"], 23:["0"], 24:["1"], 25:["0"], 26:["0"]
+  }
+},
+{
+  id:"e6_02", ch:6, title:"E6-02 · 조건부 점프 (Jcond)",
+  body:
+`[문제 1] 조건부 점프 4분류 — 점프 명령
+
+  (부호 없는 비교)            (부호 있는 비교)
+  >  : [[1]]                  >  : [[5]]
+  >= : [[2]]                  >= : [[6]]
+  <  : [[3]]                  <  : [[7]]
+  <= : [[4]]                  <= : [[8]]
+
+  ★ 부호 없는 → [[9]] / [[10]] 로 시작
+    부호 있는 → [[11]] / [[12]] 로 시작
+
+[문제 2] 동치 관계
+
+  JE  = [[13]]      (둘 다 ZF=1 이면 점프)
+  JNE = [[14]]      (둘 다 ZF=0 이면 점프)
+
+[문제 3] 두 정수 중 큰 값 (부호 없는)  — EAX, EBX 중 큰 값을 EDX 로
+
+  mov edx, eax          ; EAX가 크다고 가정
+  cmp eax, ebx
+  [[15]] L1             ; EAX >= EBX 이면 L1
+  mov edx, ebx
+  L1:
+
+[문제 4] 세 정수 중 최솟값 (부호 없는)  — V1=30, V2=10, V3=20
+
+  mov ax, V1
+  cmp ax, V2
+  [[16]] L1             ; AX <= V2 이면 L1
+  mov ax, V2
+  L1:
+  cmp ax, V3
+  [[17]] L2             ; AX <= V3 이면 L2
+  mov ax, V3
+  L2:
+  ; AX = [[18]]         (최솟값)
+
+[문제 5] 조건 구조 구현의 2단계
+
+  1) [[19]], AND, SUB 등이 CPU 상태 [[20]] 를 변경
+  2) [[21]] 점프 명령이 그 플래그를 검사하여 분기`,
+  ans:{
+    1:["JA","JNBE"], 2:["JAE","JNB"], 3:["JB","JNAE"], 4:["JBE","JNA"],
+    5:["JG","JNLE"], 6:["JGE","JNL"], 7:["JL","JNGE"], 8:["JLE","JNG"],
+    9:["A","Above"], 10:["B","Below"], 11:["G","Greater"], 12:["L","Less"],
+    13:["JZ"], 14:["JNZ"], 15:["JAE","JNB"], 16:["JBE","JNA"], 17:["JBE","JNA"], 18:["10"],
+    19:["CMP"], 20:["플래그","flags","플래그(flags)"], 21:["조건부","conditional"]
+  }
+},
+{
+  id:"e6_03", ch:6, title:"E6-03 · 조건 구조 &amp; 조건부 루프",
+  body:
+`[문제 1] IF-ELSE 변환   if (op1 == op2) X=1; else X=2;
+
+  mov eax, op1
+  cmp eax, op2
+  [[1]] L1              ; 다르면 ELSE로 (조건을 반대로 뒤집음)
+  mov X, 1
+  [[2]] L2              ; then 끝나면 건너뜀
+  L1: mov X, 2
+  L2:
+
+[문제 2] 복합 조건 AND   if (al > 10 && al < 20) X=1;
+
+  cmp al, 10
+  [[3]] next            ; al <= 10 이면 거짓 → 탈출
+  cmp al, 20
+  [[4]] next            ; al >= 20 이면 거짓 → 탈출
+  mov X, 1
+  next:
+
+  ※ 첫 조건이 거짓이면 둘째를 평가하지 않는 것을 [[5]] 평가라 함
+
+[문제 3] WHILE 변환   while (val1 < val2) val1++;   (부호 있는)
+
+  mov eax, val1
+  beginwhile:
+    cmp eax, val2
+    [[6]] endwhile      ; val1 >= val2 이면 종료
+    inc eax
+    jmp beginwhile
+  endwhile:
+
+  ※ 변수끼리는 직접 비교 불가 → 한쪽을 [[7]] 로 옮긴다
+
+[문제 4] 조건부 루프 명령어
+
+  LOOPE / LOOPZ   : ECX-- 후 (ECX != 0) 그리고 (ZF = [[8]]) 이면 점프
+  LOOPNE / LOOPNZ : ECX-- 후 (ECX != 0) 그리고 (ZF = [[9]]) 이면 점프
+
+  ★ LOOPxx 명령은 ZF를 [[10]] → 직전 명령의 ZF를 사용
+  ★ ADD 등이 ZF를 덮어쓰므로 [[11]] / [[12]] 로 플래그 보존
+
+[문제 5] 고수준 제어 흐름 디렉티브
+
+  IF 문                    : .IF / .ELSEIF / .ELSE / [[13]]
+  조건 먼저 검사하는 루프  : .WHILE / [[14]]
+  몸체 먼저 실행 후 검사   : .REPEAT / [[15]]
+
+  ★ 레지스터끼리 .IF 로 비교하면 MASM은 기본적으로
+    [[16]] 비교(JBE 등)를 생성한다`,
+  ans:{
+    1:["JNE","JNZ"], 2:["JMP"], 3:["JBE","JNA"], 4:["JAE","JNB"],
+    5:["단축","short-circuit","단축평가","단락"], 6:["JNL","JGE"], 7:["레지스터","register"],
+    8:["1"], 9:["0"], 10:["만들지 않음","변경하지 않음","변경안함","변경하지않음","바꾸지 않음"],
+    11:["PUSHFD"], 12:["POPFD"],
+    13:[".ENDIF","ENDIF"], 14:[".ENDW","ENDW"], 15:[".UNTIL","UNTIL"],
+    16:["부호 없는","unsigned","부호없는"]
+  }
+},
+/* ===== 7장 ===== */
+{
+  id:"e7_01", ch:7, title:"E7-01 · 시프트 &amp; 로테이트",
+  body:
+`[문제 1] 명령어 동작
+
+  SHL : 왼쪽 논리시프트, 최하위에 [[1]] 채움, 최상위 → [[2]]
+  SHR : 오른쪽 논리시프트, 최상위에 [[3]] 채움
+  SAR : 오른쪽 산술시프트, 빈자리를 [[4]] 비트로 채움 (부호 보존)
+  ROL : 왼쪽 회전, 최상위 비트가 [[5]] 자리와 CF로 복사
+  RCL : [[6]] 를 포함한 왼쪽 회전
+
+  ★ 모든 시프트/로테이트가 영향을 주는 두 플래그 : [[7]] , [[8]]
+
+[문제 2] 시프트로 곱셈 / 나눗셈
+
+  왼쪽 n비트 시프트 = × [[9]]
+  오른쪽 n비트 시프트(부호 없는) = ÷ [[10]]
+  부호 있는 나눗셈에는 [[11]] 명령을 써야 부호가 보존됨
+
+  mov al, 10
+  shl al, 2      ; AL = [[12]]   (10 × 4)
+
+  mov dl, -128
+  sar dl, 3      ; DL = [[13]]   (-128 ÷ 8)
+
+[문제 3] 이진 곱셈 (SHL+ADD)   123 × 36,   36 = 2^5 + 2^[[14]]
+
+  mov eax, 123
+  mov ebx, eax
+  shl eax, [[15]]    ; 123 × 32
+  shl ebx, [[16]]    ; 123 × 4
+  add eax, ebx       ; = [[17]]  (123 × 36)
+
+[문제 4] 파일 날짜 필드 추출
+  datestamp(266Ah) : 비트0~4=일, 비트5~8=월, 비트9~15=연도(1980 기준)
+
+  ; 일 추출
+  mov ax, datestamp
+  and ax, [[18]]b               ; 하위 5비트 마스크 → AX = 10
+
+  ; 월 추출
+  mov ax, datestamp
+  shr ax, [[19]]
+  and ax, 0000000000001111b     ; AX = 3
+
+  ; 연도 추출
+  mov ax, datestamp
+  shr ax, [[20]]
+  add ax, [[21]]                ; AX = 1999`,
+  ans:{
+    1:["0"], 2:["CF"], 3:["0"], 4:["부호","sign","부호 비트","부호비트"],
+    5:["최하위","최하위 비트","최하위비트","LSB"], 6:["CF"],
+    7:["OF","CF"], 8:["CF","OF"],
+    9:["2^n","2^N"], 10:["2^n","2^N"], 11:["SAR"], 12:["40"], 13:["-16","11110000b","11110000"],
+    14:["2"], 15:["5"], 16:["2"], 17:["4428"],
+    18:["0000000000011111","11111","1Fh"], 19:["5"], 20:["9"], 21:["1980"]
+  }
+},
+{
+  id:"e7_02", ch:7, title:"E7-02 · 곱셈 &amp; 나눗셈",
+  body:
+`[문제 1] MUL / IMUL 크기 규칙
+
+  8비트  : AL  × op → 결과는 [[1]]
+  16비트 : AX  × op → 결과는 [[2]]
+  32비트 : EAX × op → 결과는 [[3]]
+
+  · 곱은 피연산자의 [[4]] 배 크기 → 오버플로 불가
+  · MUL은 상위 절반이 0이 아니면 CF = [[5]] , OF = [[5]]
+
+[문제 2] DIV / IDIV 크기 규칙
+
+  8비트  : 피제수 [[6]]   / 몫 AL    / 나머지 [[7]]
+  16비트 : 피제수 [[8]]   / 몫 AX    / 나머지 DX
+  32비트 : 피제수 EDX:EAX / 몫 [[9]] / 나머지 EDX
+
+[문제 3] 부호 없는 나눗셈   83h / 2
+
+  mov ax, 0083h        ; 피제수 (AH = [[10]] 로 클리어 필수)
+  mov bl, 2
+  div bl               ; AL = [[11]] (몫), AH = [[12]] (나머지)
+
+  ★ DIV 전에 반드시 상위 절반(AH/DX/EDX)을 [[13]] 로 만든다
+
+[문제 4] 부호 확장 명령어
+
+  CBW : AL  → [[14]]
+  CWD : AX  → [[15]]
+  CDQ : EAX → [[16]]
+
+[문제 5] 부호 있는 나눗셈   -48 / 5
+
+  mov al, -48
+  [[17]]               ; AL을 AX로 부호 확장
+  mov bl, 5
+  idiv bl              ; AL = [[18]] (몫), AH = [[19]] (나머지)
+
+  ★ IDIV 나머지의 부호는 [[20]] 의 부호와 같다`,
+  ans:{
+    1:["AX"], 2:["DX:AX"], 3:["EDX:EAX"], 4:["2","두","두배","두 배"], 5:["1"],
+    6:["AX"], 7:["AH"], 8:["DX:AX"], 9:["EAX"],
+    10:["0"], 11:["41h","041h"], 12:["1"], 13:["0","클리어","zero"],
+    14:["AX"], 15:["DX","DX:AX"], 16:["EDX","EDX:EAX"],
+    17:["CBW"], 18:["-9"], 19:["-3"], 20:["피제수","dividend"]
+  }
+},
+{
+  id:"e7_03", ch:7, title:"E7-03 · 확장 덧셈 &amp; 뺄셈 (ADC / SBB)",
+  body:
+`[문제 1] ADC / SBB 의미
+
+  ADC 목적지, 소스 → 목적지 = 목적지 + 소스 + [[1]]
+  SBB 목적지, 소스 → 목적지 = 목적지 - 소스 - [[2]]
+
+  용도 : 레지스터 크기를 넘는 [[3]] 정수를 조각내어
+         [[4]] 를 다음 조각으로 전달하며 계산
+
+[문제 2] 8비트 합을 16비트로   (FFh + FFh)
+
+  mov dl, 0
+  mov al, 0FFh
+  add al, 0FFh      ; AL = [[5]], CF = [[6]]
+  [[7]] dl, 0       ; DL = 0 + 0 + CF = [[8]]
+  ; → DL:AL = [[9]]   (255 + 255 = 510)
+
+[문제 3] 32비트 합을 64비트로   (0FFFFFFFFh + 0FFFFFFFFh)
+
+  mov edx, 0
+  mov eax, 0FFFFFFFFh
+  add eax, 0FFFFFFFFh   ; EAX = FFFFFFFEh, CF = [[10]]
+  adc edx, 0            ; EDX = [[11]]
+  ; → EDX:EAX = [[12]]
+
+[문제 4] 64비트 뺄셈 (SBB)   EDX:EAX(=0000000100000000h) 에서 1 빼기
+
+  mov edx, 1
+  mov eax, 0
+  sub eax, 1            ; EAX = [[13]], CF = [[14]] (빌림)
+  [[15]] edx, 0        ; EDX = 1 - 0 - CF = [[16]]
+  ; → EDX:EAX = 00000000FFFFFFFFh`,
+  ans:{
+    1:["CF"], 2:["CF"], 3:["큰","확장","extended","큰 정수","확장 정수"],
+    4:["Carry","올림","캐리","올림/빌림","carry"],
+    5:["FEh","0FEh"], 6:["1"], 7:["ADC"], 8:["1"], 9:["01FEh","1FEh"],
+    10:["1"], 11:["1"], 12:["00000001FFFFFFFEh"],
+    13:["FFFFFFFFh","0FFFFFFFFh"], 14:["1"], 15:["SBB"], 16:["0"]
+  }
+}
+];
+
+/* ───────── 유틸 ───────── */
+function norm(s){
+  return (s||"").toString().trim().toUpperCase().replace(/\s+/g,"").replace(/[()]/g,"");
+}
+function esc(t){
+  return t.replace(/&amp;/g,"AMP")   // 데이터에 미리 쓴 &amp; 보존
+          .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+          .replace(/AMP/g,"&amp;");
+}
+function blanksOf(ex){ return Object.keys(ex.ans).length; }
+
+/* ───────── 렌더 ───────── */
+function inputHtml(ex,n){
+  const disp = ex.ans[n][0];
+  const w = Math.max(4, disp.length + 1);
+  return `<span class="bw" data-bw="${ex.id}-${n}">`
+       + `<input class="bk" data-ex="${ex.id}" data-n="${n}" `
+       + `style="width:${w}ch" autocomplete="off" autocapitalize="off" spellcheck="false" `
+       + `aria-label="빈칸 ${n}"><i class="mk"></i></span>`;
+}
+function renderBody(ex){
+  const html = esc(ex.body).replace(/\[\[(\d+)\]\]/g, (m,n)=>inputHtml(ex, n));
+  return html;
+}
+
+const main = document.getElementById("main");
+const toc  = document.getElementById("toc");
+let lastCh = 0;
+const tocGroups = {6:[], 7:[]};
+
+EX.forEach(ex=>{
+  if(ex.ch !== lastCh){
+    lastCh = ex.ch;
+    const h = document.createElement("h2");
+    h.className = "ch"; h.id = "ch"+ex.ch;
+    h.innerHTML = (ex.ch===6
+      ? `6장 · 조건 처리 <span>Conditional Processing</span>`
+      : `7장 · 정수 산술 <span>Integer Arithmetic</span>`);
+    main.appendChild(h);
+  }
+  const card = document.createElement("section");
+  card.className = "ex"; card.id = ex.id;
+  card.innerHTML =
+    `<h3>${ex.title}<span class="stat" id="stat-${ex.id}">0 / ${blanksOf(ex)}</span></h3>`
+   +`<pre>${renderBody(ex)}</pre>`
+   +`<div class="toolbar">`
+   +`<button class="solid" onclick="checkEx('${ex.id}')">채점</button>`
+   +`<button onclick="revealEx('${ex.id}')">정답 보기</button>`
+   +`<button onclick="clearEx('${ex.id}')">지우기</button>`
+   +`</div>`;
+  main.appendChild(card);
+
+  // TOC
+  const a = document.createElement("a");
+  a.href = "#"+ex.id;
+  a.textContent = ex.title.replace(/ · .*/,"").replace(/&amp;/g,"&");
+  tocGroups[ex.ch].push(a);
+
+  // Enter 키 → 해당 문제 채점
+  card.querySelectorAll("input.bk").forEach(inp=>{
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter") checkEx(ex.id); });
+  });
+});
+
+// TOC 그룹 출력
+[6,7].forEach(ch=>{
+  const g = document.createElement("span");
+  g.className="grp"; g.textContent = ch+"장:";
+  toc.appendChild(g);
+  tocGroups[ch].forEach(a=>toc.appendChild(a));
+});
+
+/* ───────── 채점 로직 ───────── */
+function getEx(id){ return EX.find(e=>e.id===id); }
+
+function judgeInput(inp){
+  const ex = getEx(inp.dataset.ex);
+  const n  = inp.dataset.n;
+  const accepts = ex.ans[n].map(norm);
+  const wrap = inp.closest(".bw");
+  wrap.classList.remove("correct","wrong","revealed");
+  if(inp.value.trim()===""){ return null; }          // 미입력
+  if(accepts.includes(norm(inp.value))){ wrap.classList.add("correct"); return true; }
+  wrap.classList.add("wrong"); return false;
+}
+
+function checkEx(id){
+  const card = document.getElementById(id);
+  let ok=0, total=0;
+  card.querySelectorAll("input.bk").forEach(inp=>{
+    total++;
+    if(judgeInput(inp)===true) ok++;
+  });
+  document.getElementById("stat-"+id).textContent = `${ok} / ${total}`;
+  updateGlobal();
+}
+
+function revealEx(id){
+  const ex = getEx(id);
+  document.getElementById(id).querySelectorAll("input.bk").forEach(inp=>{
+    inp.value = ex.ans[inp.dataset.n][0];
+    const wrap = inp.closest(".bw");
+    wrap.classList.remove("correct","wrong");
+    wrap.classList.add("revealed");
+  });
+  document.getElementById("stat-"+id).textContent = `정답 표시됨`;
+  updateGlobal();
+}
+
+function clearEx(id){
+  document.getElementById(id).querySelectorAll("input.bk").forEach(inp=>{
+    inp.value="";
+    inp.closest(".bw").classList.remove("correct","wrong","revealed");
+  });
+  document.getElementById("stat-"+id).textContent = `0 / ${blanksOf(getEx(id))}`;
+  updateGlobal();
+}
+
+function checkAll(){ EX.forEach(e=>checkEx(e.id)); }
+function resetAll(){ EX.forEach(e=>clearEx(e.id)); window.scrollTo({top:0,behavior:"smooth"}); }
+
+function updateGlobal(){
+  let total=0, ok=0;
+  document.querySelectorAll("input.bk").forEach(inp=>{
+    total++;
+    if(inp.closest(".bw").classList.contains("correct")) ok++;
+  });
+  document.getElementById("globalPct").textContent = `${ok} / ${total} 정답`;
+  document.getElementById("globalFill").style.width = total? (ok/total*100)+"%" : "0%";
+}
+
+updateGlobal();
+</script>
+</body>
+</html>

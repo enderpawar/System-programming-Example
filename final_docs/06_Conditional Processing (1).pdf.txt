@@ -1,0 +1,1295 @@
+
+===== PAGE 1 =====
+System Programming
+Conditional Processing
+Dongwann
+Kang
+Assistant Professor
+Department of Computer Science and Engineering
+===== PAGE 2 =====
+Boolean and Comparison Instructions
+•
+ The Intel instruction set contains the AND, 
+OR,
+XOR, and NOT instructions, which directly 
+implement 
+boolean
+operations on binary bits
+•
+ 1. The CPU Status Flags
+–
+ Boolean instructions affect the Zero, Carry, Sign, Overflow, and Parity flags
+•
+ The Zero flag is set when the result of an operation equals zero
+•
+ The Carry flag is set when an operation generates a carry out of the highest bit of the destination operand
+•
+ The Sign flag is a copy of the high bit of the destination operand
+•
+ The Overflow flag is set when an instruction generates a result that is outside the signed range of 
+the
+destination 
+operand
+•
+ The Parity flag is set when an instruction generates an even number of 1 bits in the low byte of the 
+destination operand
+
+===== PAGE 3 =====
+Boolean and Comparison Instructions
+•
+ 2. AND Instruction
+–
+ The AND instruction performs a 
+boolean
+(bitwise) AND operation between each pair of matching 
+bits in two operands and places the result in the destination operand
+•
+ The following operand combinations are permitted:
+•
+ The operands can be 8, 16, 32, or 64 bits, and they must be the same size
+•
+ Immediate operands can be no larger than 32 bits
+–
+ Bit masking
+•
+ The AND instruction lets you clear 1 or more bits in an operand without affecting other bits
+•
+ E.g.) A control byte is about to be copied from the AL register to a hardware device. 
+Further
+, we 
+will
+assume 
+that the device resets itself when bits 0 and 3 are cleared in the control byte. 
+Assuming 
+that
+we 
+want 
+to reset the device without modifying any other bits in AL, we can write the following:
+–
+ Flags
+•
+ The AND instruction always clears the Overflow and Carry flags
+•
+ It modifies the Sign, Zero, and Parity flags according to the destination operand
+
+===== PAGE 4 =====
+Boolean and Comparison Instructions
+•
+ 2. AND Instruction
+–
+ Converting Characters to Upper case
+•
+ The AND instruction provides an easy way to translate a letter from lowercase to uppercase
+•
+ If we compare the ASCII codes of capital A and lowercase a, it becomes clear that only bit 5 is different
+•
+ The rest of the alphabetic characters have the same relationship
+•
+ If we AND any character with 11011111 binary, all bits are unchanged except for bit 5, which is cleared
+•
+ In the following example, all characters in an array are converted to uppercase
+
+===== PAGE 5 =====
+Boolean and Comparison Instructions
+•
+ 3. OR Instruction
+–
+ The OR instruction performs a 
+boolean
+OR operation between each pair of matching bits in two 
+operands and places the result in the destination operand
+•
+ The following operand combinations are permitted:
+•
+ The operands can be 8, 16, 32, or 64 bits, and they must be the same size
+•
+ For each matching bit in the two operands, the output bit is 1 when at least one of the input bits is 1
+–
+ The OR instruction is particularly useful when you need to set 1 or more bits in an operand without 
+affecting any other bits
+•
+ E.g.) Suppose that your computer is attached to a servo motor, which is activated by setting bit 2 in its control 
+byte. 
+Assuming that
+the AL register contains a control byte in which each bit contains some 
+important
+information
+, the following code only sets the bit in position 2
+–
+ Flags
+•
+ The OR instruction always clears the Carry and Overflow flags
+•
+ It modifies the Sign, Zero, and Parity flags according to the destination operand
+
+===== PAGE 6 =====
+Boolean and Comparison Instructions
+•
+ 4. Bit
+-
+Mapped Sets
+–
+ Some applications manipulate sets of items selected from a limited
+-
+sized universal set
+•
+ E.g.) Employees within a company, environmental readings from a weather monitoring station
+•
+ In such cases, binary bits can indicate set membership
+–
+ Rather than holding pointers or references to objects in a container, an application can use a bit vector 
+to map the bits in a binary number to an array of objects
+–
+ An example
+•
+ The following binary number uses bit positions numbered from 0 on the right to 31 on the left to indicate that 
+array elements 0, 1, 2, and 31 are members of the set named 
+SetX
+•
+ We can easily check for set membership by ANDing a particular member’s bit position with a 1
+–
+ If the AND instruction in this example clears the Zero flag, we know that element [4] is a member of 
+SetX
+(The bytes have been separated to improve readability)
+
+===== PAGE 7 =====
+Boolean and Comparison Instructions
+•
+ 4. Bit
+-
+Mapped Sets
+–
+ Set Complement
+•
+ The complement of a set can be generated using the NOT instruction, which reverses all bits
+•
+ Therefore, the complement of the 
+SetX
+is generated in EAX using the following instructions:
+–
+ Set Intersection
+•
+ The AND instruction produces a bit vector that represents the intersection of two sets
+•
+ The following code generates and stores the intersection of 
+SetX
+and 
+SetY
+in EAX:
+•
+ This is how the intersection of 
+SetX
+and 
+SetY
+is produced:
+•
+ It is hard to imagine any faster way to generate a set intersection
+•
+ A larger domain would require more bits than could be held in a single register, making it necessary to use a loop 
+to AND 
+all of
+the bits together
+
+===== PAGE 8 =====
+Boolean and Comparison Instructions
+•
+ 4. Bit
+-
+Mapped Sets
+–
+ Set Union
+•
+ The OR instruction produces a bit map that represents the union of two sets
+•
+ The following code generates the union of 
+SetX
+and 
+SetY
+in EAX
+•
+ This is how the union of 
+SetX
+and 
+SetY
+is generated by the OR instruction:
+
+===== PAGE 9 =====
+Boolean and Comparison Instructions
+•
+ 5. XOR Instruction
+–
+ The XOR instruction performs a 
+boolean
+exclusive
+-
+OR operation between each pair of matching bits in 
+two operands and stores the result in the destination operand:
+•
+ The XOR instruction uses the same operand combinations and sizes as the AND 
+and
+OR instructions
+•
+ For each matching bit in the two operands, the following applies
+–
+ If both bits are the same (both 0 or both 1), the result is 0; otherwise, the result is 1
+•
+ A bit exclusive
+-
+ORed
+with 0 retains its value, and a bit exclusive
+-
+ORed
+with 1 is toggled (complemented) 
+•
+ XOR reverses itself when applied twice to the same operand
+•
+ The truth table shows that when bit x is exclusive
+-
+ORed
+with bit y twice, it reverts to its original value
+–
+ This “reversible” property of XOR makes it an ideal tool for a simple form of symmetric encryption
+
+===== PAGE 10 =====
+Boolean and Comparison Instructions
+•
+ 5. XOR Instruction
+–
+ Flags
+•
+ The XOR instruction always clears the Overflow and Carry flags
+•
+ XOR modifies the Sign, Zero, and Parity flags according to the destination operand
+–
+ Checking the Parity Flag
+•
+ Parity checking is performed on a binary number that counts the number of 1 bits contained in the number
+–
+ If the resulting count is even, we say that the data has even parity; if the count is odd, the data has odd parity
+•
+ In x86 processors, the Parity flag is set when the lowest byte of the destination operand of a bitwise or 
+arithmetic operation has even parity
+–
+ Conversely, when the operand has odd parity, the flag is cleared
+•
+ An effective way to check the parity of a number without changing its value is 
+to
+ exclusive
+-
+OR the number with 
+zero
+–
+ 16
+-
+Bit Parity
+•
+ You can check the parity of a 16
+-
+bit integer by performing an XOR between the upper and lower bytes
+•
+ The parity of this union will be the same as the parity of the entire 16
+-
+bit integer:
+
+===== PAGE 11 =====
+Boolean and Comparison Instructions
+•
+ 6. NOT Instruction
+–
+ The NOT instruction toggles (inverts) all bits in an operand
+–
+ The result is called the 
+one’s complement
+•
+ For example, the one’s complement of F0h is 0Fh
+–
+ Flags
+•
+ No flags are affected by the NOT instruction
+•
+ 7. TEST Instruction
+–
+ The TEST instruction performs an AND operation, but does not modify the destination operand
+–
+ The TEST instruction permits the same operand combinations as the AND instruction
+–
+ TEST is particularly valuable for finding out whether individual bits in an operand are set
+
+===== PAGE 12 =====
+Boolean and Comparison Instructions
+•
+ 7. TEST Instruction
+–
+ Example: Testing Multiple Bits
+•
+ The TEST instruction can check several bits at once
+•
+ Suppose we want to know whether bit 0 or bit 3 is set in the AL register
+•
+ We can use the following instruction to find this out:
+•
+ From the following example data sets, we can infer that the Zero flag is set only when all tested bits are clear:
+–
+ Flags
+•
+ The TEST instruction always clears the Overflow and Carry flags
+•
+ It modifies the Sign, Zero, and Parity flags in the same way as the AND instruction
+(The value 00001001 in this example is called a bit mask.)
+
+===== PAGE 13 =====
+Boolean and Comparison Instructions
+•
+ 8. CMP Instruction
+–
+ The most common 
+boolean
+expressions involve some type of comparison
+–
+ We use the CMP instruction to compare integers
+•
+ Character codes are also integers, so they work with CMP as well
+–
+ CMP performs an implied subtraction of a source operand from a destination operand
+•
+ Neither operand is modified
+•
+ CMP uses the same operand combinations as the AND instruction
+–
+ Flags
+•
+ CMP changes the Overflow, Sign, Zero, Carry, Auxiliary Carry, and Parity flags according to the 
+value
+the 
+destination operand would have had if actual subtraction had taken place
+unsigned operands signed operands
+===== PAGE 14 =====
+Boolean and Comparison Instructions
+•
+ 8. CMP Instruction
+–
+ Examples: how flags are affected by the CMP instruction
+•
+ When AX equals 5 and is compared to 10, the Carry flag is set because subtracting 10 from 5 requires a borrow:
+•
+ Comparing 1000 to 1000 sets the Zero flag because subtracting the source from the destination produces zero:
+•
+ Comparing 105 to 0 clears both the Zero and Carry flags because subtracting 0 from 105 generates a positive, 
+nonzero value:
+
+===== PAGE 15 =====
+Boolean and Comparison Instructions
+•
+ 9. Setting and Clearing Individual CPU Flags
+–
+ How can you easily set or clear the Zero, Sign, Carry, and Overflow flags?
+–
+ There are several ways, some of which require modifying the destination operand
+•
+ To set the Zero flag, TEST or AND an operand with Zero. To clear the Zero flag, OR an operand with 1:
+–
+ TEST does not modify the operand, whereas AND does
+•
+ To set the Sign flag, OR the highest bit of an operand with 1. To clear the Sign flag, AND the highest bit with 0:
+•
+ To set the Carry flag, use the STC instruction; to clear the Carry flag, use CLC:
+•
+ To set the Overflow flag, add two positive values that produce a negative sum. To clear the Overflow flag, OR an 
+operand with 0:
+
+===== PAGE 16 =====
+Conditional Jumps
+•
+ 1. Conditional Structures
+–
+ There are no explicit high
+-
+level logic structures in the x86 instruction set, but you can implement them 
+using a combination of comparisons and jumps
+–
+ Two steps:
+1.
+ An operation such as CMP, AND, or SUB modifies the CPU status flags
+2.
+ A conditional jump instruction tests the flags and causes a branch to a new address
+–
+ Example 1
+•
+ The CMP instruction compares EAX to Zero
+•
+ The JZ (Jump if zero) instruction jumps to label L1 if the Zero flag was set by the CMP instruction
+–
+ Example 2 
+•
+ The AND instruction performs a bitwise AND on the DL register, affecting the Zero flag
+•
+ The JNZ (jump if not Zero) instruction jumps if the Zero flag is clear
+
+===== PAGE 17 =====
+Conditional Jumps
+•
+ 2. 
+Jcond
+Instruction
+–
+ A 
+conditional jump instruction
+branches to a destination label when a status flag condition is true 
+•
+ Otherwise, if the flag condition is false, the instruction immediately following the conditional jump is executed
+–
+ The syntax:
+–
+ cond
+refers to a flag condition identifying the state of one or more flags
+–
+ CPU status flags are 
+most commonly set
+by arithmetic, comparison, and 
+boolean
+instructions
+–
+ Conditional jump instructions evaluate the flag states, using them to determine 
+whether or not
+jumps 
+should be taken
+
+===== PAGE 18 =====
+Conditional Jumps
+•
+ 2. 
+Jcond
+Instruction
+–
+ Using the CMP Instruction
+•
+ Example 1
+–
+ Suppose you want to jump to label L1 when EAX equals 5
+–
+ If EAX equals 5, the CMP instruction sets the Zero flag; then, the JE instruction jumps to L1 because the Zero flag is set:
+–
+ The JE instruction always jumps based on the value of the Zero flag
+–
+ If EAX were not equal to 5, CMP would clear the Zero flag, and the JE instruction would not jump
+•
+ Example 2
+–
+ The JL instruction jumps to label L1 because AX is less than 6
+•
+ Example 3
+–
+ The jump is taken because AX is greater than 4
+
+===== PAGE 19 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Conditional jump instructions 
+are able to
+compare signed and unsigned integers and perform actions 
+based on the values of individual CPU flags
+–
+ The conditional jump instructions can be divided into four groups:
+•
+ Jumps based on specific flag values
+•
+ Jumps based on equality between operands or the value of (E)CX
+•
+ Jumps based on comparisons of unsigned operands
+•
+ Jumps based on comparisons of signed operands
+–
+ Jumps based on specific flag values
+
+===== PAGE 20 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Equality Comparisons
+•
+ In some cases, two operands are compared; in other cases, a jump is taken based on the value of (E)CX
+•
+ The notations 
+leftOp
+and 
+rightOp
+refer to the left (destination) and right (source) operands in a CMP instruction:
+–
+ The operand names reflect the ordering of operands for relational operators in algebra
+–
+ For example, in the expression X < Y, X is called 
+leftOp
+and Y is called 
+rightOp
+•
+ The JE instruction is equivalent to JZ and JNE is equivalent to JNZ
+–
+ It’s best to select the mnemonic (JE or JZ) that best indicates your intention to either compare two operands or examine a 
+specific status flag
+
+===== PAGE 21 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Equality Comparisons
+•
+ Example 1
+•
+ Example 2
+•
+ Example 3
+•
+ Example 4
+
+===== PAGE 22 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Unsigned Comparisons
+•
+ These jumps are only meaningful when comparing unsigned values
+
+===== PAGE 23 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Signed Comparisons
+
+===== PAGE 24 =====
+Conditional Jumps
+•
+ 3. Types of Conditional Jump Instructions
+–
+ Example 1
+–
+ Example 2
+–
+ Example 3
+–
+ Example 4
+
+===== PAGE 25 =====
+Conditional Jumps
+•
+ 4. Conditional Jump Applications
+–
+ Testing Status Bits
+•
+ Often, we do not want to change the values of the bits we’re testing, but we do want to modify the values of 
+CPU status flags
+•
+ Conditional jump instructions often use these status flags to determine 
+whether or not
+to transfer control to 
+code labels
+•
+ Suppose that an 8
+-
+bit memory operand named 
+status
+contains status information about an external device 
+attached to the computer
+–
+ The following instructions jump to a label if bit 5 is set, indicating that the device is offline:
+–
+ The following statements jump to a label if any of the bits 0, 1, or 4 are set:
+–
+ Jumping to a label if bits 2, 3, and 7 are all set requires both the AND 
+and
+CMP instructions:
+
+===== PAGE 26 =====
+Conditional Jumps
+•
+ 4. Conditional Jump Applications
+–
+ Larger of Two Integers
+•
+ The following code compares the unsigned integers in EAX and EBX and moves the larger of the two to EDX:
+–
+ Smallest of Three Integers
+•
+ The following instructions compare the unsigned 16
+-
+bit values in the variables V1, V2, and V3 and move the 
+smallest of the three to AX:
+
+===== PAGE 27 =====
+Conditional Jumps
+•
+ 4. Conditional Jump Applications
+–
+ Loop until Key Pressed
+•
+ In the following 32
+-
+bit code, a loop runs continuously until the user presses a standard alphanumeric key
+•
+ The 
+ReadKey
+method from the Irvine32 library sets the Zero flag if no key is present in the input buffer
+–
+ The code inserts a 10
+-
+millisecond delay in the loop to give MS
+-
+Windows time to process event messages
+–
+ If you omit the delay, keystrokes may be ignored
+
+===== PAGE 28 =====
+Conditional Jumps
+•
+ 4. Conditional Jump Applications
+–
+ Application: Sequential Search of an Array
+•
+ The following program looks for the first nonzero value in an array of 16
+-
+bit integers
+–
+ If it finds one, it displays the value
+–
+ Otherwise, it displays a message stating that a nonzero value was not found
+
+===== PAGE 29 =====
+Conditional Jumps
+•
+ 4. Conditional Jump Applications
+–
+ Application: Simple String Encryption
+•
+ If an integer X is XORed with Y and the resulting value is XORed with Y again, the value produced is X:
+–
+ This reversible property of XOR provides an easy way to perform a simple form of data encryption:
+»
+ A 
+plain text
+message is transformed into an encrypted string called 
+cipher text
+by XORing each of its characters with 
+a character from a third string called a 
+key
+»
+ The intended viewer can use the key to decrypt the cipher text and produce the original plain text
+•
+ Example Program
+–
+ We will demonstrate a simple program that uses symmetric encryption, a process by which the same key is used for both 
+encryption and decryption
+–
+ The following steps occur in order at runtime:
+1.
+ The user enters the plain text
+2.
+ The program uses a single
+-
+character key to encrypt the plain text, producing the cipher text, which is displayed on 
+the screen
+3.
+ The program decrypts the cipher text, producing and displaying the original plain text
+–
+ Here is sample output from the program
+
+===== PAGE 30 =====
+
+===== PAGE 31 =====
+Conditional Loop Instructions
+•
+ 1. LOOPZ and LOOPE Instructions
+–
+ The LOOPZ (loop if zero) instruction
+•
+ This 
+instruction works like the LOOP instruction, but the Zero flag must be set 
+in order for
+control to transfer to 
+the destination label
+–
+ The LOOPE (loop if equal) instruction
+•
+ Equivalent to LOOPZ, and they share the same opcode
+–
+ They perform the following tasks:
+•
+ Otherwise, no jump occurs, and control passes to the next instruction
+–
+ LOOPZ and LOOPE do not affect any of the status flags
+
+===== PAGE 32 =====
+Conditional Loop Instructions
+•
+ 2. LOOPNZ and LOOPNE Instructions
+–
+ The LOOPNZ (loop if not zero) instruction
+•
+ The counterpart of LOOPZ
+•
+ The loop continues while the unsigned value of ECX is greater than zero (after being decremented) and the Zero 
+flag is clear
+–
+ The LOOPNE (loop if not equal) instruction
+•
+ Equivalent to LOOPNZ, and they share the same opcode
+–
+ They perform the following tasks:
+•
+ Otherwise, nothing happens, and control passes to the next instruction
+
+===== PAGE 33 =====
+Conditional Loop Instructions
+•
+ 2. LOOPNZ and LOOPNE Instructions
+–
+ Example
+•
+ The following code scans each number in an array until a nonnegative number is found
+•
+ Notice that we push the flags on the stack before the ADD instruction because ADD will modify the flags
+•
+ Then the flags are restored by POPFD just before the LOOPNZ instruction executes
+
+===== PAGE 34 =====
+Conditional Structures
+•
+ Conditional structure
+–
+ One or more conditional expressions that trigger a choice between different logical branches
+–
+ Each branch causes a different sequence of instructions to execute
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ If structure in HLL
+–
+ In assembly language
+•
+ First, we evaluate the 
+boolean
+expression in such a way that one of the CPU status flags is affected
+•
+ Second, we construct a series of jumps that transfer control to the two lists of statements, based on the value of 
+the relevant CPU status flag
+
+===== PAGE 35 =====
+Conditional Structures
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ Example 1
+•
+ We can translate this IF statement into assembly language with a CMP instruction followed by conditional jumps
+•
+ If we implemented the == operator using JE, the resulting code would be slightly less compact 
+(six instructions rather than five)
+
+===== PAGE 36 =====
+Conditional Structures
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ Example 2
+•
+ In the NTFS file storage system, the size of a disk cluster depends on the disk volume’s overall capacity
+•
+ In the following pseudocode, we set the cluster size to 4,096 if the volume size is less than 16 
+Tbytes
+•
+ Otherwise, we set the cluster size to 8,192
+•
+ We can implement the pseudocode in assembly language
+
+===== PAGE 37 =====
+Conditional Structures
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ Example 3
+•
+ In the following assembly language translation of the pseudocode, we assume that op1 and op2 are signed 
+doubleword variables
+•
+ When comparing variables, one must be moved to a register
+
+===== PAGE 38 =====
+Conditional Structures
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ White Box Testing
+•
+ Complex conditional statements may have multiple execution paths, making them hard to debug
+•
+ Programmers often implement a technique known as white box testing, which verifies a subroutine’s inputs and 
+corresponding outputs
+–
+ White box testing requires you to have a copy of the source code
+–
+ You assign a variety of values to the input variables
+–
+ For each combination of inputs, you manually trace through the source code and verify the execution path and outputs 
+produced by the subroutine
+
+===== PAGE 39 =====
+Conditional Structures
+•
+ 1. Block
+-
+Structured IF Statements
+–
+ White Box Testing
+•
+ The following code reverses the initial condition (op1 == op2) and immediately jumps to the ELSE portion
+•
+ All that is left to translate is the inner IF
+-
+ELSE statement
+
+===== PAGE 40 =====
+Conditional Structures
+•
+ 2. Compound Expressions
+–
+ Logical AND Operator
+•
+ Short
+-
+Circuit Evaluation
+–
+ The following is a straightforward implementation using short
+-
+circuit evaluation
+»
+ The second expression is not evaluated if the first expression is false
+–
+ We can reduce the code to five instructions by changing the initial JA instruction to JBE
+
+===== PAGE 41 =====
+Conditional Structures
+•
+ 2. Compound Expressions
+–
+ Logical OR Operator
+•
+ In the following implementation, the code branches to L1 if the first expression is true
+–
+ otherwise, it falls through to the second CMP instruction
+•
+ The second expression reverses the > operator and uses JBE instead
+
+===== PAGE 42 =====
+Conditional Structures
+•
+ 3. WHILE Loops
+–
+ It is convenient to reverse the loop condition and jump to 
+endwhile
+if a condition becomes true
+–
+ Assuming that val1 and val2 are variables, we must copy one of them to a register at the beginning and 
+restore the variable’s value at the end
+•
+ EAX is a substitute for val1 inside the loop
+•
+ References to val1 must be through EAX
+•
+ JNL is used, implying that val1 and val2 are signed integers
+
+===== PAGE 43 =====
+Conditional Structures
+•
+ 3. WHILE Loops
+–
+ Example: IF statement Nested in a Loop
+•
+ The following code calculates the sum of all array elements 
+greater than the value in sample
+•
+ To simplify the translation and speed up execution by reducing 
+the number of memory accesses, registers have been 
+substituted for variables
+–
+ EDX = sample, EAX = sum, ESI = index, and ECX = 
+ArraySize
+
+===== PAGE 44 =====
+Conditional Structures
+•
+ 3. WHILE Loops
+–
+ Example: IF statement Nested in a Loop
+•
+ Assembly Code
+
+===== PAGE 45 =====
+Conditional Structures
+•
+ 4. Table
+-
+Driven Selection
+–
+ A way of using a table lookup to replace a multiway selection structure
+•
+ You must create a lookup table, and then you must use a loop to search the table
+–
+ The table must contain lookup values and the offsets of labels or procedures
+•
+ E.g.) The following is part of a table containing single
+-
+character lookup values and addresses of procedures
+–
+ Assume that 
+Process_A
+, 
+Process_B
+, 
+Process_C
+, and 
+Process_D
+are located at addresses 120h, 130h, 140h, and 150h, 
+respectively
+
+===== PAGE 46 =====
+Conditional Structures
+•
+ 4. Table
+-
+Driven Selection
+–
+ Example Program
+•
+ The user inputs a character from the keyboard
+•
+ Using a loop, the character is compared to each entry in a lookup table
+•
+ The 1
+st
+ match found causes a call to the procedure offset stored immediately after the lookup value
+•
+ Each procedure loads EDX with the offset of a different string, which is displayed during the loop
+
+===== PAGE 47 =====
+Conditional Structures
+•
+ 4. Table
+-
+Driven Selection
+–
+ Cons
+•
+ The table
+-
+driven selection method involves some initial overhead
+–
+ Pros
+•
+ The table
+-
+driven selection method can reduce the amount of code you write
+•
+ A table can handle 
+a large number of
+comparisons, and it can be more easily modified than a long series of 
+compare, jump, and CALL instructions
+•
+ A table can even be reconfigured at runtime
+===== PAGE 48 =====
+Application: Finite
+-
+State Machines
+•
+ A finite
+-
+state machine (FSM)
+–
+ A machine or program that changes state based on some input
+–
+ A graph which represents an FSM
+•
+ A 
+node
+: a program state
+•
+ An 
+edge
+: a transition from one state to another 
+•
+ One node is designated as the 
+initial state
+•
+ One or more states are designated as 
+terminal states
+–
+ A terminal state represents a state in which the program might stop without producing an error
+•
+ A
+FSM is a specific instance of a more general type of structure called a 
+directed graph
+
+===== PAGE 49 =====
+Application: Finite
+-
+State Machines
+•
+ 1. Validating an Input String
+–
+ Programs that read input streams often must validate their input
+•
+ E.g.) A programming language compiler can use a FSM to scan source programs and convert words and symbols 
+into tokens, which are usually keywords, arithmetic operators, and identifiers
+–
+ A FSM for checking the validity of an input string
+•
+ Read the input character by character
+–
+ Each character is represented by an edge in the diagram 
+•
+ A FSM detects illegal input sequences in one of two ways:
+–
+ The next input character does not correspond to any transitions from the current state
+–
+ The end of input is reached and the current state is a nonterminal state
+===== PAGE 50 =====
+Application: Finite
+-
+State Machines
+•
+ 1. Validating an Input String
+–
+ Character String Example
+•
+ Let’s check the validity of an input string according to the following two rules:
+–
+ The string must begin with the letter “x” and end with the letter “z”
+–
+ Between the first and last characters, there can be zero or more letters within the range {‘a’...‘y’}
+•
+ Each transition is identified with a particular type of input
+–
+ The transition from state A to state B can only be accomplished if the letter x is read from the input stream
+–
+ A transition from state B to itself is accomplished by the input of any letter of the alphabet except z
+–
+ A transition from state B to state C occurs only when the letter z is read from the input stream
+•
+ If the end of the input stream is reached while the program is in state A or B, an error condition results because 
+only state C is marked as a terminal state
+•
+ The following input strings would be recognized by this FSM: 
+
+===== PAGE 51 =====
+Application: Finite
+-
+State Machines
+•
+ 2. Validating a Signed Integer
+–
+ Input consists of an optional leading sign followed by a sequence of digits
+–
+ There is no maximum number of digits implied by the diagram
+–
+ Translating finite
+-
+state machines into assembly language code
+•
+ Each state in the diagram (A, B, C, . . . ) is represented in the program by a label
+•
+ The following actions are performed at each label
+1.
+ A call to an input procedure reads the next character from input
+2.
+ If the state is a terminal state, check to see whether the user has pressed the Enter key to end the input
+3.
+ One or more compare instructions check for each possible transition leading away from the state. Each comparison is 
+followed by a conditional jump instruction
+•
+ E.g.) At state A, the following code reads the next input character and checks for a possible transition to state B
+
+===== PAGE 52 =====
+Application: Finite
+-
+State Machines
+•
+ 2. Validating a Signed Integer
+–
+ Complete Finite
+-
+State Machine Program
+
+===== PAGE 53 =====
+Application: Finite
+-
+State Machines
+•
+ 2. Validating a Signed Integer
+–
+ IsDigit
+Procedure
+•
+ The Finite
+-
+State Machine sample program calls the 
+IsDigit
+procedure, which belongs to the Irvine32 library
+•
+ IsDigit
+receives the AL register as input, and the value it returns is the setting of the Zero flag
+
+===== PAGE 54 =====
+Conditional Control Flow Directives
+•
+ MASM includes 
+a number of
+high
+-
+level conditional control flow directives that help to simplify the 
+coding of conditional statements
+•
+ In the preprocessing step, the assembler recognizes directives such as .CODE, .DATA, as well as 
+conditional control flow directives
+
+===== PAGE 55 =====
+Conditional Control Flow Directives
+•
+ 1. Creating IF Statements
+–
+ .IF, .ELSE, .ELSEIF, and .ENDIF directives
+•
+ They make it easy for you to code multiway branching logic
+•
+ They cause the assembler to generate CMP and conditional jump instructions in the background, which appear 
+in the output listing file
+•
+ The square brackets show that .ELSEIF and .ELSE are optional, whereas .IF and .ENDIF are required
+•
+ A condition is a 
+boolean
+expression involving the same operators used in C (such as <, >, ==, and !=)
+–
+ The expression is evaluated at runtime
+
+===== PAGE 56 =====
+Conditional Control Flow Directives
+•
+ 1. Creating IF Statements
+–
+ Generating ASM Code
+•
+ You can view expanded assembly language instructions if you run the program in the Visual Studio debugger, 
+right
+-
+click, and select Go to Disassembly
+
+===== PAGE 57 =====
+Conditional Control Flow Directives
+•
+ 2. Signed and Unsigned Comparisons
+–
+ When you use the .IF directive to compare values, you must be aware of how MASM generates 
+conditional jumps
+•
+ If the comparison involves an unsigned variable, an unsigned conditional jump instruction is inserted in the 
+generated code
+–
+ Comparing a Signed Integer
+
+===== PAGE 58 =====
+Conditional Control Flow Directives
+•
+ 2. Signed and Unsigned Comparisons
+–
+ Comparing Registers
+•
+ The assembler cannot determine whether the values are signed or unsigned
+•
+ The assembler defaults to an unsigned comparison (note the use of the JBE instruction)
+•
+ 3. Compound Expressions
+–
+ Using the .IF directive with logical OR and 
+AND
+operators
+
+===== PAGE 59 =====
+Conditional Control Flow Directives
+•
+ 3. Compound Expressions
+–
+ SetCursorPosition
+Example
+•
+ The 
+SetCursorPosition
+procedure performs range checking on its two input parameters, DH and DL
+–
+ The Y
+-
+coordinate (DH) must be between 0 and 24
+–
+ The X
+-
+coordinate (DL) must be between 0 and 79
+–
+ If either is found to be out of range, an error message is displayed
+
+===== PAGE 60 =====
+Conditional Control Flow Directives
+•
+ 3. Compound Expressions
+–
+ College Registration Example
+•
+ Suppose a college student wants to register for courses
+•
+ We will use two criteria to determine 
+whether or not
+the student can register
+–
+ The first is the person’s grade average, based on a 0 to 400 scale, where 400 is the highest possible grade
+–
+ The second is the number of credits the person wants to take
+•
+ A multiway branch structure can be used, involving .IF, .ELSEIF, and .ENDIF
+
+===== PAGE 61 =====
+Conditional Control Flow Directives
+•
+ 4. Creating Loops with .REPEAT and .WHILE
+–
+ The .REPEAT and .WHILE directives
+•
+ They offer alternatives to writing your own loops with CMP and conditional jump instructions
+•
+ The .REPEAT directive executes the loop body before testing the runtime condition following the .UNTIL 
+directive
+•
+ The .WHILE directive tests the condition before executing the loop
+•
+ E.g.) displaying the values 1 through 10
+
+===== PAGE 62 =====
+Conditional Control Flow Directives
+•
+ 4. Creating Loops with .REPEAT and .WHILE
+–
+ Example: Loop Containing an IF Statement
+•
+ A pseudocode for an IF statement nested inside a WHILE loop:
+•
+ An assembly language version
