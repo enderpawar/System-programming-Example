@@ -119,6 +119,22 @@
   button.solid{ background:var(--ink); color:var(--paper); }
   button.solid:hover{ background:var(--paper); color:var(--ink); }
 
+
+  /* ── 전체 예제 코드 부록 ── */
+  .source-note{
+    margin:12px 0 18px; color:var(--soft); font-size:13px;
+  }
+  .src-card{ border:1px solid var(--line); margin-top:18px; }
+  .src-card > summary{
+    cursor:pointer; padding:10px 14px; font-size:14px; font-weight:700;
+    border-bottom:1px solid var(--line); background:var(--paper);
+  }
+  .src-card pre{
+    margin:0; padding:16px; overflow-x:auto;
+    font-family:"Consolas","D2Coding","Courier New",monospace;
+    font-size:12.5px; line-height:1.7; white-space:pre; word-break:normal;
+  }
+
   /* ── 범례 ── */
   .legend{
     display:flex; gap:18px; flex-wrap:wrap; font-size:12px; color:var(--soft);
@@ -149,6 +165,8 @@
     <span><b>출제 범위</b></span>
     <span>6장 — 조건 처리 (Conditional Processing)</span>
     <span>7장 — 정수 산술 (Integer Arithmetic)</span>
+    <span>8장 — 고급 프로시저 (Advanced Procedures)</span>
+    <span>9장 — 메모리 관리 (Memory Management)</span>
   </div>
   <p class="note">빈칸에 답을 입력하고 <b>채점</b>을 누르세요. 대소문자·여백·괄호는 자동 무시되고, 동의어(예: JA / JNBE)도 정답 처리됩니다.</p>
 </header>
@@ -158,6 +176,7 @@
     <div class="track"><div class="fill" id="globalFill"></div></div>
     <div class="pct" id="globalPct">0 / 0 정답</div>
     <button class="solid" onclick="checkAll()">전체 채점</button>
+    <button onclick="revealAll()">전체 정답 보기</button>
     <button onclick="resetAll()">전체 지우기</button>
   </div>
 </div>
@@ -173,7 +192,7 @@
 <main id="main"></main>
 
 <footer>
-  연습용 학습 자료 · 6장·7장 예제 코드의 빈칸을 그대로 옮긴 것이며 모든 레지스터·플래그 값은 교재 예제와 일치합니다.
+  연습용 학습 자료 · 6장~9장 예제 코드와 핵심 API 호출 순서를 빈칸 연습으로 정리했습니다.
 </footer>
 
 <script>
@@ -503,7 +522,540 @@ const EX = [
     10:["1"], 11:["1"], 12:["00000001FFFFFFFEh"],
     13:["FFFFFFFFh","0FFFFFFFFh"], 14:["1"], 15:["SBB"], 16:["0"]
   }
+},
+/* ===== 8장 ===== */
+{
+  id:"e8_01", ch:8, title:"E8-01 · 스택 프레임과 매개변수",
+  body:
+`[문제 1] 표준 스택 프레임 생성 순서
+
+  ; 호출자(caller)
+  push arg2
+  push arg1
+  call MyProc        ; [[1]] 주소가 스택에 자동 저장됨
+
+  ; 피호출자(callee)
+  MyProc PROC
+      push [[2]]     ; 이전 기준 포인터 저장
+      mov  [[2]], [[3]]
+      sub  [[3]], 8  ; 지역 변수 8바이트 예약
+      ...
+      mov  [[3]], [[2]]
+      pop  [[2]]
+      ret
+  MyProc ENDP
+
+[문제 2] EBP 기준 접근
+
+  [EBP+8]  → 첫 번째 [[4]]
+  [EBP+12] → 두 번째 [[4]]
+  [EBP-4]  → 첫 번째 [[5]]
+  [EBP-8]  → 두 번째 [[5]]
+
+[문제 3] 호출 규약
+
+  C 호출 규약      : [[6]] 가 매개변수 스택 공간을 정리
+  STDCALL 호출 규약: [[7]] 가 RET n으로 매개변수 스택 공간을 정리
+
+  ; 두 개의 DWORD 매개변수를 받는 STDCALL 프로시저
+  ret [[8]]          ; 2 × 4바이트 제거`,
+  ans:{
+    1:["return","return address","반환 주소","리턴 주소"],
+    2:["EBP"], 3:["ESP"], 4:["매개변수","parameter","argument","인수"],
+    5:["지역 변수","local variable","local"], 6:["호출자","caller"],
+    7:["피호출자","callee","프로시저"], 8:["8"]
+  }
+},
+{
+  id:"e8_02", ch:8, title:"E8-02 · ArrayFill 참조 매개변수 예제",
+  body:
+`[문제 1] 배열은 값이 아니라 주소로 전달
+
+  .data
+  count = 100
+  array WORD count DUP(?)
+
+  .code
+  push count
+  push [[1]] array       ; 배열의 시작 주소 전달
+  call ArrayFill
+
+[문제 2] ArrayFill의 스택 매개변수
+
+  ArrayFill PROC
+      push ebp
+      mov  ebp, esp
+      pushad
+
+      mov  [[2]], [ebp+8]    ; 배열 주소
+      mov  [[3]], [ebp+12]   ; 배열 길이
+
+  L1:
+      call RandomRange
+      mov  [esi], [[4]]      ; 16비트 난수 저장
+      add  esi, [[5]]        ; WORD 배열의 다음 원소
+      loop L1
+
+      popad
+      pop  ebp
+      ret [[6]]
+  ArrayFill ENDP
+
+[문제 3] 보존할 레지스터
+
+  pushad / popad는 [[7]] 개의 32비트 범용 레지스터를 저장/복원한다.`,
+  ans:{
+    1:["OFFSET"], 2:["ESI"], 3:["ECX"], 4:["AX"], 5:["2"],
+    6:["8"], 7:["8","여덟"]
+  }
+},
+{
+  id:"e8_03", ch:8, title:"E8-03 · ENTER / LEAVE와 지역 변수",
+  body:
+`[문제 1] ENTER 명령의 의미
+
+  MySub PROC
+      enter [[1]], [[2]]
+      ; 위 명령은 다음 세 명령과 같은 역할
+      ; push ebp
+      ; mov  ebp, esp
+      ; sub  esp, [[1]]
+      ...
+      leave
+      ret
+  MySub ENDP
+
+  ENTER의 첫 번째 피연산자 → [[3]] 로 예약할 바이트 수
+  ENTER의 두 번째 피연산자 → [[4]] 레벨
+
+[문제 2] LEAVE 명령의 의미
+
+  leave 는
+      mov [[5]], [[6]]
+      pop [[6]]
+  와 같은 효과를 낸다.
+
+[문제 3] LEA와 OFFSET
+
+  sub esp, 32
+  lea esi, [esp]        ; 런타임에 계산된 [[7]] 를 ESI에 저장
+
+  OFFSET은 [[8]] 시간에 이미 알려진 주소에만 사용할 수 있다.`,
+  ans:{
+    1:["numbytes","NUMBYTES","8","바이트수","bytes"],
+    2:["0"], 3:["지역 변수","local variable","local"],
+    4:["lexical nesting","lexical","중첩","렉시컬 중첩"],
+    5:["ESP"], 6:["EBP"], 7:["주소","effective address","유효 주소"],
+    8:["어셈블","assembly","compile","컴파일"]
+  }
+},
+{
+  id:"e8_04", ch:8, title:"E8-04 · 재귀 Factorial 예제",
+  body:
+`[문제 1] Factorial 프로시저 골격
+
+  Factorial PROC USES ebx,
+      n:DWORD
+
+      mov eax, [[1]]
+      cmp n, [[2]]
+      ja  L1
+      jmp L2
+
+  L1:
+      dec n
+      INVOKE Factorial, n
+      mov ebx, [[3]]
+      inc n
+      mul [[4]]
+
+  L2:
+      ret
+  Factorial ENDP
+
+[문제 2] 재귀 조건
+
+  n > 1 이면 [[5]] 호출을 계속한다.
+  n <= 1 이면 EAX = [[1]] 을 반환한다.
+
+[문제 3] 32비트 EAX에 안전하게 담을 수 있는 최대 팩토리얼
+
+  최대 n = [[6]]     ; 12! 까지 가능`,
+  ans:{
+    1:["1"], 2:["1"], 3:["n"], 4:["EBX"], 5:["재귀","recursive","recursion"],
+    6:["12"]
+  }
+},
+{
+  id:"e8_05", ch:8, title:"E8-05 · INVOKE, ADDR, PROC, PROTO",
+  body:
+`[문제 1] INVOKE 지시어
+
+  INVOKE MySub, arg1, arg2
+
+  INVOKE는 .MODEL에 지정된 순서로 인수를 [[1]] 에 push한 뒤
+  프로시저를 [[2]] 한다.
+
+  32비트보다 작은 인수를 전달하면 MASM이 확장 과정에서
+  [[3]] 와 [[4]] 를 덮어쓸 수 있다.
+
+[문제 2] ADDR 연산자
+
+  .data
+  buffer BYTE 80 DUP(?)
+
+  .code
+  INVOKE ReadString, [[5]] buffer, LENGTHOF buffer
+
+  ADDR은 INVOKE에서 [[6]] 인수를 전달할 때 사용한다.
+
+[문제 3] PROC / PROTO
+
+  ArrayFill [[7]],
+      pArray:PTR WORD,
+      count:DWORD
+
+  ArrayFill [[8]] USES esi ecx,
+      pArray:PTR WORD,
+      count:DWORD
+      ...
+      ret
+  ArrayFill ENDP
+
+  PROTO는 INVOKE로 호출하기 [[9]] 에 선언되어야 한다.`,
+  ans:{
+    1:["스택","stack"], 2:["호출","call"], 3:["EAX"], 4:["EDX"],
+    5:["ADDR"], 6:["포인터","pointer","주소","reference","참조"],
+    7:["PROTO"], 8:["PROC"], 9:["전","before","이전"]
+  }
+},
+/* ===== 9장 ===== */
+{
+  id:"e9_01", ch:9, title:"E9-01 · Win32 Heap API 호출 순서",
+  body:
+`[문제 1] 기존 프로세스 힙 사용
+
+  INVOKE [[1]]
+  mov hHeap, [[2]]             ; 기존 힙 핸들 저장
+
+  INVOKE [[3]], hHeap, 0, 1000 ; 1000바이트 할당
+  mov pArray, [[2]]            ; 새 저장공간 포인터
+
+  INVOKE [[4]], hHeap, 0, pArray
+
+[문제 2] 새 private heap 생성과 제거
+
+  INVOKE [[5]], 0, 4096, 0
+  mov hHeap, eax
+  ...
+  INVOKE [[6]], hHeap
+
+[문제 3] 오류 확인
+
+  HeapCreate, HeapDestroy, GetProcessHeap 호출에서 오류가 나면
+  자세한 오류 코드는 [[7]] API로 얻는다.`,
+  ans:{
+    1:["GetProcessHeap"], 2:["EAX"], 3:["HeapAlloc"], 4:["HeapFree"],
+    5:["HeapCreate"], 6:["HeapDestroy"], 7:["GetLastError"]
+  }
+},
+{
+  id:"e9_02", ch:9, title:"E9-02 · HeapAlloc 플래그와 HeapTest",
+  body:
+`[문제 1] 1000바이트 배열 생성 예제 흐름
+
+  .data
+  ARRAY_SIZE = [[1]]
+  hHeap DWORD ?
+  pArray DWORD ?
+
+  .code
+      INVOKE GetProcessHeap
+      mov hHeap, eax
+
+      INVOKE HeapAlloc,
+             hHeap,
+             [[2]],
+             ARRAY_SIZE
+      mov pArray, eax
+
+      ; pArray가 가리키는 1000바이트 블록을 채운 뒤
+      INVOKE HeapFree, hHeap, [[3]], pArray
+
+[문제 2] 0으로 초기화된 힙 블록
+
+  HeapAlloc의 dwFlags에 [[4]] 를 지정하면
+  할당된 메모리 블록이 모두 [[5]] 으로 초기화된다.
+
+[문제 3] 반복 할당 예제
+
+  HeapTest의 두 번째 예제는 큰 블록을 반복해서 할당하다가
+  힙 크기를 초과하면 할당 결과 포인터가 [[6]] 이 되어 실패를 확인한다.`,
+  ans:{
+    1:["1000"], 2:["0","NULL"], 3:["0","NULL"], 4:["HEAP_ZERO_MEMORY"],
+    5:["0","zero","제로"], 6:["0","NULL"]
+  }
+},
+{
+  id:"e9_03", ch:9, title:"E9-03 · 선형 주소와 세그먼트 디스크립터",
+  body:
+`[문제 1] 보호 모드 주소 변환
+
+  논리 주소 = 세그먼트 [[1]] + 32비트 [[2]]
+
+  32비트 선형 주소 =
+      세그먼트 디스크립터의 [[3]] 주소 + 32비트 [[2]]
+
+[문제 2] 세그먼트 관련 용어
+
+  [[4]] : 코드 또는 데이터를 담는 가변 크기 메모리 영역
+  [[5]] : 단일 메모리 세그먼트의 기준 주소, 접근 권한,
+          크기 제한, 타입 등을 설명하는 구조
+  [[1]] : CS, DS, SS, ES, FS, GS 같은 세그먼트 레지스터에 저장되는
+          [[6]] 비트 값
+
+[문제 3] 디스크립터 테이블
+
+  [[7]] : 보호 모드 부팅 시 OS가 만드는 전역 디스크립터 테이블
+  [[8]] : 각 태스크/프로그램이 가질 수 있는 지역 디스크립터 테이블`,
+  ans:{
+    1:["selector","선택자","세그먼트 선택자","segment selector"],
+    2:["offset","오프셋"], 3:["base","기준","베이스","base address"],
+    4:["segment","세그먼트"], 5:["segment descriptor","세그먼트 디스크립터"],
+    6:["16"], 7:["GDT"], 8:["LDT"]
+  }
+},
+{
+  id:"e9_04", ch:9, title:"E9-04 · 페이징과 페이지 변환",
+  body:
+`[문제 1] 페이지 단위
+
+  페이징은 프로그램이 사용하는 메모리를 작은 단위인 [[1]] 로 나눈다.
+  일반적인 페이지 크기는 [[2]] KByte이다.
+
+[문제 2] 선형 주소의 세 필드
+
+  32비트 선형 주소는 다음 세 필드로 나뉜다.
+
+  상위 10비트   → page [[3]] entry 인덱스
+  다음 10비트   → page [[4]] entry 인덱스
+  하위 12비트   → page frame 안의 [[5]]
+
+[문제 3] 페이지 변환 흐름
+
+  CR3 레지스터는 [[6]] 의 시작 주소를 가진다.
+  page directory entry는 [[7]] 의 기준 주소를 가진다.
+  page table entry는 실제 물리 메모리의 [[8]] 기준 위치를 가진다.
+  마지막으로 하위 12비트 [[5]] 을 더해 정확한 물리 주소를 만든다.
+
+  요청한 페이지가 메모리에 없으면 프로세서는 [[9]] 를 발생시킨다.`,
+  ans:{
+    1:["page","페이지"], 2:["4"], 3:["directory","디렉터리"], 4:["table","테이블"],
+    5:["offset","오프셋"], 6:["page directory","페이지 디렉터리"],
+    7:["page table","페이지 테이블"], 8:["page","페이지"], 9:["page fault","페이지 폴트"]
+  }
 }
+];
+
+const SOURCE_EXAMPLES = [
+  {
+    "ch": 6,
+    "title": "Chapter 06/00_StudyNotes.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 00_StudyNotes.asm\n; 설  명  : 6장 Conditional Processing (조건 처리)\n;           기말고사 직전 핵심 요약 + 퀴즈\n;           (빌드 불가 — 학습/복습 전용 노트)\n;\n; [관련 예제 파일]\n;   14_BooleanComparison.asm   → AND / OR / XOR / NOT / TEST / CMP\n;   15_ConditionalJumps.asm    → Jcond 4분류 / 최대·최소 / 검색\n;   16_ConditionalLoops.asm    → LOOPZ / LOOPE / LOOPNZ / LOOPNE\n;   17_ConditionalStructures.asm → IF / 복합조건 / WHILE / .IF / .WHILE\n; ============================================================\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 1: 불리언 & 비교 명령어                    ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ─────────────────────────────────────────────────────────\n; 1-1. 명령어별 동작 & 플래그 영향 (시험 단골!)\n; ─────────────────────────────────────────────────────────\n;   ┌────────┬──────────────────────┬─────────────────────┐\n;   │ 명령어 │ 동작                 │ 플래그              │\n;   ├────────┼──────────────────────┼─────────────────────┤\n;   │ AND    │ 비트곱(비트 끄기)    │ OF=0,CF=0 / SF,ZF,PF│\n;   │ OR     │ 비트합(비트 켜기)    │ OF=0,CF=0 / SF,ZF,PF│\n;   │ XOR    │ 배타합(토글/패리티)  │ OF=0,CF=0 / SF,ZF,PF│\n;   │ NOT    │ 1의 보수(전체 반전)  │ 영향 없음! ★        │\n;   │ TEST   │ AND하되 결과 버림    │ OF=0,CF=0 / SF,ZF,PF│\n;   │ CMP    │ 뺄셈하되 결과 버림   │ OF,SF,ZF,CF,AF,PF   │\n;   └────────┴──────────────────────┴─────────────────────┘\n;\n;   ★ NOT 은 플래그를 전혀 바꾸지 않는다 (자주 출제!)\n;   ★ AND/OR/XOR/TEST 는 항상 OF=0, CF=0\n;\n; ─────────────────────────────────────────────────────────\n; 1-2. 비트 마스킹 활용 (암기)\n; ─────────────────────────────────────────────────────────\n;   · 비트 끄기(clear) → AND  (마스크의 해당 비트=0)\n;   · 비트 켜기(set)   → OR   (마스크의 해당 비트=1)\n;   · 비트 토글        → XOR  (마스크의 해당 비트=1)\n;\n;   대문자화: AND ch, 11011111b (DFh) → 비트5 클리어\n;   숫자→ASCII: OR digit, 30h\n;\n; ─────────────────────────────────────────────────────────\n; 1-3. 비트 매핑 집합\n; ─────────────────────────────────────────────────────────\n;   여집합 → NOT,  교집합 → AND,  합집합 → OR\n;\n; ─────────────────────────────────────────────────────────\n; 1-4. XOR 의 가역성 (암호화)\n; ─────────────────────────────────────────────────────────\n;   (X XOR Y) XOR Y = X\n;   같은 키로 두 번 XOR → 원래 값 → 대칭키 암호화의 원리\n;\n; ─────────────────────────────────────────────────────────\n; 1-5. CMP 결과 정리 (부호 없는 비교)\n; ─────────────────────────────────────────────────────────\n;   목적지 < 소스 → CF=1\n;   목적지 = 소스 → ZF=1\n;   목적지 > 소스 → CF=0, ZF=0\n;\n;   ☑ 퀴즈 1: mov ax,5 / cmp ax,10 후 CF, ZF 는?\n;     (답: CF=1, ZF=0  — 5-10 은 빌림 발생)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 2: 조건부 점프 (Jcond) 4분류              ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ─────────────────────────────────────────────────────────\n; 2-1. (1) 특정 플래그 값\n; ─────────────────────────────────────────────────────────\n;   JZ/JNZ(ZF) JC/JNC(CF) JO/JNO(OF) JS/JNS(SF) JP/JNP(PF)\n;\n; 2-2. (2) 같음 / (E)CX\n;   JE(=)=JZ,  JNE(≠)=JNZ,  JCXZ(CX=0),  JECXZ(ECX=0)\n;\n; 2-3. (3) 부호 없는(unsigned) 비교  ★ A/B\n;   JA/JNBE(>)  JAE/JNB(>=)  JB/JNAE(<)  JBE/JNA(<=)\n;\n; 2-4. (4) 부호 있는(signed) 비교    ★ G/L\n;   JG/JNLE(>)  JGE/JNL(>=)  JL/JNGE(<)  JLE/JNG(<=)\n;\n;   ★★★ 시험 최빈출 ★★★\n;     부호 없는 → A(Above)/B(Below)\n;     부호 있는 → G(Greater)/L(Less)\n;     (이 구분을 틀리면 음수 비교에서 논리 버그!)\n;\n;   ☑ 퀴즈 2: 부호 있는 정수 EAX > EBX 일 때 점프하는 명령은?\n;     (답: JG  (또는 JNLE))\n;   ☑ 퀴즈 3: 부호 없는 정수 EAX < EBX 일 때 점프하는 명령은?\n;     (답: JB  (또는 JNAE))\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 3: 조건부 루프 명령어                      ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n;   LOOP        : ECX-- 후 ECX!=0 이면 점프\n;   LOOPZ/LOOPE : ECX-- 후 (ECX!=0 그리고 ZF=1) 이면 점프\n;   LOOPNZ/LOOPNE: ECX-- 후 (ECX!=0 그리고 ZF=0) 이면 점프\n;\n;   ★ LOOPxx 는 ZF를 만들지 않음 → 직전 명령의 ZF를 본다\n;   ★ ADD 등이 ZF를 덮어쓰므로 PUSHFD/POPFD 로 플래그 보존\n;\n;   ☑ 퀴즈 4: LOOPE 가 점프하는 두 조건은?\n;     (답: ECX != 0  그리고  ZF = 1)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 4: 조건 구조 변환                          ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ─────────────────────────────────────────────────────────\n; 4-1. IF-ELSE 변환 정석\n; ─────────────────────────────────────────────────────────\n;   조건을 '반대로' 뒤집어 ELSE 레이블로 점프하면 코드가 간결\n;   if(a==b) X=1; else X=2;\n;     mov eax,a / cmp eax,b / jne L1 / mov X,1 / jmp L2\n;     L1: mov X,2 / L2:\n;\n; 4-2. 복합 조건\n;   AND : 첫 조건 거짓이면 즉시 탈출(단축 평가)\n;   OR  : 첫 조건 참이면 즉시 실행부로 분기\n;\n; 4-3. WHILE\n;   조건을 반대로 뒤집어 endwhile 로 점프\n;   변수끼리 비교 불가 → 한쪽을 레지스터로 옮긴 뒤 비교\n;\n; 4-4. 고수준 디렉티브\n;   .IF / .ELSEIF / .ELSE / .ENDIF  (.IF, .ENDIF 필수)\n;   .WHILE / .ENDW  (조건 먼저 검사)\n;   .REPEAT / .UNTIL (몸체 먼저 실행 후 검사)\n;   ★ 레지스터끼리 .IF 비교 시 MASM은 기본적으로 '부호 없는'\n;     비교(JBE 등)를 생성한다 (시험 주의)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 5: 흔한 실수 모음                          ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ✗ 실수 1: 부호 있는 값에 A/B 점프 사용\n;   음수 비교에서 JA/JB는 오답 → JG/JL 사용해야 함\n;\n; ✗ 실수 2: NOT 후 플래그가 바뀌었다고 가정\n;   NOT 은 플래그 무영향!\n;\n; ✗ 실수 3: LOOPNZ 앞에서 플래그 보존 안 함\n;   ADD/INC 등이 ZF를 덮어씀 → PUSHFD/POPFD 필요\n;\n; ✗ 실수 4: 변수끼리 직접 CMP\n;   cmp val1, val2  ← 메모리-메모리 불가, 한쪽을 레지스터로\n;\n; ✗ 실수 5: TEST/CMP 가 피연산자를 바꾼다고 착각\n;   둘 다 결과를 버리고 플래그만 변경 (피연산자 불변)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 6: 퀴즈 정답 모음                          ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; Q1: mov ax,5 / cmp ax,10 → CF=1, ZF=0\n; Q2: 부호 있는 > → JG (JNLE)\n; Q3: 부호 없는 < → JB (JNAE)\n; Q4: LOOPE 점프 조건 → ECX!=0 그리고 ZF=1\n;\n; ─────────────────────────────────────────────────────────\n; [풀어야 할 연습 파일 순서]\n;   1. example/E6_01_Boolean_Practice.asm\n;   2. example/E6_02_ConditionalJumps_Practice.asm\n;   3. example/E6_03_Structures_Practice.asm\n; ─────────────────────────────────────────────────────────\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/14_BooleanComparison.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 14_BooleanComparison.asm\n; 설  명  : 6장 조건 처리 (1) - 불리언 & 비교 명령어\n;           AND / OR / XOR / NOT / TEST / CMP\n;           (PDF 06_Conditional Processing - Boolean and Comparison)\n; ============================================================\n;\n; [핵심] 불리언 명령어는 비트 단위(bitwise) 연산을 수행하며\n;        조건 분기를 위해 CPU 상태 플래그를 변경한다.\n;\n;   영향받는 플래그 요약 (시험 단골!)\n;   ┌────────┬───────────────────────────────────────────┐\n;   │ 명령어 │ 플래그 영향                                │\n;   ├────────┼───────────────────────────────────────────┤\n;   │ AND    │ OF=0, CF=0  / SF,ZF,PF 는 결과에 따라      │\n;   │ OR     │ OF=0, CF=0  / SF,ZF,PF 는 결과에 따라      │\n;   │ XOR    │ OF=0, CF=0  / SF,ZF,PF 는 결과에 따라      │\n;   │ NOT    │ 어떤 플래그도 변경하지 않음! (시험 주의)   │\n;   │ TEST   │ OF=0, CF=0  / SF,ZF,PF (AND와 동일, 결과   │\n;   │        │ 는 버림 → 목적지 불변)                     │\n;   │ CMP    │ OF,SF,ZF,CF,AF,PF (뺄셈했다고 가정한 결과) │\n;   └────────┴───────────────────────────────────────────┘\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    ; 비트 매핑 집합 예제용 (SetX, SetY)\n    SetX    DWORD 80000007h     ; 원소 0,1,2,31 이 집합에 속함\n    SetY    DWORD 00000101h     ; 원소 0,8 이 집합에 속함\n\n    ; 대문자 변환 예제용 문자 배열\n    array   BYTE  \"abcde\"       ; 소문자 5글자\n\n    ; TEST / 상태비트 검사 예제용\n    status  BYTE  00100000b     ; 외부 장치 상태 바이트 (비트5=1)\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. AND 명령어 - 비트 단위 논리곱\n    ;    형식: AND 목적지, 소스\n    ;    규칙: 두 피연산자 크기 동일, 즉치는 최대 32비트\n    ;    용도: 특정 비트를 0으로 지우기(clear, 마스킹)\n    ;          → 마스크 비트가 0인 자리는 0, 1인 자리는 원본 유지\n    ; ==========================================================\n\n    ; [예제] 장치 리셋: 비트 0과 비트 3을 0으로 지우기\n    ;   마스크 = 11110110b (비트0,3 자리만 0)\n    mov al, 11111111b\n    and al, 11110110b       ; AL = 11110110b (비트0,3 클리어)\n\n    ; [예제] 소문자 -> 대문자 변환\n    ;   'a'(61h)와 'A'(41h)는 비트5만 다름\n    ;   11011111b(=0DFh)와 AND 하면 비트5만 0으로 → 대문자화\n    mov al, 'a'             ; 01100001b\n    and al, 11011111b       ; AL = 01000001b = 'A'\n\n    ; ==========================================================\n    ; 2. OR 명령어 - 비트 단위 논리합\n    ;    용도: 특정 비트를 1로 켜기(set)\n    ;          → 마스크 비트가 1인 자리는 1, 0인 자리는 원본 유지\n    ; ==========================================================\n\n    ; [예제] 제어 바이트의 비트 2만 1로 설정 (나머지 보존)\n    mov al, 11100011b\n    or  al, 00000100b       ; AL = 11100111b (비트2 set)\n\n    ; [예제] 0~9 숫자를 ASCII 문자로 변환 (OR 30h)\n    mov al, 6\n    or  al, 30h             ; AL = 36h = '6'\n\n    ; ==========================================================\n    ; 3. 비트 매핑 집합 (Bit-Mapped Sets)\n    ;    이진수의 각 비트로 집합 원소의 소속 여부 표현\n    ; ==========================================================\n\n    ; 여집합(Complement): NOT\n    mov eax, SetX\n    not eax                 ; EAX = SetX의 여집합\n\n    ; 교집합(Intersection): AND\n    mov eax, SetX\n    and eax, SetY           ; EAX = SetX ∩ SetY = 00000001h\n\n    ; 합집합(Union): OR\n    mov eax, SetX\n    or  eax, SetY           ; EAX = SetX ∪ SetY = 80000107h\n\n    ; ==========================================================\n    ; 4. XOR 명령어 - 비트 단위 배타적 논리합\n    ;    같으면 0, 다르면 1\n    ;    특징: 같은 값으로 두 번 XOR 하면 원래 값으로 복원\n    ;          → 간단한 대칭키 암호화에 활용\n    ; ==========================================================\n\n    ; [예제] XOR 두 번 적용 → 원상복구 (암호화/복호화 동일 키)\n    mov al, 'A'             ; 평문 41h\n    xor al, 0FFh            ; 암호화: AL = BEh\n    xor al, 0FFh            ; 복호화: AL = 41h = 'A' (원래 값)\n\n    ; [예제] 패리티 검사: 값을 바꾸지 않고 PF 확인\n    ;   값을 0과 XOR → 값 불변, PF만 갱신\n    mov al, 10110101b       ; 1비트 개수 = 5개(홀수)\n    xor al, 0               ; PF = 0 (홀수 패리티), AL 불변\n\n    ; ==========================================================\n    ; 5. NOT 명령어 - 1의 보수(모든 비트 반전)\n    ;    ★ 어떤 플래그에도 영향을 주지 않음 (시험 주의!)\n    ; ==========================================================\n    mov al, 0F0h\n    not al                  ; AL = 0Fh (F0h의 1의 보수)\n\n    ; ==========================================================\n    ; 6. TEST 명령어 - AND를 수행하되 결과는 버림\n    ;    목적지 피연산자는 변하지 않고 플래그만 설정\n    ;    용도: 특정 비트가 켜져 있는지 검사\n    ;    ★ 검사한 모든 비트가 0일 때만 ZF=1\n    ; ==========================================================\n\n    ; [예제] AL의 비트0 또는 비트3이 켜져 있는지 검사\n    mov al, status\n    test al, 00001001b      ; 비트0,3 검사 (AL은 변하지 않음)\n    ; → 검사 비트가 모두 0이면 ZF=1, 하나라도 1이면 ZF=0\n\n    ; ==========================================================\n    ; 7. CMP 명령어 - 정수 비교 (암시적 뺄셈)\n    ;    형식: CMP 목적지, 소스   (목적지 - 소스, 결과는 버림)\n    ;    피연산자는 변하지 않고 플래그만 변경\n    ;\n    ;    [부호 없는 비교 결과]\n    ;      목적지 < 소스  → CF=1\n    ;      목적지 > 소스  → CF=0, ZF=0\n    ;      목적지 = 소스  → ZF=1\n    ; ==========================================================\n\n    ; [예제 A] 5와 10 비교 → 5-10 은 빌림 발생 → CF=1\n    mov ax, 5\n    cmp ax, 10              ; CF=1 (빌림 발생)\n\n    ; [예제 B] 1000과 1000 비교 → 결과 0 → ZF=1\n    mov ax, 1000\n    cmp ax, 1000            ; ZF=1\n\n    ; [예제 C] 105와 0 비교 → 양수, 0 아님 → ZF=0, CF=0\n    mov ax, 105\n    cmp ax, 0               ; ZF=0, CF=0\n\n    ; ==========================================================\n    ; 8. 개별 CPU 플래그 설정/해제 기법\n    ; ==========================================================\n    ; ZF 설정: TEST 또는 AND 를 0과 / ZF 해제: OR 을 1과\n    ; CF 설정: STC 명령 / CF 해제: CLC 명령\n    stc                     ; CF = 1\n    clc                     ; CF = 0\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/15_ConditionalJumps.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 15_ConditionalJumps.asm\n; 설  명  : 6장 조건 처리 (2) - 조건부 점프 (Jcond)\n;           조건부 점프의 4가지 분류 + 대표 응용 예제\n;           (PDF 06_Conditional Processing - Conditional Jumps)\n; ============================================================\n;\n; [조건 구조 구현의 2단계]\n;   1) CMP / AND / SUB 등이 CPU 상태 플래그를 변경\n;   2) 조건부 점프(Jcond)가 그 플래그를 검사하여 분기\n;\n; [조건부 점프 4가지 분류 - 암기!]\n;\n;   (1) 특정 플래그 값에 따른 점프\n;       JZ/JNZ(ZF) JC/JNC(CF) JO/JNO(OF) JS/JNS(SF) JP/JNP(PF)\n;\n;   (2) 같음/(E)CX 값에 따른 점프\n;       JE(=, ZF=1)  JNE(≠, ZF=0)\n;       JCXZ(CX=0)   JECXZ(ECX=0)\n;       ※ JE=JZ, JNE=JNZ (같은 명령, 의도에 맞는 이름 선택)\n;\n;   (3) 부호 없는(unsigned) 정수 비교 점프\n;       JA / JNBE  : 위(>)\n;       JAE / JNB  : 크거나 같음(>=)\n;       JB / JNAE  : 아래(<)\n;       JBE / JNA  : 작거나 같음(<=)\n;       (A=Above, B=Below 로 외우기)\n;\n;   (4) 부호 있는(signed) 정수 비교 점프\n;       JG / JNLE  : 큼(>)\n;       JGE / JNL  : 크거나 같음(>=)\n;       JL / JNGE  : 작음(<)\n;       JLE / JNG  : 작거나 같음(<=)\n;       (G=Greater, L=Less 로 외우기)\n;\n;   ★ 시험 단골: 부호 없는→A/B,  부호 있는→G/L 구분!\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    ; 세 정수 중 최솟값 예제용 (부호 없는 16비트)\n    V1      WORD  30\n    V2      WORD  10\n    V3      WORD  20\n    result  WORD  0\n\n    ; 순차 검색 예제용 (16비트 정수 배열)\n    intArray SWORD 0, 0, 0, 0, 1, 20, 35, -12, 66, 4, 0\n    arrSize  = ($ - intArray) / TYPE intArray\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. CMP + 조건부 점프 기본형\n    ; ==========================================================\n\n    ; [예제] EAX == 5 일 때 L1 로 점프\n    mov eax, 5\n    cmp eax, 5              ; 같으면 ZF=1\n    je  L1                  ; JE: ZF=1 이면 점프\n    ; ... (EAX != 5 일 때 실행) ...\nL1:\n\n    ; ==========================================================\n    ; 2. 응용: 두 정수 중 큰 값 (부호 없는)\n    ;    EAX, EBX 중 큰 값을 EDX 로 이동\n    ; ==========================================================\n    mov eax, 25\n    mov ebx, 40\n    mov edx, eax           ; EAX가 크다고 가정\n    cmp eax, ebx           ; EAX >= EBX 이면\n    jae L2                 ;   L2로 점프 (가정 유지)\n    mov edx, ebx           ; 아니면 EBX가 큼 → EDX = EBX\nL2:                        ; EDX = 두 값 중 큰 값\n\n    ; ==========================================================\n    ; 3. 응용: 세 정수 중 최솟값 (부호 없는 16비트)\n    ;    V1, V2, V3 중 가장 작은 값을 AX 로 이동\n    ; ==========================================================\n    mov ax, V1             ; V1이 최소라 가정\n    cmp ax, V2             ; AX <= V2 이면\n    jbe L3                 ;   L3로 점프 (V2 건너뜀)\n    mov ax, V2             ; 아니면 V2가 더 작음\nL3:\n    cmp ax, V3             ; AX <= V3 이면\n    jbe L4                 ;   L4로 점프 (V3 건너뜀)\n    mov ax, V3             ; 아니면 V3가 더 작음\nL4:\n    mov result, ax         ; result = 최솟값 (= 10)\n\n    ; ==========================================================\n    ; 4. 응용: 상태 비트 검사 (TEST + 조건부 점프)\n    ; ==========================================================\n    mov al, 00100000b      ; 가상의 장치 상태 바이트\n    test al, 00100000b     ; 비트5가 켜져 있는가?\n    jnz DeviceOffline      ; 1이면(ZF=0) 점프 = 오프라인\n    jmp CheckDone\nDeviceOffline:\n    ; ... 장치 오프라인 처리 ...\nCheckDone:\n\n    ; ==========================================================\n    ; 5. 응용: 배열 순차 검색 (첫 0이 아닌 값 찾기)\n    ;    16비트 정수 배열에서 처음으로 0이 아닌 값을 찾는다\n    ; ==========================================================\n    mov ebx, OFFSET intArray   ; 배열 시작 주소\n    mov ecx, arrSize           ; 루프 카운터 = 원소 개수\nL5:\n    cmp WORD PTR [ebx], 0      ; 현재 원소가 0인가?\n    jne found                  ; 0이 아니면 찾음 → 종료\n    add ebx, TYPE intArray     ; 다음 원소로 이동\n    loop L5                    ; ECX회 반복\n    jmp notFound               ; 끝까지 0만 있었음\nfound:\n    mov ax, [ebx]              ; AX = 찾은 0이 아닌 값 (=1)\n    jmp searchDone\nnotFound:\n    ; ... \"0이 아닌 값 없음\" 처리 ...\nsearchDone:\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/16_ConditionalLoops.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 16_ConditionalLoops.asm\n; 설  명  : 6장 조건 처리 (3) - 조건부 루프 명령어\n;           LOOPZ / LOOPE / LOOPNZ / LOOPNE\n;           (PDF 06_Conditional Processing - Conditional Loop Instructions)\n; ============================================================\n;\n; [기본 LOOP 와의 차이]\n;   LOOP   : ECX를 1 감소시키고 ECX != 0 이면 점프\n;   LOOPZ/LOOPE   : ECX 감소 후 (ECX != 0) AND (ZF == 1) 이면 점프\n;   LOOPNZ/LOOPNE : ECX 감소 후 (ECX != 0) AND (ZF == 0) 이면 점프\n;\n;   ★ ZF는 LOOPxx 명령 자체가 바꾸지 않음 → 직전 명령의 ZF를 본다\n;   ★ LOOPZ = LOOPE,  LOOPNZ = LOOPNE (같은 opcode)\n;\n;   동작 순서 (LOOPZ/LOOPE)\n;     ① ECX = ECX - 1\n;     ② (ECX != 0) 그리고 (ZF = 1) 이면 → 레이블로 점프\n;     ③ 아니면 → 다음 명령으로 진행 (루프 종료)\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    ; LOOPNZ 예제: 처음으로 음수가 아닌(0 이상) 수를 찾는 배열\n    array    SWORD -3, -6, -1, -10, 10, 30, 40, 4\n    sentinel SWORD 0\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; LOOPNZ/LOOPNE 응용: 첫 번째 '음수가 아닌' 수 찾기\n    ;\n    ;   각 원소의 부호 비트(비트15)를 TEST로 검사한다.\n    ;   · 음수면 부호 비트=1 → TEST 결과 ZF=0 → LOOPNZ 계속\n    ;   · 0이상이면 부호 비트=0 → TEST 결과 ZF=1 → 루프 탈출\n    ;\n    ;   ★ 핵심: ADD가 ZF를 바꾸므로, TEST 직후의 플래그를\n    ;     스택에 저장(PUSHFD)했다가 LOOPNZ 직전에 복원(POPFD)한다.\n    ; ==========================================================\n\n    mov esi, OFFSET array\n    mov ecx, LENGTHOF array\nL1:\n    test WORD PTR [esi], 8000h   ; 부호 비트(비트15) 검사\n    pushfd                       ; 플래그를 스택에 저장\n    add  esi, TYPE array         ; 다음 원소로 이동(ZF가 변함)\n    popfd                        ; 저장해 둔 플래그 복원\n    loopnz L1                    ; ZF=0(음수)이고 ECX!=0이면 반복\n\n    jnz quit                     ; 끝까지 음수만 있었음 → 종료\n    sub esi, TYPE array          ; ESI를 찾은 값 위치로 되돌림\n    ; 이 시점에서 [esi] = 첫 번째 0 이상인 값(=10)\nquit:\n\n    ; ==========================================================\n    ; (참고) LOOPE/LOOPZ 동작 개념\n    ;   \"조건이 같은(equal) 동안 계속 반복\"\n    ;   예: 배열에서 연속된 동일 값이 이어지는 구간을 셀 때 등\n    ;   동작: ECX 감소 후 ECX!=0 그리고 ZF=1 이면 점프\n    ; ==========================================================\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/17_ConditionalStructures.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 17_ConditionalStructures.asm\n; 설  명  : 6장 조건 처리 (4) - 조건 구조 & 제어 흐름 디렉티브\n;           IF / IF-ELSE / 복합 조건(AND,OR) / WHILE 루프 /\n;           .IF .ELSE .ELSEIF .ENDIF / .WHILE / .REPEAT\n;           (PDF 06_Conditional Processing - Conditional Structures /\n;            Conditional Control Flow Directives)\n; ============================================================\n;\n; [고수준 구조 → 어셈블리 변환의 핵심]\n;   1) 불리언 식을 평가하여 CPU 플래그를 변경 (CMP 등)\n;   2) 조건부 점프로 분기를 구현\n;   ※ 변수끼리는 직접 비교 불가 → 한쪽을 레지스터로 옮긴 뒤 CMP\n;   ※ 흔한 기법: 조건을 '반대로 뒤집어' ELSE/endwhile 로 점프\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    op1     DWORD 5\n    op2     DWORD 10\n    X       DWORD 0\n    Y       DWORD 0\n    val1    SDWORD 7\n    val2    SDWORD 9\n\n    ; 배열 합산 예제 (sample 보다 큰 원소들의 합)\n    intarray DWORD 10, 60, 20, 33, 72, 89, 45, 65, 72, 18\n    sample   DWORD 50\n    sum      DWORD 0\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. 블록 구조 IF 문\n    ;    if (op1 == op2)  X = 1;\n    ;    else             X = 2;\n    ;\n    ;    기법: 조건을 반대로(JNE) 뒤집어 ELSE로 점프\n    ; ==========================================================\n    mov eax, op1\n    cmp eax, op2           ; op1 == op2 ?\n    jne L1                 ; 다르면 ELSE(L1)로\n    mov X, 1               ; (then) X = 1\n    jmp L2\nL1: mov X, 2               ; (else) X = 2\nL2:\n\n    ; ==========================================================\n    ; 2. 복합 조건 - 논리 AND (단축 평가 Short-Circuit)\n    ;    if (al > 10 AND al < 20)  X = 1;\n    ;    → 첫 조건이 거짓이면 둘째 조건은 평가하지 않음\n    ;    기법: 첫 비교를 JBE(반대)로 뒤집어 거짓 시 바로 next\n    ; ==========================================================\n    mov al, 15\n    cmp al, 10\n    jbe next1              ; al <= 10 이면 거짓 → 건너뜀\n    cmp al, 20\n    jae next1              ; al >= 20 이면 거짓 → 건너뜀\n    mov X, 1               ; 두 조건 모두 참\nnext1:\n\n    ; ==========================================================\n    ; 3. 복합 조건 - 논리 OR\n    ;    if (al > 10 OR al == 0)  Y = 1;\n    ;    → 첫 조건이 참이면 둘째는 평가 불필요 → 바로 분기\n    ; ==========================================================\n    mov al, 5\n    cmp al, 10\n    ja  L3                 ; al > 10 이면 참 → 실행부로\n    cmp al, 0\n    jne next2             ; 둘 다 거짓 → 건너뜀\nL3: mov Y, 1               ; 둘 중 하나라도 참\nnext2:\n\n    ; ==========================================================\n    ; 4. WHILE 루프\n    ;    while (val1 < val2)  val1++;\n    ;    기법: 조건을 반대로(JNL) 뒤집어 endwhile로 점프\n    ;          변수는 레지스터(EAX)로 옮겨 처리 (부호 있는 → JNL)\n    ; ==========================================================\n    mov eax, val1          ; EAX가 루프 안에서 val1 대역\nbeginwhile:\n    cmp eax, val2          ; val1 < val2 ?\n    jnl endwhile           ; val1 >= val2 이면 종료(부호 있음)\n    inc eax                ; val1++\n    jmp beginwhile\nendwhile:\n    mov val1, eax          ; 변수 값 복원\n\n    ; ==========================================================\n    ; 5. 루프 안에 IF 문 (배열 합산 응용)\n    ;    sample(50) 보다 큰 모든 원소의 합을 구한다.\n    ;    EDX=sample, EAX=sum, ESI=index, ECX=원소수\n    ; ==========================================================\n    mov eax, 0                     ; sum = 0\n    mov edx, sample                ; EDX = 비교 기준값\n    mov esi, 0                     ; 인덱스 = 0\n    mov ecx, LENGTHOF intarray     ; 카운터\nL4:\n    cmp intarray[esi*4], edx       ; 원소 > sample ?\n    jng L5                         ; 크지 않으면 건너뜀(부호 있음)\n    add eax, intarray[esi*4]       ; 합에 누적\nL5:\n    inc esi\n    loop L4\n    mov sum, eax                   ; sum 저장\n\n    ; ==========================================================\n    ; 6. 고수준 제어 흐름 디렉티브 (.IF / .ELSEIF / .ENDIF)\n    ;    MASM이 내부적으로 CMP + 조건부 점프를 자동 생성\n    ;    조건식에 C 스타일 연산자 사용: < > == != && ||\n    ; ==========================================================\n    mov eax, op1\n    .IF eax > op2\n        mov X, 1\n    .ELSEIF eax == op2\n        mov X, 2\n    .ELSE\n        mov X, 3\n    .ENDIF\n\n    ; ==========================================================\n    ; 7. .WHILE 디렉티브 (조건 먼저 검사)\n    ;    값 1~10 을 ECX 로 세는 예\n    ; ==========================================================\n    mov eax, 0\n    .WHILE eax < 10\n        inc eax\n    .ENDW\n\n    ; ==========================================================\n    ; 8. .REPEAT 디렉티브 (몸체 먼저 실행, .UNTIL 에서 검사)\n    ; ==========================================================\n    mov eax, 0\n    .REPEAT\n        inc eax\n    .UNTIL eax == 10\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_01_Boolean_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 6장 - 불리언 & 비교 명령어\n; 문제 파일: E6_01_Boolean_Practice.asm\n; ============================================================\n;\n; (1)  0\n; (2)  0          (AND/OR/XOR/TEST 는 항상 OF=0, CF=0)\n; (3)  영향 없음  (NOT 은 어떤 플래그도 바꾸지 않음! ★)\n; (4)  AND\n; (5)  목적지 피연산자  (TEST 는 결과를 버림)\n; (6)  SUB(뺄셈)\n;\n; (7)  AND\n; (8)  OR\n; (9)  XOR\n;\n; (10) 5\n; (11) 11011111   (= 0DFh, 비트5만 0)\n; (12) 41h\n;\n; (13) NOT\n; (14) AND\n; (15) OR\n; (16) 00000001h\n; (17) 80000107h\n;\n; (18) X          (원래 값으로 복원됨)\n; (19) 2          (두 번)\n; (20) 대칭(symmetric)\n;\n; (21) 1   (22) 0     (5-10 → 빌림 발생, CF=1)\n; (23) 0   (24) 1     (1000-1000 → 0, ZF=1)\n; (25) 0   (26) 0     (105-0 → 양수, 0 아님)\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_01_Boolean_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 6장 - 불리언 & 비교 명령어\n; 빈칸( ______ )을 채우세요. 정답은 E6_01_Boolean_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    SetX  DWORD 80000007h\n    SetY  DWORD 00000101h\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] 명령어별 플래그 영향 — 빈칸을 채우세요.\n;\n;   AND  → OF = (1)______, CF = (2)______\n;   OR   → OF = ______,    CF = ______        (AND와 동일)\n;   XOR  → OF = ______,    CF = ______        (AND와 동일)\n;   NOT  → 플래그 영향: (3)______\n;   TEST → 동작은 (4)______ 와 같지만 (5)______ 는 변하지 않음\n;   CMP  → 동작은 (6)______ 과 같지만 피연산자는 변하지 않음\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] 비트 마스킹 — 알맞은 명령어를 채우세요.\n;\n;   · 특정 비트를 0으로 끄기(clear) → (7)______\n;   · 특정 비트를 1로 켜기(set)     → (8)______\n;   · 특정 비트를 토글(toggle)      → (9)______\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] 대문자 변환 — 빈칸을 채우세요.\n;\n;   소문자 'a'(61h) → 대문자 'A'(41h) : 비트 (10)______ 만 다름\n;   mov al, 'a'\n;   and al, (11)______b      ; 비트5를 끄는 8비트 마스크\n;   ; → AL = (12)______ ('A')\n\n; ──────────────────────────────────────────────────────────\n; [문제 4] 집합 연산 — 알맞은 명령어를 채우세요.\n;\n;   여집합(complement) → (13)______\n;   교집합(intersection) → (14)______\n;   합집합(union)        → (15)______\n;\n;   SetX=80000007h, SetY=00000101h 일 때\n;   교집합 결과 EAX = (16)______\n;   합집합 결과 EAX = (17)______\n\n; ──────────────────────────────────────────────────────────\n; [문제 5] XOR 가역성 — 빈칸을 채우세요.\n;\n;   (X XOR Y) XOR Y = (18)______\n;   → 같은 키로 (19)______ 번 XOR 하면 원래 값 복원\n;   → 이 성질을 이용한 암호화 방식: (20)______ 키 암호화\n\n; ──────────────────────────────────────────────────────────\n; [문제 6] CMP 결과 예측 — CF, ZF 값을 채우세요. (부호 없는)\n;\n;   mov ax, 5\n;   cmp ax, 10     ; CF=(21)______  ZF=(22)______\n;\n;   mov ax, 1000\n;   cmp ax, 1000   ; CF=(23)______  ZF=(24)______\n;\n;   mov ax, 105\n;   cmp ax, 0      ; CF=(25)______  ZF=(26)______\n\n    ; (실행용 코드 - 교집합/합집합 계산)\n    mov eax, SetX\n    and eax, SetY\n    mov eax, SetX\n    or  eax, SetY\n\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_02_ConditionalJumps_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 6장 - 조건부 점프 (Jcond)\n; 문제 파일: E6_02_ConditionalJumps_Practice.asm\n; ============================================================\n;\n; [문제 1] 조건부 점프 4분류\n;   (부호 없는)                  (부호 있는)\n;   (1) JA  (JNBE)               (5) JG  (JNLE)\n;   (2) JAE (JNB)                (6) JGE (JNL)\n;   (3) JB  (JNAE)               (7) JL  (JNGE)\n;   (4) JBE (JNA)                (8) JLE (JNG)\n;\n;   (9)  A (Above)\n;   (10) B (Below)\n;   (11) G (Greater)\n;   (12) L (Less)\n;\n; [문제 2]\n;   (13) JZ\n;   (14) JNZ\n;\n; [문제 3]\n;   (15) JAE      (부호 없는 >= → JAE)\n;\n; [문제 4]\n;   (16) JBE      (부호 없는 <= → JBE)\n;   (17) JBE\n;   (18) 10       (V1,V2,V3 중 최솟값)\n;\n; [문제 5]\n;   (19) CMP\n;   (20) 플래그(flags)\n;   (21) 조건부(conditional)\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_02_ConditionalJumps_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 6장 - 조건부 점프 (Jcond)\n; 빈칸( ______ )을 채우세요. 정답은 E6_02_ConditionalJumps_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    V1 WORD 30\n    V2 WORD 10\n    V3 WORD 20\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] 조건부 점프 4분류 — 점프 명령을 채우세요.\n;\n;   (부호 없는 비교)         (부호 있는 비교)\n;   >  : (1)______           >  : (5)______\n;   >= : (2)______           >= : (6)______\n;   <  : (3)______           <  : (7)______\n;   <= : (4)______           <= : (8)______\n;\n;   ★ 부호 없는 → (9)______ / (10)______ 로 시작\n;     부호 있는 → (11)______ / (12)______ 로 시작\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] 동치 관계 — 빈칸을 채우세요.\n;\n;   JE  = (13)______      (둘 다 ZF=1 이면 점프)\n;   JNE = (14)______      (둘 다 ZF=0 이면 점프)\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] 두 정수 중 큰 값(부호 없는) — 빈칸을 채우세요.\n;   EAX, EBX 중 큰 값을 EDX 로.\n;\n;   mov edx, eax          ; EAX가 크다고 가정\n;   cmp eax, ebx\n;   (15)______ L1         ; EAX >= EBX 이면 L1 (부호 없는)\n;   mov edx, ebx\n;   L1:\n; ──────────────────────────────────────────────────────────\n\n; [문제 4] 세 정수 중 최솟값(부호 없는) — 빈칸을 채우세요.\n;   V1=30, V2=10, V3=20\n;\n;   mov ax, V1\n;   cmp ax, V2\n;   (16)______ L1         ; AX <= V2 이면 L1\n;   mov ax, V2\n;   L1:\n;   cmp ax, V3\n;   (17)______ L2         ; AX <= V3 이면 L2\n;   mov ax, V3\n;   L2:\n;   ; AX = (18)______     (최솟값)\n\n; ──────────────────────────────────────────────────────────\n; [문제 5] 조건 구조 구현의 2단계 — 빈칸을 채우세요.\n;\n;   1) (19)______, AND, SUB 등이 CPU 상태 (20)______ 를 변경\n;   2) (21)______ 점프 명령이 그 플래그를 검사하여 분기\n\n    ; (실행용 코드)\n    mov ax, V1\n    cmp ax, V2\n    jbe L1\n    mov ax, V2\nL1: cmp ax, V3\n    jbe L2\n    mov ax, V3\nL2:\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_03_Structures_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 6장 - 조건 구조 & 조건부 루프\n; 문제 파일: E6_03_Structures_Practice.asm\n; ============================================================\n;\n; [문제 1] IF-ELSE\n;   (1) JNE      (조건을 반대로 뒤집어 ELSE로)\n;   (2) JMP\n;\n; [문제 2] 복합 조건 AND\n;   (3) JBE      (al <= 10 이면 거짓)\n;   (4) JAE      (al >= 20 이면 거짓)\n;   (5) 단축(short-circuit)\n;\n; [문제 3] WHILE\n;   (6) JNL      (부호 있는 >= → JNL, JGE 와 동일)\n;   (7) 레지스터\n;\n; [문제 4] 조건부 루프\n;   (8)  1       (LOOPE/LOOPZ 는 ZF=1 이어야 점프)\n;   (9)  0       (LOOPNE/LOOPNZ 는 ZF=0 이어야 점프)\n;   (10) 만들지 않음 (변경하지 않음)\n;   (11) PUSHFD\n;   (12) POPFD\n;\n; [문제 5] 제어 흐름 디렉티브\n;   (13) .ENDIF\n;   (14) .ENDW\n;   (15) .UNTIL\n;   (16) 부호 없는(unsigned)\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/E6_03_Structures_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 6장 - 조건 구조 & 조건부 루프\n; 빈칸( ______ )을 채우세요. 정답은 E6_03_Structures_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    op1 DWORD 5\n    op2 DWORD 10\n    X   DWORD 0\n    array    SWORD -3, -6, -1, -10, 10, 30, 40, 4\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] IF-ELSE 변환 — 빈칸을 채우세요.\n;   if (op1 == op2)  X = 1;\n;   else             X = 2;\n;\n;   mov eax, op1\n;   cmp eax, op2\n;   (1)______ L1          ; 다르면 ELSE로 (조건을 반대로 뒤집음)\n;   mov X, 1\n;   (2)______ L2          ; then 끝나면 건너뜀\n;   L1: mov X, 2\n;   L2:\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] 복합 조건 AND — 빈칸을 채우세요.\n;   if (al > 10 && al < 20)  X = 1;\n;\n;   cmp al, 10\n;   (3)______ next        ; al <= 10 이면 거짓 → 탈출\n;   cmp al, 20\n;   (4)______ next        ; al >= 20 이면 거짓 → 탈출\n;   mov X, 1\n;   next:\n;\n;   ※ 첫 조건이 거짓이면 둘째를 평가하지 않는 것을 (5)______ 평가라 함\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] WHILE 변환 — 빈칸을 채우세요.\n;   while (val1 < val2)  val1++;   (부호 있는 정수)\n;\n;   mov eax, val1\n;   beginwhile:\n;     cmp eax, val2\n;     (6)______ endwhile  ; val1 >= val2 이면 종료 (부호 있는)\n;     inc eax\n;     jmp beginwhile\n;   endwhile:\n;\n;   ※ 변수끼리는 직접 비교 불가 → 한쪽을 (7)______ 로 옮긴다\n\n; ──────────────────────────────────────────────────────────\n; [문제 4] 조건부 루프 명령어 — 빈칸을 채우세요.\n;\n;   LOOPE/LOOPZ  : ECX-- 후 (ECX!=0) 그리고 (ZF = (8)______ ) 이면 점프\n;   LOOPNE/LOOPNZ: ECX-- 후 (ECX!=0) 그리고 (ZF = (9)______ ) 이면 점프\n;\n;   ★ LOOPxx 명령은 ZF를 (10)______ → 직전 명령의 ZF를 사용\n;   ★ ADD 등이 ZF를 덮어쓰므로 (11)______ / (12)______ 로 플래그 보존\n\n; ──────────────────────────────────────────────────────────\n; [문제 5] 고수준 제어 흐름 디렉티브 — 빈칸을 채우세요.\n;\n;   IF 문   : .IF / .ELSEIF / .ELSE / (13)______\n;   조건 먼저 검사하는 루프 : .WHILE / (14)______\n;   몸체 먼저 실행 후 검사  : .REPEAT / (15)______\n;\n;   ★ 레지스터끼리 .IF 로 비교하면 MASM은 기본적으로\n;     (16)______ 비교(JBE 등)를 생성한다\n\n    ; (실행용 코드 - IF-ELSE)\n    mov eax, op1\n    cmp eax, op2\n    jne L1\n    mov X, 1\n    jmp L2\nL1: mov X, 2\nL2:\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 6,
+    "title": "Chapter 06/example/README_기말고사출제포인트.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [6장 기말고사 출제 포인트 요약]\n; ============================================================\n;\n; ★★★ 최우선 암기 항목 ★★★\n;\n; 1. 불리언 명령어 플래그 (시험 단골!)\n;    AND/OR/XOR/TEST → 항상 OF=0, CF=0 / SF,ZF,PF는 결과 따라\n;    NOT → 어떤 플래그도 변경 안 함! ★\n;    CMP → 뺄셈 결과 기준으로 OF,SF,ZF,CF,AF,PF 변경\n;\n; 2. 비트 마스킹\n;    비트 끄기 → AND,  켜기 → OR,  토글 → XOR\n;    대문자화 → AND ch, 11011111b (0DFh)\n;\n; 3. 집합 연산\n;    여집합 → NOT,  교집합 → AND,  합집합 → OR\n;\n; 4. 조건부 점프 4분류 (★★★ 최빈출 ★★★)\n;    부호 없는 → A(Above)/B(Below) : JA JAE JB JBE\n;    부호 있는 → G(Greater)/L(Less): JG JGE JL JLE\n;    JE=JZ, JNE=JNZ, JCXZ/JECXZ\n;    ※ 음수 비교에서 A/B 와 G/L 혼동 = 논리 버그!\n;\n; 5. CMP 결과 (부호 없는)\n;    목적지 < 소스 → CF=1\n;    목적지 = 소스 → ZF=1\n;    목적지 > 소스 → CF=0, ZF=0\n;\n; 6. 조건부 루프\n;    LOOPE/LOOPZ   → ECX!=0 그리고 ZF=1 이면 점프\n;    LOOPNE/LOOPNZ → ECX!=0 그리고 ZF=0 이면 점프\n;    LOOPNZ 앞에서 PUSHFD/POPFD 로 플래그 보존 (ADD가 ZF 덮어씀)\n;\n; 7. 조건 구조 변환 정석\n;    IF-ELSE : 조건을 '반대로' 뒤집어 ELSE 레이블로 점프\n;    WHILE   : 조건 반대로 뒤집어 endwhile 로 점프\n;    변수끼리 직접 CMP 불가 → 한쪽을 레지스터로 옮김\n;\n; 8. 고수준 디렉티브\n;    .IF/.ELSEIF/.ELSE/.ENDIF, .WHILE/.ENDW, .REPEAT/.UNTIL\n;    ★ 레지스터끼리 .IF 비교 → MASM은 기본 '부호 없는' 비교 생성\n;\n; ─────────────────────────────────────────────────────────\n; [풀어야 할 연습 파일 순서]\n;   1. E6_01_Boolean_Practice.asm\n;   2. E6_02_ConditionalJumps_Practice.asm\n;   3. E6_03_Structures_Practice.asm\n; ─────────────────────────────────────────────────────────\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/00_StudyNotes.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 00_StudyNotes.asm\n; 설  명  : 7장 Integer Arithmetic (정수 산술)\n;           기말고사 직전 핵심 요약 + 퀴즈\n;           (빌드 불가 — 학습/복습 전용 노트)\n;\n; [관련 예제 파일]\n;   18_ShiftRotate.asm            → SHL/SHR/SAL/SAR/ROL/ROR/RCL/RCR\n;   19_ShiftRotateApplications.asm→ 다중바이트시프트/이진곱셈/비트추출\n;   20_MulDiv.asm                 → MUL/IMUL/DIV/IDIV/CBW/CWD/CDQ\n;   21_ExtendedArithmetic.asm     → ADC / SBB\n; ============================================================\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 1: 시프트 & 로테이트                       ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ─────────────────────────────────────────────────────────\n; 1-1. 명령어 한눈에 정리 (시험 단골!)\n; ─────────────────────────────────────────────────────────\n;   ┌──────┬────────────────────────────────────────────┐\n;   │ 명령 │ 동작                                       │\n;   ├──────┼────────────────────────────────────────────┤\n;   │ SHL  │ 왼쪽 논리시프트, 최하위=0, 최상위→CF        │\n;   │ SHR  │ 오른쪽 논리시프트, 최상위=0, 최하위→CF      │\n;   │ SAL  │ SHL과 동일 (산술 왼쪽)                      │\n;   │ SAR  │ 오른쪽 산술시프트, 부호비트 복제(부호 보존) │\n;   │ ROL  │ 왼쪽 회전, 최상위→최하위 & CF               │\n;   │ ROR  │ 오른쪽 회전, 최하위→최상위 & CF             │\n;   │ RCL  │ CF 포함 왼쪽 회전 (CF를 9번째 비트처럼)     │\n;   │ RCR  │ CF 포함 오른쪽 회전                         │\n;   │ SHLD │ 더블 왼쪽시프트, 빈자리=소스의 상위비트     │\n;   │ SHRD │ 더블 오른쪽시프트, 빈자리=소스의 하위비트   │\n;   └──────┴────────────────────────────────────────────┘\n;   ★ 모든 시프트/로테이트는 OF, CF에 영향\n;\n; ─────────────────────────────────────────────────────────\n; 1-2. 시프트로 곱셈/나눗셈 (암기)\n; ─────────────────────────────────────────────────────────\n;   왼쪽 n비트 시프트 (SHL) = × 2^n\n;   오른쪽 n비트 시프트(SHR)= ÷ 2^n  (부호 없는)\n;   부호 있는 나눗셈        = SAR    (부호 비트 보존하므로)\n;\n;   ☑ 퀴즈 1: mov al,10 / shl al,2 후 AL=?  (답: 40 = 10×4)\n;   ☑ 퀴즈 2: 부호 있는 -128 ÷ 8 을 하려면? (답: sar dl,3 → -16)\n;\n; ─────────────────────────────────────────────────────────\n; 1-3. SAR로 부호 확장 / 부호 오버플로\n; ─────────────────────────────────────────────────────────\n;   AX→EAX 부호 확장: shl eax,16 / sar eax,16\n;   1비트 시프트/회전으로 부호가 뒤집히면 OF=1\n;   (카운트가 1보다 크면 OF는 정의되지 않음)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 2: 곱셈 & 나눗셈                           ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ─────────────────────────────────────────────────────────\n; 2-1. MUL / IMUL 크기 규칙 (★★★ 최빈출 ★★★)\n; ─────────────────────────────────────────────────────────\n;   8비트  : AL  × op8  → AX\n;   16비트 : AX  × op16 → DX:AX\n;   32비트 : EAX × op32 → EDX:EAX\n;   · 곱은 피연산자의 2배 크기 → 오버플로 불가\n;   · 즉치 피연산자 사용 불가 (단, IMUL 2/3-피연산자 형식은 가능)\n;\n;   MUL  : 상위 절반 ≠ 0 이면 CF=1, OF=1\n;   IMUL : 상위 절반이 하위의 부호확장이 아니면 CF=1, OF=1\n;\n;   ☑ 퀴즈 3: AX × BX 의 결과는 어느 레지스터에? (답: DX:AX)\n;   ☑ 퀴즈 4: IMUL 48,4 → AX=192 인데 왜 OF=1?\n;     (답: AH가 AL의 부호확장이 아님 → AL 최상위=1인데 AH=0)\n;\n; ─────────────────────────────────────────────────────────\n; 2-2. DIV / IDIV 크기 규칙 (★★★ 최빈출 ★★★)\n; ─────────────────────────────────────────────────────────\n;   ┌────────┬──────────┬──────┬────────┐\n;   │ 제수   │ 피제수   │ 몫   │ 나머지 │\n;   ├────────┼──────────┼──────┼────────┤\n;   │ 8비트  │ AX       │ AL   │ AH     │\n;   │ 16비트 │ DX:AX    │ AX   │ DX     │\n;   │ 32비트 │ EDX:EAX  │ EAX  │ EDX    │\n;   └────────┴──────────┴──────┴────────┘\n;\n;   ★ DIV(부호 없는): 상위 절반(AH/DX/EDX)을 반드시 0으로 클리어\n;   ★ IDIV(부호 있는): 나누기 전 반드시 부호 확장(CBW/CWD/CDQ)\n;     CBW: AL→AX,  CWD: AX→DX,  CDQ: EAX→EDX\n;   ★ IDIV 나머지의 부호 = 피제수의 부호\n;\n;   ☑ 퀴즈 5: 16비트 IDIV 전에 어떤 명령으로 부호 확장? (답: CWD)\n;   ☑ 퀴즈 6: 8비트 -48/5 의 몫과 나머지는? (답: 몫 -9, 나머지 -3)\n;\n; ─────────────────────────────────────────────────────────\n; 2-3. 나눗셈 오버플로\n; ─────────────────────────────────────────────────────────\n;   몫이 목적지에 안 들어가거나 0으로 나누면 → CPU 예외(프로그램 중단)\n;   대책: 더 큰 피제수/제수 사용, 나누기 전 제수≠0 검사\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 3: 확장 덧셈 & 뺄셈 (ADC / SBB)            ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n;   ADC 목적지, 소스 → 목적지 = 목적지 + 소스 + CF\n;   SBB 목적지, 소스 → 목적지 = 목적지 - 소스 - CF\n;   레지스터 크기를 넘는 큰 수를 조각내어 Carry를 전달하며 계산\n;\n;   FFh + FFh:\n;     add al,0FFh (CF=1) → adc dl,0 (DL=1) → DL:AL = 01FEh\n;\n;   ☑ 퀴즈 7: 0FFFFFFFFh + 0FFFFFFFFh 의 EDX:EAX 결과?\n;     (답: 00000001FFFFFFFEh)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 4: 흔한 실수 모음                          ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; ✗ 실수 1: DIV 전에 AH/DX/EDX 클리어 안 함 → 엉뚱한 몫/예외\n; ✗ 실수 2: IDIV 전에 부호 확장(CBW/CWD/CDQ) 안 함 → 오답\n; ✗ 실수 3: 부호 있는 나눗셈에 SHR 사용 (SAR를 써야 부호 보존)\n; ✗ 실수 4: MUL에 즉치 피연산자 사용 (mul 5 ← 불가)\n; ✗ 실수 5: 곱셈 결과를 AX 한 곳에만 있다고 가정\n;           (16비트는 DX:AX, 32비트는 EDX:EAX)\n; ✗ 실수 6: ADC/SBB로 큰 수 계산 시 Carry 전달 순서 착각\n;           (덧셈/뺄셈은 하위 조각부터 처리해야 CF가 맞음)\n\n; ╔══════════════════════════════════════════════════════════╗\n; ║       SECTION 5: 퀴즈 정답 모음                          ║\n; ╚══════════════════════════════════════════════════════════╝\n;\n; Q1: shl al,2 → AL = 40 (10 × 4)\n; Q2: sar dl,3 → -128 ÷ 8 = -16 (SAR로 부호 보존)\n; Q3: AX × BX → DX:AX\n; Q4: AH가 AL의 부호확장이 아니므로 OF=1 (192=00C0h, AL=C0h,AH=00h)\n; Q5: CWD (AX → DX 부호 확장)\n; Q6: -48/5 → 몫 -9, 나머지 -3\n; Q7: 00000001FFFFFFFEh\n;\n; ─────────────────────────────────────────────────────────\n; [풀어야 할 연습 파일 순서]\n;   1. example/E7_01_ShiftRotate_Practice.asm\n;   2. example/E7_02_MulDiv_Practice.asm\n;   3. example/E7_03_Extended_Practice.asm\n; ─────────────────────────────────────────────────────────\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/18_ShiftRotate.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 18_ShiftRotate.asm\n; 설  명  : 7장 정수 산술 (1) - 시프트 & 로테이트 명령어\n;           SHL / SHR / SAL / SAR / ROL / ROR / RCL / RCR /\n;           SHLD / SHRD\n;           (PDF 07_Integer Arithmetic - Shift and Rotate Instructions)\n; ============================================================\n;\n; [논리 시프트 vs 산술 시프트]\n;   논리(Logical)   : 새로 생기는 비트 자리를 0으로 채움\n;   산술(Arithmetic): 새 비트 자리를 원래 부호 비트로 채움(부호 보존)\n;\n; [공통] 모든 시프트/로테이트는 OF, CF에 영향을 준다.\n;        카운트는 즉치(0~255) 또는 CL 레지스터 사용.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    testval BYTE 11001111b\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. SHL (Shift Left) - 논리 왼쪽 시프트\n    ;    최하위 비트에 0을 채우고, 최상위 비트는 CF로 나감\n    ; ==========================================================\n    mov bl, 8Fh            ; BL = 10001111b\n    shl bl, 1              ; BL = 00011110b, CF=1 (밀려난 최상위 비트)\n\n    ; [비트 곱셈] 왼쪽 n비트 시프트 = ×2^n\n    mov dl, 5\n    shl dl, 1              ; DL = 10  (5 × 2^1)\n    mov dl, 10            ; 00001010b\n    shl dl, 2             ; DL = 40  (10 × 2^2)\n\n    ; ==========================================================\n    ; 2. SHR (Shift Right) - 논리 오른쪽 시프트\n    ;    최상위 비트에 0을 채우고, 최하위 비트는 CF로 나감\n    ; ==========================================================\n    mov al, 0D0h           ; AL = 11010000b\n    shr al, 1              ; AL = 01101000b, CF=0\n\n    ; [비트 나눗셈] 오른쪽 n비트 시프트 = ÷2^n (부호 없는)\n    mov al, 32\n    shr al, 3             ; AL = 4  (32 ÷ 2^3)\n\n    ; ==========================================================\n    ; 3. SAL / SAR - 산술 시프트\n    ;    SAL : SHL과 완전히 동일 (왼쪽)\n    ;    SAR : 오른쪽 시프트하되 부호 비트를 복제(부호 보존)\n    ; ==========================================================\n\n    ; SAR로 부호 보존 확인 (음수는 음수로 유지)\n    mov al, 0F0h           ; AL = -16 (11110000b)\n    sar al, 1             ; AL = 11111000b = -8 (부호 비트 복제)\n\n    ; [부호 있는 나눗셈] SAR 사용: -128 ÷ 2^3 = -16\n    mov dl, -128           ; DL = 10000000b\n    sar dl, 3             ; DL = 11110000b = -16\n\n    ; [AX의 부호를 EAX로 확장하는 기법]\n    ;   왼쪽 16비트 시프트 후 산술 오른쪽 16비트 시프트\n    mov eax, 0FFFFh        ; 하위 워드만 채워진 상태 가정\n    shl eax, 16\n    sar eax, 16           ; 부호 확장 완료\n\n    ; ==========================================================\n    ; 4. ROL (Rotate Left) - 왼쪽 회전\n    ;    최상위 비트가 최하위 비트 자리 + CF 로 동시에 복사됨\n    ;    회전은 비트를 잃지 않음(한 끝에서 나간 비트가 반대편으로)\n    ; ==========================================================\n    mov al, 11110000b\n    rol al, 1             ; AL = 11100001b (최상위 1 → 최하위)\n\n    ; [니블 교환] 바이트의 상위4/하위4 비트 교환 → 4비트 회전\n    mov al, 26h\n    rol al, 4            ; AL = 62h (16진수 자리 교환)\n\n    ; ==========================================================\n    ; 5. ROR (Rotate Right) - 오른쪽 회전\n    ;    최하위 비트가 최상위 비트 자리 + CF 로 복사됨\n    ; ==========================================================\n    mov al, 11110000b\n    ror al, 1            ; AL = 01111000b (최하위 0 → 최상위)\n\n    ; ==========================================================\n    ; 6. RCL (Rotate Carry Left) - CF를 포함한 왼쪽 회전\n    ;    CF를 최하위 비트로, 최상위 비트를 CF로 (CF가 9번째 비트)\n    ; ==========================================================\n    clc                   ; CF = 0\n    mov bl, 88h            ; BL = 10001000b, CF=0\n    rcl bl, 1            ; CF=1, BL=00010000b (최상위→CF, CF→최하위)\n    rcl bl, 1            ; CF=0, BL=00100001b\n\n    ; ==========================================================\n    ; 7. RCR (Rotate Carry Right) - CF를 포함한 오른쪽 회전\n    ;    CF를 최상위 비트로, 최하위 비트를 CF로\n    ; ==========================================================\n    stc                   ; CF = 1\n    mov ah, 10h           ; AH = 00010000b, CF=1\n    rcr ah, 1            ; AH = 10001000b, CF=0 (CF→최상위)\n\n    ; ==========================================================\n    ; 8. 부호 오버플로 (시프트/로테이트의 OF)\n    ;    1비트 시프트/회전으로 부호가 뒤집히면 OF=1\n    ;    예) +127 을 왼쪽 회전 → 음수가 되면 OF=1\n    ;    (카운트가 1보다 크면 OF는 정의되지 않음)\n    ; ==========================================================\n    mov al, +127           ; 01111111b\n    rol al, 1            ; 11111110b = -2 → 부호 반전 → OF=1\n\n    ; ==========================================================\n    ; 9. SHLD / SHRD (Double Precision Shift)\n    ;    SHLD 목적지, 소스, 카운트\n    ;      목적지를 왼쪽으로 시프트, 빈 자리를 '소스의 상위비트'로 채움\n    ;    SHRD 목적지, 소스, 카운트\n    ;      목적지를 오른쪽으로 시프트, 빈 자리를 '소스의 하위비트'로 채움\n    ;    ※ 소스는 변하지 않으며 반드시 레지스터여야 함\n    ; ==========================================================\n    mov ax, 234Bh\n    mov dx, 7654h\n    shrd ax, dx, 4       ; AX를 오른쪽 4비트, DX 하위4비트가 AX 상위로\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/19_ShiftRotateApplications.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 19_ShiftRotateApplications.asm\n; 설  명  : 7장 정수 산술 (2) - 시프트 & 로테이트 응용\n;           다중 더블워드 시프트 / 이진 곱셈 / 비트 필드 추출\n;           (PDF 07_Integer Arithmetic - Shift and Rotate Applications)\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    ; 확장 정수: 리틀 엔디안으로 저장된 바이트 배열\n    ArrayVal BYTE 81h, 20h, 33h        ; 최하위 바이트가 가장 앞\n\n    ; 파일 날짜 스탬프 예제: 1999년 3월 10일\n    ;   비트 0~4 = 일(10), 비트 5~8 = 월(3), 비트 9~15 = 연도(19, 1980기준)\n    datestamp WORD 266Ah\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. 다중 바이트(확장 정수) 1비트 오른쪽 시프트\n    ;    리틀 엔디안 배열을 '높은 바이트부터' 처리해야\n    ;    밀려난 비트를 CF로 이어받아 다음 바이트로 전달 가능\n    ;\n    ;    Step1: 최상위 바이트 [esi+2] SHR → 최하위 비트가 CF로\n    ;    Step2: [esi+1] RCR → CF를 최상위로 받고 최하위를 CF로\n    ;    Step3: [esi]   RCR → 동일하게 처리\n    ; ==========================================================\n    mov esi, OFFSET ArrayVal\n    shr BYTE PTR [esi+2], 1   ; 최상위 바이트, 최하위 비트 → CF\n    rcr BYTE PTR [esi+1], 1   ; CF를 최상위로 채우고, 최하위 → CF\n    rcr BYTE PTR [esi], 1     ; 마지막 바이트도 동일 처리\n    ; → 전체 24비트가 1비트 오른쪽으로 이동 완료\n\n    ; ==========================================================\n    ; 2. 이진 곱셈 (SHL + ADD 로 MUL 대체)\n    ;    승수가 2의 거듭제곱들의 합이면 SHL로 분해 가능\n    ;    예) 123 × 36,  36 = 2^5 + 2^2 (비트 5,2 가 set)\n    ; ==========================================================\n    mov eax, 123\n    mov ebx, eax\n    shl eax, 5             ; 123 × 2^5 = 123 × 32\n    shl ebx, 2             ; 123 × 2^2 = 123 × 4\n    add eax, ebx           ; = 123 × 36 = 4428\n\n    ; ==========================================================\n    ; 3. 파일 날짜 필드 추출 (비트 문자열 분리)\n    ;    하나의 정수에 여러 필드가 패킹됨 → 시프트+마스크로 추출\n    ;    datestamp = 266Ah  (1999-03-10)\n    ; ==========================================================\n\n    ; (1) 일(day) 추출: 비트 0~4 → 하위 5비트 마스크\n    mov ax, datestamp\n    and ax, 0000000000011111b   ; AX = 10 (일)\n\n    ; (2) 월(month) 추출: 비트 5~8 → 오른쪽 5시프트 후 4비트 마스크\n    mov ax, datestamp\n    shr ax, 5\n    and ax, 0000000000001111b   ; AX = 3 (월)\n\n    ; (3) 연도(year) 추출: 비트 9~15 → 오른쪽 9시프트, 1980 더하기\n    mov ax, datestamp\n    shr ax, 9\n    add ax, 1980                ; AX = 1999 (연도)\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/20_MulDiv.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 20_MulDiv.asm\n; 설  명  : 7장 정수 산술 (3) - 곱셈 & 나눗셈 명령어\n;           MUL / IMUL / DIV / IDIV / CBW / CWD / CDQ\n;           (PDF 07_Integer Arithmetic - Multiplication and Division)\n; ============================================================\n;\n; [MUL/IMUL 피연산자-결과 크기 규칙 (암기!)]\n;   ┌────────┬──────────┬──────────────┐\n;   │ 피연산자│ 곱해지는 │ 결과 위치     │\n;   ├────────┼──────────┼──────────────┤\n;   │ 8비트  │ AL       │ AX           │\n;   │ 16비트 │ AX       │ DX:AX        │\n;   │ 32비트 │ EAX      │ EDX:EAX      │\n;   └────────┴──────────┴──────────────┘\n;   ※ 곱은 항상 피연산자의 2배 크기 → 오버플로 불가\n;   ※ 즉치 피연산자 불가 (레지스터/메모리만)\n;\n; [DIV/IDIV 피연산자-결과 규칙 (암기!)]\n;   ┌────────┬──────────┬────────┬────────┐\n;   │ 제수   │ 피제수   │ 몫     │ 나머지 │\n;   ├────────┼──────────┼────────┼────────┤\n;   │ 8비트  │ AX       │ AL     │ AH     │\n;   │ 16비트 │ DX:AX    │ AX     │ DX     │\n;   │ 32비트 │ EDX:EAX  │ EAX    │ EDX    │\n;   └────────┴──────────┴────────┴────────┘\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    val32 DWORD 7FFFh\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. MUL (Unsigned Multiply) - 부호 없는 곱셈\n    ;    상위 절반이 0이 아니면 CF=1, OF=1 (결과가 하위에 안 들어감)\n    ; ==========================================================\n\n    ; 8비트: AL × BL → AX\n    mov al, 5h\n    mov bl, 10h\n    mul bl                 ; AX = 0050h, CF=0 (AH=0이므로)\n\n    ; 16비트: AX × BX → DX:AX\n    mov ax, 2000h\n    mov bx, 0100h\n    mul bx                 ; DX:AX = 00200000h, CF=1 (DX!=0)\n\n    ; 32비트: EAX × EBX → EDX:EAX\n    mov eax, 12345h\n    mov ebx, 1000h\n    mul ebx                ; EDX:EAX = 0000000012345000h, CF=0\n\n    ; ==========================================================\n    ; 2. IMUL (Signed Multiply) - 부호 있는 곱셈\n    ;    부호를 보존(상위로 부호 확장)\n    ;    상위 절반이 하위의 부호 확장이 '아니면' CF=1, OF=1\n    ; ==========================================================\n\n    ; 1-피연산자 형식: 48 × 4 = +192\n    mov al, 48\n    mov bl, 4\n    imul bl                ; AX = 192. 단, AH가 AL의 부호확장이\n                           ; 아니므로(AL 최상위=1) OF=1\n\n    ; 1-피연산자 형식: -4 × 4 = -16\n    mov al, -4\n    mov bl, 4\n    imul bl                ; AX = -16 (FFF0h), AH가 부호확장 → OF=0\n\n    ; 2-피연산자 형식: 목적지(레지스터) = 목적지 × 소스\n    ;   결과를 목적지 크기로 자름 → 유효 자리 손실 시 OF=1,CF=1\n    mov eax, 4823424\n    mov ebx, -423\n    imul ebx, eax          ; EBX = EBX × EAX (32비트로 잘림)\n\n    ; 3-피연산자 형식: 목적지 = 소스 × 즉치\n    imul ebx, eax, 10      ; EBX = EAX × 10\n\n    ; ==========================================================\n    ; 3. DIV (Unsigned Divide) - 부호 없는 나눗셈\n    ;    피제수의 상위 절반(AH/DX/EDX)을 반드시 0으로 클리어!\n    ; ==========================================================\n\n    ; 8비트: 83h / 2 → 몫 41h, 나머지 1\n    mov ax, 0083h          ; 피제수 = AX (AH=0)\n    mov bl, 2\n    div bl                 ; AL = 41h (몫), AH = 1 (나머지)\n\n    ; 16비트: 8003h / 100h → 몫 80h, 나머지 3\n    mov dx, 0              ; ★ 상위 절반 DX를 반드시 클리어\n    mov ax, 8003h\n    mov cx, 100h\n    div cx                 ; AX = 0080h (몫), DX = 0003h (나머지)\n\n    ; 32비트: 메모리 제수 사용\n    mov edx, 0             ; ★ EDX 클리어\n    mov eax, 10000h\n    div val32              ; EAX = 몫, EDX = 나머지\n\n    ; ==========================================================\n    ; 4. 부호 확장 명령어 (CBW / CWD / CDQ)\n    ;    부호 있는 나눗셈 전에 피제수를 반드시 부호 확장!\n    ;    CBW : AL → AX  (Byte → Word)\n    ;    CWD : AX → DX  (Word → Doubleword, DX:AX)\n    ;    CDQ : EAX → EDX (Doubleword → Quadword, EDX:EAX)\n    ; ==========================================================\n\n    ; ==========================================================\n    ; 5. IDIV (Signed Divide) - 부호 있는 나눗셈\n    ;    나머지의 부호는 항상 피제수와 같음\n    ; ==========================================================\n\n    ; 8비트: -48 / 5 → 몫 -9, 나머지 -3\n    mov al, -48\n    cbw                    ; AL을 AX로 부호 확장 (AX = FFD0h)\n    mov bl, 5\n    idiv bl                ; AL = -9 (몫), AH = -3 (나머지)\n\n    ; 16비트: -5000 / 256 → 몫 -19, 나머지 -136\n    mov ax, -5000\n    cwd                    ; AX를 DX로 부호 확장\n    mov bx, 256\n    idiv bx                ; AX = -19 (몫), DX = -136 (나머지)\n\n    ; 32비트: 50000 / -256 → 몫 -195, 나머지 80\n    mov eax, 50000\n    cdq                    ; EAX를 EDX로 부호 확장\n    mov ebx, -256\n    idiv ebx               ; EAX = -195 (몫), EDX = 80 (나머지)\n\n    ; ==========================================================\n    ; 6. 나눗셈 오버플로 (Divide Overflow) - 주의!\n    ;    몫이 목적지에 안 들어가거나 0으로 나누면\n    ;    CPU 예외 발생 → 프로그램 중단\n    ;    예) AX=100h 를 8비트로 나누면 몫이 AL을 초과 → 예외\n    ;    대책: 더 큰 피제수/제수 사용, 나누기 전 제수≠0 검사\n    ; ==========================================================\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/21_ExtendedArithmetic.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; 파일명  : 21_ExtendedArithmetic.asm\n; 설  명  : 7장 정수 산술 (4) - 확장 덧셈 & 뺄셈\n;           ADC (add with carry) / SBB (subtract with borrow)\n;           (PDF 07_Integer Arithmetic - Extended Addition and Subtraction)\n; ============================================================\n;\n; [핵심] 레지스터 크기를 넘는 큰 정수를 여러 조각으로 나눠\n;        Carry(빌림)를 다음 조각으로 전달하며 계산한다.\n;   ADC 목적지, 소스 → 목적지 = 목적지 + 소스 + CF\n;   SBB 목적지, 소스 → 목적지 = 목적지 - 소스 - CF\n;   ※ 피연산자 규칙은 ADD/SUB와 동일, 두 피연산자 크기 같아야 함\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.CODE\nmain PROC\n\n    ; ==========================================================\n    ; 1. ADC - 8비트 두 수의 합을 16비트로 (FFh + FFh)\n    ;    하위 바이트 ADD에서 발생한 CF를 상위 바이트에 ADC로 전달\n    ; ==========================================================\n    mov dl, 0              ; 상위 바이트 누적용 (초기 0)\n    mov al, 0FFh\n    add al, 0FFh           ; AL = FEh, CF=1 (올림 발생)\n    adc dl, 0              ; DL = 0 + 0 + CF(1) = 1\n    ; → DL:AL = 01FEh (= 255 + 255 = 510)\n\n    ; ==========================================================\n    ; 2. ADC - 32비트 두 수의 합을 64비트로\n    ;    (FFFFFFFFh + FFFFFFFFh)\n    ; ==========================================================\n    mov edx, 0\n    mov eax, 0FFFFFFFFh\n    add eax, 0FFFFFFFFh    ; EAX = FFFFFFFEh, CF=1\n    adc edx, 0             ; EDX = 0 + 0 + CF(1) = 1\n    ; → EDX:EAX = 00000001FFFFFFFEh\n\n    ; ==========================================================\n    ; 3. SBB - 64비트 뺄셈 (32비트 피연산자 사용)\n    ;    EDX:EAX 에서 1을 빼기\n    ;    하위 SUB에서 빌림(CF) 발생 → 상위에 SBB로 빌림 전달\n    ; ==========================================================\n    mov edx, 1\n    mov eax, 0             ; EDX:EAX = 0000000100000000h\n    sub eax, 1             ; EAX = FFFFFFFFh, CF=1 (빌림 발생)\n    sbb edx, 0             ; EDX = 1 - 0 - CF(1) = 0\n    ; → EDX:EAX = 00000000FFFFFFFFh\n\n    INVOKE ExitProcess, 0\nmain ENDP\n\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_01_ShiftRotate_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 7장 - 시프트 & 로테이트\n; 문제 파일: E7_01_ShiftRotate_Practice.asm\n; ============================================================\n;\n; [문제 1]\n;   (1) 0\n;   (2) CF (Carry Flag)\n;   (3) 0\n;   (4) 부호(sign) 비트 (원래 최상위 비트)\n;   (5) 최하위(최하위 비트)\n;   (6) CF (Carry Flag)\n;   (7) OF (Overflow Flag)\n;   (8) CF (Carry Flag)\n;\n; [문제 2]\n;   (9)  2^n\n;   (10) 2^n\n;   (11) SAR\n;   (12) 40\n;   (13) -16   (11110000b)\n;\n; [문제 3]\n;   (14) 2          (36 = 2^5 + 2^2)\n;   (15) 5\n;   (16) 2\n;   (17) 4428\n;\n; [문제 4]\n;   (18) 0000000000011111      (하위 5비트 마스크 = 1Fh)\n;   (19) 5\n;   (20) 9\n;   (21) 1980                  (연도는 1980 기준 상대값)\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_01_ShiftRotate_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 7장 - 시프트 & 로테이트\n; 빈칸( ______ )을 채우세요. 정답은 E7_01_ShiftRotate_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.DATA\n    datestamp WORD 266Ah     ; 1999-03-10\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] 명령어 동작 — 빈칸을 채우세요.\n;\n;   SHL : 왼쪽 논리시프트, 최하위에 (1)______ 채움, 최상위→(2)______\n;   SHR : 오른쪽 논리시프트, 최상위에 (3)______ 채움\n;   SAR : 오른쪽 산술시프트, 빈자리를 (4)______ 비트로 채움(부호 보존)\n;   ROL : 왼쪽 회전, 최상위 비트가 (5)______ 자리와 CF로 복사\n;   RCL : (6)______ 를 포함한 왼쪽 회전\n;\n;   ★ 모든 시프트/로테이트가 영향을 주는 두 플래그: (7)______, (8)______\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] 시프트로 곱셈/나눗셈 — 빈칸을 채우세요.\n;\n;   왼쪽 n비트 시프트 = × (9)______\n;   오른쪽 n비트 시프트(부호 없는) = ÷ (10)______\n;   부호 있는 나눗셈에는 (11)______ 명령을 써야 부호가 보존됨\n;\n;   mov al, 10\n;   shl al, 2      ; AL = (12)______   (10 × 4)\n;\n;   mov dl, -128\n;   sar dl, 3      ; DL = (13)______   (-128 ÷ 8)\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] 이진 곱셈 (SHL+ADD) — 빈칸을 채우세요.\n;   123 × 36 을 구한다.  36 = 2^5 + 2^(14)______\n;\n;   mov eax, 123\n;   mov ebx, eax\n;   shl eax, (15)______    ; 123 × 32\n;   shl ebx, (16)______    ; 123 × 4\n;   add eax, ebx           ; = (17)______  (123 × 36)\n\n; ──────────────────────────────────────────────────────────\n; [문제 4] 파일 날짜 필드 추출 — 빈칸을 채우세요.\n;   datestamp(266Ah): 비트0~4=일, 비트5~8=월, 비트9~15=연도(1980기준)\n;\n;   ; 일 추출\n;   mov ax, datestamp\n;   and ax, (18)______b           ; 하위 5비트 마스크 → AX = 10\n;\n;   ; 월 추출\n;   mov ax, datestamp\n;   shr ax, (19)______\n;   and ax, 0000000000001111b     ; AX = 3\n;\n;   ; 연도 추출\n;   mov ax, datestamp\n;   shr ax, (20)______\n;   add ax, (21)______            ; AX = 1999\n\n    ; (실행용 코드 - 연도 추출)\n    mov ax, datestamp\n    shr ax, 9\n    add ax, 1980\n\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_02_MulDiv_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 7장 - 곱셈 & 나눗셈\n; 문제 파일: E7_02_MulDiv_Practice.asm\n; ============================================================\n;\n; [문제 1] MUL / IMUL 크기 규칙\n;   (1) AX\n;   (2) DX:AX\n;   (3) EDX:EAX\n;   (4) 2 (두 배)\n;   (5) 1 (CF=1, OF=1)\n;\n; [문제 2] DIV / IDIV 크기 규칙\n;   (6) AX\n;   (7) AH\n;   (8) DX:AX\n;   (9) EAX\n;\n; [문제 3] 부호 없는 나눗셈 (83h / 2)\n;   (10) 0\n;   (11) 41h    (몫)\n;   (12) 1      (나머지)\n;   (13) 0 (클리어)\n;\n; [문제 4] 부호 확장 명령어\n;   (14) AX\n;   (15) DX     (DX:AX)\n;   (16) EDX    (EDX:EAX)\n;\n; [문제 5] 부호 있는 나눗셈 (-48 / 5)\n;   (17) CBW\n;   (18) -9     (몫)\n;   (19) -3     (나머지)\n;   (20) 피제수(dividend)\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_02_MulDiv_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 7장 - 곱셈 & 나눗셈\n; 빈칸( ______ )을 채우세요. 정답은 E7_02_MulDiv_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] MUL / IMUL 크기 규칙 — 빈칸을 채우세요.\n;\n;   8비트  : AL  × op → 결과는 (1)______\n;   16비트 : AX  × op → 결과는 (2)______\n;   32비트 : EAX × op → 결과는 (3)______\n;\n;   · 곱은 피연산자의 (4)______ 배 크기 → 오버플로 불가\n;   · MUL은 상위 절반이 0이 아니면 CF=(5)______, OF=(5)______\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] DIV / IDIV 크기 규칙 — 빈칸을 채우세요.\n;\n;   ┌────────┬──────────┬──────┬────────┐\n;   │ 제수   │ 피제수   │ 몫   │ 나머지 │\n;   ├────────┼──────────┼──────┼────────┤\n;   │ 8비트  │ (6)____  │ AL   │ (7)____│\n;   │ 16비트 │ (8)____  │ AX   │ DX     │\n;   │ 32비트 │EDX:EAX   │(9)___│ EDX    │\n;   └────────┴──────────┴──────┴────────┘\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] 부호 없는 나눗셈 — 빈칸을 채우세요.\n;   83h / 2\n;\n;   mov ax, 0083h        ; 피제수 (AH=(10)______ 로 클리어 필수)\n;   mov bl, 2\n;   div bl               ; AL = (11)______ (몫), AH = (12)______ (나머지)\n;\n;   ★ DIV 전에 반드시 상위 절반(AH/DX/EDX)을 (13)______ 로 만든다\n\n; ──────────────────────────────────────────────────────────\n; [문제 4] 부호 확장 명령어 — 빈칸을 채우세요.\n;\n;   CBW : AL → (14)______\n;   CWD : AX → (15)______\n;   CDQ : EAX → (16)______\n\n; ──────────────────────────────────────────────────────────\n; [문제 5] 부호 있는 나눗셈 — 빈칸을 채우세요.\n;   -48 / 5\n;\n;   mov al, -48\n;   (17)______           ; AL을 AX로 부호 확장\n;   mov bl, 5\n;   idiv bl              ; AL = (18)______ (몫), AH = (19)______ (나머지)\n;\n;   ★ IDIV 나머지의 부호는 (20)______ 의 부호와 같다\n\n    ; (실행용 코드 - 부호 있는 나눗셈)\n    mov al, -48\n    cbw\n    mov bl, 5\n    idiv bl\n\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_03_Extended_Answer.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [정답] 7장 - 확장 덧셈 & 뺄셈 (ADC / SBB)\n; 문제 파일: E7_03_Extended_Practice.asm\n; ============================================================\n;\n; [문제 1]\n;   (1) CF (Carry Flag)\n;   (2) CF (Carry Flag, 빌림)\n;   (3) 큰(확장, extended) 정수\n;   (4) Carry(올림/빌림)\n;\n; [문제 2] FFh + FFh\n;   (5) FEh\n;   (6) 1        (올림 발생)\n;   (7) ADC\n;   (8) 1\n;   (9) 01FEh\n;\n; [문제 3] 0FFFFFFFFh + 0FFFFFFFFh\n;   (10) 1\n;   (11) 1       (0 + 0 + CF)\n;   (12) 00000001FFFFFFFEh\n;\n; [문제 4] 64비트 뺄셈\n;   (13) FFFFFFFFh\n;   (14) 1       (빌림 발생)\n;   (15) SBB\n;   (16) 0       (1 - 0 - 1)\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/E7_03_Extended_Practice.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [시험 대비 빈칸 채우기] 7장 - 확장 덧셈 & 뺄셈 (ADC / SBB)\n; 빈칸( ______ )을 채우세요. 정답은 E7_03_Extended_Answer.asm 참고.\n; ============================================================\n\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nExitProcess PROTO, dwExitCode:DWORD\n\n.CODE\nmain PROC\n\n; ──────────────────────────────────────────────────────────\n; [문제 1] ADC / SBB 의미 — 빈칸을 채우세요.\n;\n;   ADC 목적지, 소스 → 목적지 = 목적지 + 소스 + (1)______\n;   SBB 목적지, 소스 → 목적지 = 목적지 - 소스 - (2)______\n;\n;   용도: 레지스터 크기를 넘는 (3)______ 정수를 조각내어\n;         (4)______ 를 다음 조각으로 전달하며 계산\n; ──────────────────────────────────────────────────────────\n\n; [문제 2] 8비트 합을 16비트로 (FFh + FFh) — 빈칸을 채우세요.\n;\n;   mov dl, 0\n;   mov al, 0FFh\n;   add al, 0FFh      ; AL = (5)______, CF = (6)______\n;   (7)______ dl, 0   ; DL = 0 + 0 + CF = (8)______\n;   ; → DL:AL = (9)______   (255 + 255 = 510)\n\n; ──────────────────────────────────────────────────────────\n; [문제 3] 32비트 합을 64비트로 — 빈칸을 채우세요.\n;   0FFFFFFFFh + 0FFFFFFFFh\n;\n;   mov edx, 0\n;   mov eax, 0FFFFFFFFh\n;   add eax, 0FFFFFFFFh   ; EAX = FFFFFFFEh, CF = (10)______\n;   adc edx, 0            ; EDX = (11)______\n;   ; → EDX:EAX = (12)______\n\n; ──────────────────────────────────────────────────────────\n; [문제 4] 64비트 뺄셈 (SBB) — 빈칸을 채우세요.\n;   EDX:EAX(=0000000100000000h) 에서 1 빼기\n;\n;   mov edx, 1\n;   mov eax, 0\n;   sub eax, 1            ; EAX = (13)______, CF = (14)______ (빌림)\n;   (15)______ edx, 0    ; EDX = 1 - 0 - CF = (16)______\n;   ; → EDX:EAX = 00000000FFFFFFFFh\n\n    ; (실행용 코드 - 8비트 → 16비트 덧셈)\n    mov dl, 0\n    mov al, 0FFh\n    add al, 0FFh\n    adc dl, 0\n\n    INVOKE ExitProcess, 0\nmain ENDP\nEND main\n"
+  },
+  {
+    "ch": 7,
+    "title": "Chapter 07/example/README_기말고사출제포인트.asm",
+    "kind": "원문 ASM",
+    "code": "; ============================================================\n; [7장 기말고사 출제 포인트 요약]\n; ============================================================\n;\n; ★★★ 최우선 암기 항목 ★★★\n;\n; 1. 시프트/로테이트 명령어\n;    SHL/SAL → 왼쪽, 최하위=0, 최상위→CF\n;    SHR     → 오른쪽(논리), 최상위=0\n;    SAR     → 오른쪽(산술), 부호 비트 복제 (부호 보존)\n;    ROL/ROR → 회전, RCL/RCR → CF 포함 회전\n;    ★ 모두 OF, CF 에 영향\n;\n; 2. 시프트로 곱셈/나눗셈\n;    SHL n = ×2^n,  SHR n = ÷2^n (부호 없는)\n;    부호 있는 나눗셈 → SAR (부호 보존!)\n;    AX→EAX 부호확장: shl eax,16 / sar eax,16\n;\n; 3. MUL / IMUL 크기 규칙 (★★★ 최빈출 ★★★)\n;    8비트  AL ×op → AX\n;    16비트 AX ×op → DX:AX\n;    32비트 EAX×op → EDX:EAX\n;    MUL : 상위절반≠0 → CF=1,OF=1\n;    IMUL: 상위절반이 부호확장 아니면 → CF=1,OF=1\n;    ※ MUL은 즉치 불가 (IMUL 2/3-피연산자만 즉치 가능)\n;\n; 4. DIV / IDIV 크기 규칙 (★★★ 최빈출 ★★★)\n;    8비트  AX     ÷op → 몫 AL,  나머지 AH\n;    16비트 DX:AX  ÷op → 몫 AX,  나머지 DX\n;    32비트 EDX:EAX÷op → 몫 EAX, 나머지 EDX\n;    ★ DIV  : 상위절반(AH/DX/EDX) 반드시 0으로 클리어\n;    ★ IDIV : 나누기 전 반드시 부호확장 (CBW/CWD/CDQ)\n;       CBW: AL→AX,  CWD: AX→DX,  CDQ: EAX→EDX\n;    ★ IDIV 나머지 부호 = 피제수 부호\n;    ★ 나눗셈 오버플로/0 나눗셈 → CPU 예외(프로그램 중단)\n;\n; 5. 예제 값 (외워두면 유리)\n;    -48 / 5  → 몫 -9, 나머지 -3\n;    83h / 2  → 몫 41h, 나머지 1\n;    48 × 4 (IMUL) → AX=192, OF=1 (AH가 부호확장 아님)\n;\n; 6. 이진 곱셈 (SHL+ADD)\n;    123 × 36, 36 = 2^5 + 2^2\n;    shl eax,5 / shl ebx,2 / add → 4428\n;\n; 7. 비트 필드 추출 (시프트+마스크)\n;    오른쪽 시프트로 필드를 하위로 옮긴 뒤 AND 마스크\n;\n; 8. 확장 덧셈/뺄셈 (ADC / SBB)\n;    ADC: 목적지 = 목적지 + 소스 + CF\n;    SBB: 목적지 = 목적지 - 소스 - CF\n;    하위 조각부터 처리 → Carry를 상위로 전달\n;    0FFFFFFFFh + 0FFFFFFFFh → EDX:EAX = 00000001FFFFFFFEh\n;\n; ─────────────────────────────────────────────────────────\n; [풀어야 할 연습 파일 순서]\n;   1. E7_01_ShiftRotate_Practice.asm\n;   2. E7_02_MulDiv_Practice.asm\n;   3. E7_03_Extended_Practice.asm\n; ─────────────────────────────────────────────────────────\n"
+  },
+  {
+    "ch": 8,
+    "title": "Chapter 08 / StackFrame_Standard.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; 표준 스택 프레임 / 매개변수 접근\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nMyProc PROC\n    push ebp\n    mov  ebp, esp\n    sub  esp, 8          ; 지역 변수 8바이트\n\n    mov  eax, [ebp+8]    ; 첫 번째 매개변수\n    mov  ebx, [ebp+12]   ; 두 번째 매개변수\n    mov  [ebp-4], eax    ; 첫 번째 지역 변수\n    mov  [ebp-8], ebx    ; 두 번째 지역 변수\n\n    mov  esp, ebp\n    pop  ebp\n    ret  8               ; STDCALL: callee가 2개 DWORD 정리\nMyProc ENDP"
+  },
+  {
+    "ch": 8,
+    "title": "Chapter 08 / ArrayFill_ReferenceParameter.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; ArrayFill 참조 매개변수 예제\n.386\n.MODEL flat, stdcall\n.STACK 4096\n\nRandomRange PROTO\nExitProcess PROTO, dwExitCode:DWORD\n\n.data\ncount = 100\narray WORD count DUP(?)\n\n.code\nmain PROC\n    push count\n    push OFFSET array\n    call ArrayFill\n    INVOKE ExitProcess, 0\nmain ENDP\n\nArrayFill PROC\n    push ebp\n    mov  ebp, esp\n    pushad\n\n    mov  esi, [ebp+8]     ; pArray\n    mov  ecx, [ebp+12]    ; count\nL1:\n    call RandomRange\n    mov  [esi], ax\n    add  esi, TYPE WORD\n    loop L1\n\n    popad\n    pop  ebp\n    ret  8\nArrayFill ENDP\nEND main"
+  },
+  {
+    "ch": 8,
+    "title": "Chapter 08 / EnterLeave_LocalVariables.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; ENTER / LEAVE는 표준 스택 프레임 생성/해제를 한 명령으로 표현한다.\nMySub PROC\n    enter 8, 0            ; push ebp / mov ebp,esp / sub esp,8\n    mov DWORD PTR [ebp-4], 10\n    mov DWORD PTR [ebp-8], 20\n    leave                 ; mov esp,ebp / pop ebp\n    ret\nMySub ENDP\n\n; LEA는 런타임 유효 주소 계산에 사용한다.\nsub esp, 32\nlea esi, [esp]            ; OFFSET으로는 표현할 수 없는 스택 주소"
+  },
+  {
+    "ch": 8,
+    "title": "Chapter 08 / Factorial_Recursive.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; 재귀 Factorial 예제: n은 0..12, 결과는 EAX\nFactorial PROC USES ebx,\n    n:DWORD\n\n    mov eax, 1\n    cmp n, 1\n    ja  L1\n    jmp L2\n\nL1:\n    dec n\n    INVOKE Factorial, n\n    mov ebx, n\n    inc n\n    mul ebx\n\nL2:\n    ret\nFactorial ENDP"
+  },
+  {
+    "ch": 8,
+    "title": "Chapter 08 / InvokeAddrProcProto.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; INVOKE / ADDR / PROC / PROTO 예제\nArrayFill PROTO,\n    pArray:PTR WORD,\n    count:DWORD\n\n.data\nbuffer BYTE 80 DUP(?)\narray  WORD 100 DUP(?)\n\n.code\nINVOKE ReadString, ADDR buffer, LENGTHOF buffer\nINVOKE ArrayFill, ADDR array, LENGTHOF array\n\nArrayFill PROC USES esi ecx,\n    pArray:PTR WORD,\n    count:DWORD\n\n    mov esi, pArray\n    mov ecx, count\n    ret\nArrayFill ENDP\n\n; 32비트보다 작은 인수를 INVOKE로 전달하면 MASM이 확장 과정에서 EAX/EDX를 사용할 수 있다."
+  },
+  {
+    "ch": 9,
+    "title": "Chapter 09 / HeapApi_CallSequence.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; Win32 Heap API 호출 순서\nGetProcessHeap PROTO\nHeapCreate     PROTO, flOptions:DWORD, dwInitialSize:DWORD, dwMaximumSize:DWORD\nHeapAlloc      PROTO, hHeap:DWORD, dwFlags:DWORD, dwBytes:DWORD\nHeapFree       PROTO, hHeap:DWORD, dwFlags:DWORD, lpMem:DWORD\nHeapDestroy    PROTO, hHeap:DWORD\nGetLastError   PROTO\n\n.data\nhHeap DWORD ?\npArray DWORD ?\n\n.code\nINVOKE GetProcessHeap\nmov hHeap, eax\n\nINVOKE HeapAlloc, hHeap, 0, 1000\nmov pArray, eax\n\nINVOKE HeapFree, hHeap, 0, pArray\n\nINVOKE HeapCreate, 0, 4096, 0\nmov hHeap, eax\nINVOKE HeapDestroy, hHeap"
+  },
+  {
+    "ch": 9,
+    "title": "Chapter 09 / HeapTest_1000ByteArray.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; HeapTest 예제 1: 1000바이트 배열 생성과 해제\nARRAY_SIZE = 1000\n\n.data\nhHeap DWORD ?\npArray DWORD ?\n\n.code\nINVOKE GetProcessHeap\nmov hHeap, eax\n\nINVOKE HeapAlloc, hHeap, 0, ARRAY_SIZE\nmov pArray, eax\ncmp pArray, 0\nje  allocation_failed\n\n; pArray가 가리키는 1000바이트 블록을 사용한다.\nINVOKE HeapFree, hHeap, 0, pArray\njmp done\n\nallocation_failed:\nINVOKE GetLastError\n\ndone:"
+  },
+  {
+    "ch": 9,
+    "title": "Chapter 09 / HeapTest_RepeatedAllocation.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; HeapTest 예제 2: 큰 블록을 반복 할당하여 힙 한계 확인\n.data\nhHeap DWORD ?\npBlock DWORD ?\n\n.code\nINVOKE HeapCreate, 0, 4096, 0\nmov hHeap, eax\n\nL1:\n    INVOKE HeapAlloc, hHeap, 0, 100000h\n    mov pBlock, eax\n    cmp pBlock, 0\n    je  heap_exceeded\n    jmp L1\n\nheap_exceeded:\n    INVOKE GetLastError\n    INVOKE HeapDestroy, hHeap"
+  },
+  {
+    "ch": 9,
+    "title": "Chapter 09 / SegmentationAndPaging_Flow.asm",
+    "kind": "PDF 예제 재구성",
+    "code": "; 보호 모드 주소 변환 / 페이징 흐름 요약\n; logical address = segment selector + 32-bit offset\n; linear address  = descriptor.base + offset\n;\n; GDT/LDT의 segment descriptor는 base address, limit, access right, type을 가진다.\n;\n; 32-bit linear address bit field:\n;   bits 31..22 = page directory entry index\n;   bits 21..12 = page table entry index\n;   bits 11..0  = page frame offset\n;\n; CR3 -> page directory base\n; PDE -> page table base\n; PTE -> physical page frame base\n; physical address = page frame base + offset\n; page not present -> page fault"
+  }
 ];
 
 /* ───────── 유틸 ───────── */
@@ -534,16 +1086,20 @@ function renderBody(ex){
 const main = document.getElementById("main");
 const toc  = document.getElementById("toc");
 let lastCh = 0;
-const tocGroups = {6:[], 7:[]};
+const CHAPTERS = {
+  6:"조건 처리 <span>Conditional Processing</span>",
+  7:"정수 산술 <span>Integer Arithmetic</span>",
+  8:"고급 프로시저 <span>Advanced Procedures</span>",
+  9:"메모리 관리 <span>Memory Management</span>"
+};
+const tocGroups = {6:[], 7:[], 8:[], 9:[]};
 
 EX.forEach(ex=>{
   if(ex.ch !== lastCh){
     lastCh = ex.ch;
     const h = document.createElement("h2");
     h.className = "ch"; h.id = "ch"+ex.ch;
-    h.innerHTML = (ex.ch===6
-      ? `6장 · 조건 처리 <span>Conditional Processing</span>`
-      : `7장 · 정수 산술 <span>Integer Arithmetic</span>`);
+    h.innerHTML = `${ex.ch}장 · ${CHAPTERS[ex.ch]}`;
     main.appendChild(h);
   }
   const card = document.createElement("section");
@@ -571,12 +1127,49 @@ EX.forEach(ex=>{
 });
 
 // TOC 그룹 출력
-[6,7].forEach(ch=>{
+[6,7,8,9].forEach(ch=>{
   const g = document.createElement("span");
   g.className="grp"; g.textContent = ch+"장:";
   toc.appendChild(g);
   tocGroups[ch].forEach(a=>toc.appendChild(a));
 });
+
+
+function renderSourceAppendix(){
+  const h = document.createElement("h2");
+  h.className = "ch";
+  h.id = "source-appendix";
+  h.innerHTML = "전체 예제 코드 <span>Original / Reconstructed Appendix</span>";
+  main.appendChild(h);
+
+  const note = document.createElement("p");
+  note.className = "source-note";
+  note.textContent = "6장/7장은 로컬 ASM 원문 전체를 포함했고, 8장/9장은 PDF에 제시된 예제 흐름을 실행 가능한 코드 형태로 재구성했습니다.";
+  main.appendChild(note);
+
+  SOURCE_EXAMPLES.forEach((src, idx)=>{
+    const d = document.createElement("details");
+    d.className = "src-card";
+    d.id = "src-" + (idx + 1);
+    const summary = document.createElement("summary");
+    summary.textContent = `${src.ch}장 · ${src.kind} · ${src.title}`;
+    const pre = document.createElement("pre");
+    pre.textContent = src.code;
+    d.appendChild(summary);
+    d.appendChild(pre);
+    main.appendChild(d);
+  });
+
+  const g = document.createElement("span");
+  g.className="grp";
+  g.textContent = "부록:";
+  toc.appendChild(g);
+  const a = document.createElement("a");
+  a.href = "#source-appendix";
+  a.textContent = "전체 예제 코드";
+  toc.appendChild(a);
+}
+renderSourceAppendix();
 
 /* ───────── 채점 로직 ───────── */
 function getEx(id){ return EX.find(e=>e.id===id); }
@@ -625,6 +1218,7 @@ function clearEx(id){
 }
 
 function checkAll(){ EX.forEach(e=>checkEx(e.id)); }
+function revealAll(){ EX.forEach(e=>revealEx(e.id)); }
 function resetAll(){ EX.forEach(e=>clearEx(e.id)); window.scrollTo({top:0,behavior:"smooth"}); }
 
 function updateGlobal(){
