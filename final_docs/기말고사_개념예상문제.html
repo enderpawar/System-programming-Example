@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템프로그래밍 기말고사 개념 예상문제</title>
+<style>
+  :root{
+    --bg:#f7f8fb;
+    --panel:#ffffff;
+    --ink:#1b2430;
+    --muted:#667085;
+    --line:#d7dce5;
+    --accent:#0f766e;
+    --accent2:#7c3aed;
+    --warn:#b45309;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  header{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:rgba(247,248,251,.94);
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(10px);
+  }
+  .top{
+    max-width:1120px;
+    margin:0 auto;
+    padding:18px 20px 14px;
+  }
+  h1{
+    margin:0 0 6px;
+    font-size:clamp(22px,3vw,34px);
+    letter-spacing:0;
+  }
+  .sub{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+  }
+  nav{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 20px 14px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  nav a, button{
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink);
+    border-radius:8px;
+    padding:8px 11px;
+    font-size:14px;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  button.primary{
+    border-color:var(--accent);
+    background:var(--accent);
+    color:white;
+  }
+  main{
+    max-width:1120px;
+    margin:0 auto;
+    padding:24px 20px 60px;
+  }
+  section{
+    margin:0 0 28px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  h2{
+    margin:0;
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    font-size:20px;
+  }
+  h2 span{
+    display:block;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:500;
+    margin-top:2px;
+  }
+  .toolbar{
+    padding:12px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  ol{
+    margin:0;
+    padding:18px 20px 18px 46px;
+  }
+  li{
+    margin:0 0 13px;
+    padding-left:4px;
+  }
+  li::marker{
+    color:var(--accent);
+    font-weight:700;
+  }
+  .answer{
+    display:none;
+    margin:8px 0 0;
+    padding:10px 12px;
+    border-left:4px solid var(--accent);
+    background:#eefaf7;
+    color:#123d37;
+    border-radius:0 8px 8px 0;
+  }
+  .show .answer{display:block}
+  .tf li::marker{color:var(--accent2)}
+  .danger{
+    border-left-color:var(--warn);
+    background:#fff7ed;
+    color:#5f3207;
+  }
+  .hint{
+    margin:0;
+    padding:14px 20px;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .compact li{margin-bottom:9px}
+  code{
+    background:#edf0f5;
+    padding:1px 5px;
+    border-radius:5px;
+    font-family:Consolas,Monaco,monospace;
+    font-size:.95em;
+  }
+  @media (max-width:640px){
+    .top, nav, main{padding-left:14px;padding-right:14px}
+    ol{padding-left:34px}
+    nav a, button{font-size:13px;padding:7px 9px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>시스템프로그래밍 기말고사 개념 예상문제</h1>
+    <p class="sub">범위: 6장 조건 처리, 7장 정수 산술, 8장 고급 프로시저, 9장 메모리 관리</p>
+  </div>
+  <nav>
+    <a href="#ch6">6장</a>
+    <a href="#ch7">7장</a>
+    <a href="#ch8">8장</a>
+    <a href="#ch9">9장</a>
+    <a href="#tf">참거짓</a>
+    <button class="primary" onclick="showAll()">전체 정답 보기</button>
+    <button onclick="hideAll()">전체 정답 숨기기</button>
+  </nav>
+</header>
+
+<main>
+  <section id="ch6">
+    <h2>6장 조건 처리 <span>Conditional Processing</span></h2>
+    <p class="hint">조건 점프는 signed/unsigned 구분과 flag 조건을 정확히 외우는 쪽이 가장 중요하다.</p>
+    <div class="toolbar"><button onclick="toggleSection('ch6')">이 장 정답 토글</button></div>
+    <ol>
+      <li><code>AND</code>, <code>OR</code>, <code>XOR</code> 명령이 실행되면 <code>CF</code>와 <code>OF</code>는 어떻게 되는가?<div class="answer">둘 다 0으로 클리어된다.</div></li>
+      <li><code>NOT</code> 명령은 플래그에 어떤 영향을 주는가?<div class="answer">플래그에 영향을 주지 않는다.</div></li>
+      <li><code>TEST</code>와 <code>AND</code>의 공통점과 차이점을 설명하시오.<div class="answer">둘 다 bitwise AND 결과 기준으로 flag를 설정한다. <code>AND</code>는 결과를 저장하고, <code>TEST</code>는 결과를 버린다.</div></li>
+      <li><code>CMP</code>와 <code>SUB</code>의 공통점과 차이점을 설명하시오.<div class="answer">둘 다 뺄셈 기준으로 flag를 설정한다. <code>SUB</code>는 결과를 저장하고, <code>CMP</code>는 피연산자를 바꾸지 않는다.</div></li>
+      <li><code>CMP eax, ebx</code> 후 <code>JA</code>와 <code>JG</code>는 각각 어떤 비교에서 사용하는가?<div class="answer"><code>JA</code>는 unsigned greater, <code>JG</code>는 signed greater.</div></li>
+      <li>signed 비교에서 <code>JA/JB/JAE/JBE</code>를 쓰면 왜 위험한가?<div class="answer">signed 대소 관계는 <code>SF</code>, <code>OF</code>, <code>ZF</code> 조합으로 판단해야 하므로 음수에서 틀린다.</div></li>
+      <li>unsigned 비교에서 <code>JG/JL/JGE/JLE</code>를 쓰면 왜 위험한가?<div class="answer">unsigned 대소 관계는 <code>CF</code>, <code>ZF</code> 중심으로 판단해야 하므로 최상위 bit가 1인 값에서 틀린다.</div></li>
+      <li><code>JE</code>와 <code>JZ</code>는 어떤 관계인가?<div class="answer">같은 조건이다. 둘 다 <code>ZF=1</code>.</div></li>
+      <li><code>JNE</code>와 <code>JNZ</code>는 어떤 관계인가?<div class="answer">같은 조건이다. 둘 다 <code>ZF=0</code>.</div></li>
+      <li><code>JA</code>가 점프하는 flag 조건을 쓰시오.<div class="answer"><code>CF=0 AND ZF=0</code>.</div></li>
+      <li><code>JBE</code>가 점프하는 flag 조건을 쓰시오.<div class="answer"><code>CF=1 OR ZF=1</code>.</div></li>
+      <li><code>JG</code>가 점프하는 flag 조건을 쓰시오.<div class="answer"><code>ZF=0 AND SF=OF</code>.</div></li>
+      <li><code>JL</code>이 점프하는 flag 조건을 쓰시오.<div class="answer"><code>SF != OF</code>.</div></li>
+      <li>복합 조건 <code>AND</code>를 어셈블리로 구현할 때 보통 어떤 방식으로 분기하는가?<div class="answer">하나라도 거짓이면 false label로 빠지는 방식이 흔하다.</div></li>
+      <li>복합 조건 <code>OR</code>를 어셈블리로 구현할 때 보통 어떤 방식으로 분기하는가?<div class="answer">하나라도 참이면 true label로 바로 점프하는 방식이 흔하다.</div></li>
+      <li><code>LOOP</code> 명령은 어떤 레지스터를 자동으로 감소시키는가?<div class="answer"><code>ECX</code>.</div></li>
+      <li><code>LOOPE</code>와 <code>LOOPNE</code>는 각각 어떤 조건에서 반복하는가?<div class="answer"><code>LOOPE</code>: <code>ECX != 0</code> and <code>ZF=1</code>. <code>LOOPNE</code>: <code>ECX != 0</code> and <code>ZF=0</code>.</div></li>
+      <li><code>LOOP</code>, <code>LOOPE</code>, <code>LOOPNE</code>는 <code>ZF</code>를 변경하는가?<div class="answer">변경하지 않는다. 직전 명령이 만든 <code>ZF</code>를 사용한다.</div></li>
+      <li>MASM의 <code>.IF</code>, <code>.WHILE</code> 같은 고수준 제어 지시어를 사용할 때 주의할 점은 무엇인가?<div class="answer">MASM이 생성하는 signed/unsigned 비교를 정확히 의식해야 한다.</div></li>
+      <li>소문자를 대문자로 바꿀 때 ASCII에서 보통 어떤 비트를 조작하는가?<div class="answer">bit 5를 끈다. 보통 <code>AND 11011111b</code>.</div></li>
+    </ol>
+  </section>
+
+  <section id="ch7">
+    <h2>7장 정수 산술 <span>Integer Arithmetic</span></h2>
+    <p class="hint">나눗셈은 피제수 크기, 몫/나머지 위치, <code>EDX</code>/<code>CDQ</code> 처리가 핵심이다.</p>
+    <div class="toolbar"><button onclick="toggleSection('ch7')">이 장 정답 토글</button></div>
+    <ol start="21">
+      <li><code>SHL</code>은 산술적으로 어떤 의미를 가지는가?<div class="answer">왼쪽으로 n비트 shift하면 보통 <code>2^n</code> 곱셈과 같다.</div></li>
+      <li>unsigned 정수를 오른쪽으로 나눌 때 <code>SHR</code>을 쓰는 이유는 무엇인가?<div class="answer">빈자리를 0으로 채워 unsigned 값을 논리적으로 나누기 때문이다.</div></li>
+      <li>signed 정수를 오른쪽으로 나눌 때 <code>SAR</code>을 써야 하는 이유는 무엇인가?<div class="answer">signed 음수의 부호 bit를 유지해야 하기 때문이다.</div></li>
+      <li><code>ROL</code>과 <code>RCL</code>의 차이점을 설명하시오.<div class="answer"><code>ROL</code>은 CF를 회전 대상에 포함하지 않고, <code>RCL</code>은 CF까지 포함해 회전한다.</div></li>
+      <li><code>MUL</code>의 8비트, 16비트, 32비트 결과 저장 위치를 쓰시오.<div class="answer">8비트: <code>AX</code>, 16비트: <code>DX:AX</code>, 32비트: <code>EDX:EAX</code>.</div></li>
+      <li><code>IMUL</code>과 <code>MUL</code>의 핵심 차이는 무엇인가?<div class="answer"><code>MUL</code>은 unsigned, <code>IMUL</code>은 signed 곱셈이다.</div></li>
+      <li><code>DIV</code>의 8비트, 16비트, 32비트 피제수와 몫/나머지 저장 위치를 쓰시오.<div class="answer">8비트: 피제수 <code>AX</code>, 몫 <code>AL</code>, 나머지 <code>AH</code>. 16비트: 피제수 <code>DX:AX</code>, 몫 <code>AX</code>, 나머지 <code>DX</code>. 32비트: 피제수 <code>EDX:EAX</code>, 몫 <code>EAX</code>, 나머지 <code>EDX</code>.</div></li>
+      <li><code>DIV</code> 전에 상위 절반 레지스터를 0으로 만드는 이유는 무엇인가?<div class="answer"><code>DIV</code>은 상위:하위 전체를 피제수로 보기 때문에 상위 절반이 쓰레기 값이면 잘못된 피제수가 된다.</div></li>
+      <li><code>IDIV</code> 전에 <code>CBW</code>, <code>CWD</code>, <code>CDQ</code>를 사용하는 이유는 무엇인가?<div class="answer">signed 피제수를 올바르게 상위 절반까지 부호 확장하기 위해서다.</div></li>
+      <li><code>CBW</code>, <code>CWD</code>, <code>CDQ</code>가 각각 어떤 크기의 부호 확장을 수행하는지 쓰시오.<div class="answer"><code>CBW</code>: <code>AL -> AX</code>, <code>CWD</code>: <code>AX -> DX:AX</code>, <code>CDQ</code>: <code>EAX -> EDX:EAX</code>.</div></li>
+      <li><code>IDIV</code>에서 나머지의 부호는 무엇을 따라가는가?<div class="answer">피제수의 부호를 따른다.</div></li>
+      <li><code>DIV</code> 또는 <code>IDIV</code>에서 divide error가 발생하는 대표적인 경우 2가지를 쓰시오.<div class="answer">divisor가 0인 경우, 또는 몫이 destination 크기에 들어가지 않는 경우.</div></li>
+      <li><code>ADC</code>가 일반 <code>ADD</code>와 다른 점은 무엇인가?<div class="answer"><code>CF</code>까지 더한다.</div></li>
+      <li><code>SBB</code>가 일반 <code>SUB</code>와 다른 점은 무엇인가?<div class="answer"><code>CF</code>까지 뺀다.</div></li>
+      <li>큰 정수 덧셈에서 하위 워드를 먼저 계산해야 하는 이유는 무엇인가?<div class="answer">하위 계산에서 발생한 carry/borrow를 상위 계산에 전달해야 하기 때문이다.</div></li>
+      <li><code>MUL</code> 실행 후 <code>CF</code>, <code>OF</code>는 언제 1이 되는가?<div class="answer">결과의 상위 절반이 0이 아니면 <code>CF=1</code>, <code>OF=1</code>.</div></li>
+      <li><code>SHL</code>로 곱셈을 최적화할 때 <code>IMUL</code>보다 항상 좋은가? 주의할 점을 설명하시오.<div class="answer">항상 좋은 것은 아니다. 표현이 복잡해질 수 있고 overflow, signed 의미, 가독성을 고려해야 한다.</div></li>
+      <li>파일 날짜 필드에서 bit mask와 shift를 같이 쓰는 이유는 무엇인가?<div class="answer">특정 bit field만 분리하기 위해 mask로 불필요한 bit를 지우고 shift로 위치를 맞춘다.</div></li>
+      <li><code>EDX:EAX</code> 표기에서 <code>EDX</code>와 <code>EAX</code>는 각각 어떤 역할을 하는가?<div class="answer"><code>EDX</code>는 상위 32비트, <code>EAX</code>는 하위 32비트.</div></li>
+      <li>signed 산술식 문제에서 <code>CDQ</code>를 빼먹으면 어떤 문제가 생길 수 있는가?<div class="answer"><code>EDX:EAX</code> 피제수의 부호 확장이 틀려 <code>IDIV</code> 결과가 틀리거나 divide error가 날 수 있다.</div></li>
+    </ol>
+  </section>
+
+  <section id="ch8">
+    <h2>8장 고급 프로시저 <span>Advanced Procedures</span></h2>
+    <p class="hint">스택 프레임은 <code>[ebp+]</code> 매개변수, <code>[ebp-]</code> 지역 변수, <code>ret n</code> 정리 바이트를 묻기 쉽다.</p>
+    <div class="toolbar"><button onclick="toggleSection('ch8')">이 장 정답 토글</button></div>
+    <ol start="41">
+      <li>stack frame을 사용하는 이유를 설명하시오.<div class="answer">매개변수와 지역 변수를 안정적으로 접근하고 호출 전후 stack을 관리하기 위해서다.</div></li>
+      <li>표준 stack frame에서 <code>EBP</code>는 어떤 역할을 하는가?<div class="answer">현재 프로시저 stack frame의 기준 주소 역할을 한다.</div></li>
+      <li><code>push ebp / mov ebp, esp</code>를 하는 이유는 무엇인가?<div class="answer">caller의 <code>EBP</code>를 보존하고 현재 <code>ESP</code>를 새 기준점으로 만들기 위해서다.</div></li>
+      <li>일반적으로 <code>[ebp+8]</code>에는 무엇이 위치하는가?<div class="answer">첫 번째 매개변수.</div></li>
+      <li>일반적으로 <code>[ebp+12]</code>에는 무엇이 위치하는가?<div class="answer">두 번째 매개변수.</div></li>
+      <li>일반적으로 <code>[ebp-4]</code> 같은 음수 offset은 무엇을 의미하는가?<div class="answer">지역 변수.</div></li>
+      <li><code>RET n</code>에서 <code>n</code>은 무엇을 의미하는가?<div class="answer">return 후 제거할 매개변수 byte 수.</div></li>
+      <li>C calling convention과 STDCALL의 차이점을 설명하시오.<div class="answer">C convention은 caller가 stack을 정리하고, STDCALL은 callee가 <code>ret n</code>으로 정리한다.</div></li>
+      <li>STDCALL에서 stack을 정리하는 주체는 누구인가?<div class="answer">callee.</div></li>
+      <li>C calling convention에서 stack을 정리하는 주체는 누구인가?<div class="answer">caller.</div></li>
+      <li><code>INVOKE</code> 지시어가 해 주는 일을 설명하시오.<div class="answer">인수 push, 호출, 타입 검사 등을 MASM이 도와준다.</div></li>
+      <li><code>PROTO</code>가 필요한 이유를 설명하시오.<div class="answer">프로시저의 이름, 호출 규약, 매개변수 형식을 미리 알려주기 위해서다.</div></li>
+      <li><code>ADDR</code>과 <code>OFFSET</code>의 차이를 설명하시오.<div class="answer"><code>OFFSET</code>은 전역/static label 주소를 얻을 때, <code>ADDR</code>은 <code>INVOKE</code>에서 변수 주소 전달에 사용되며 지역 변수에도 적합하다.</div></li>
+      <li>배열을 프로시저에 전달할 때 배열 전체가 복사되는가?<div class="answer">배열 전체가 아니라 시작 주소가 전달된다.</div></li>
+      <li>프로시저 안에서 보존해야 하는 레지스터를 저장하지 않으면 어떤 문제가 생길 수 있는가?<div class="answer">caller가 기대하던 레지스터 값이 깨져 이후 코드가 오동작할 수 있다.</div></li>
+      <li><code>ENTER</code>와 <code>LEAVE</code> 명령의 역할을 설명하시오.<div class="answer"><code>ENTER</code>는 stack frame 생성, <code>LEAVE</code>는 stack frame 해제.</div></li>
+      <li>재귀 프로시저에서 stack frame이 중요한 이유는 무엇인가?<div class="answer">호출마다 독립적인 매개변수, return address, 지역 변수 공간이 필요하기 때문이다.</div></li>
+      <li>지역 변수와 매개변수의 stack 위치 방향 차이를 설명하시오.<div class="answer">매개변수는 보통 <code>[ebp+...]</code>, 지역 변수는 <code>[ebp-...]</code>.</div></li>
+      <li>procedure call 직후 stack top에는 보통 무엇이 저장되어 있는가?<div class="answer">return address.</div></li>
+      <li><code>RET</code> 명령이 실제로 하는 일을 설명하시오.<div class="answer">return address를 pop하여 <code>EIP</code>로 이동하고, 필요하면 <code>ret n</code>으로 매개변수 공간도 제거한다.</div></li>
+    </ol>
+  </section>
+
+  <section id="ch9">
+    <h2>9장 메모리 관리 <span>Memory Management</span></h2>
+    <p class="hint">힙 API는 실패 확인과 해제 후 포인터 사용 금지, 페이징은 10/10/12 비트 분해가 핵심이다.</p>
+    <div class="toolbar"><button onclick="toggleSection('ch9')">이 장 정답 토글</button></div>
+    <ol start="61">
+      <li>heap memory를 사용하는 이유를 설명하시오.<div class="answer">실행 중 필요한 크기의 메모리를 동적으로 할당하기 위해서다.</div></li>
+      <li><code>HeapAlloc</code>이 실패했는지 확인하는 대표적인 방법은 무엇인가?<div class="answer">반환값이 0인지 확인한다.</div></li>
+      <li><code>HeapFree</code> 후 같은 포인터를 계속 사용하는 것이 왜 위험한가?<div class="answer">해제된 메모리는 더 이상 유효하지 않아 use-after-free 문제가 생긴다.</div></li>
+      <li><code>HeapCreate</code>와 process default heap의 차이를 설명하시오.<div class="answer">default heap은 프로세스 기본 힙이고, <code>HeapCreate</code>는 별도의 private heap을 만든다.</div></li>
+      <li><code>HeapDestroy</code>는 언제 사용되는가?<div class="answer">만든 private heap 전체를 제거할 때 사용한다.</div></li>
+      <li><code>HEAP_ZERO_MEMORY</code> 옵션의 의미를 설명하시오.<div class="answer">할당된 메모리 블록을 0으로 초기화한다.</div></li>
+      <li>memory leak이 무엇인지 설명하시오.<div class="answer">할당한 메모리를 해제하지 않아 계속 점유되는 문제.</div></li>
+      <li>dangling pointer가 무엇인지 설명하시오.<div class="answer">이미 해제되었거나 유효하지 않은 메모리를 가리키는 포인터.</div></li>
+      <li>protected mode에서 logical address와 linear address의 차이를 설명하시오.<div class="answer">logical address는 selector와 offset 형태이고, linear address는 segmentation 변환 후 paging 전 주소이다.</div></li>
+      <li>segment descriptor가 포함하는 대표 정보 3가지를 쓰시오.<div class="answer">base address, limit, access rights/type.</div></li>
+      <li>GDT와 LDT의 역할을 간단히 설명하시오.<div class="answer">GDT는 전역 descriptor table, LDT는 특정 task/process에 대한 local descriptor table.</div></li>
+      <li>paging을 사용하는 이유를 설명하시오.<div class="answer">가상 메모리 제공, 보호, 물리 메모리의 유연한 매핑을 위해서다.</div></li>
+      <li>32-bit linear address가 paging에서 어떤 3개 필드로 나뉘는지 쓰시오.<div class="answer">page directory index, page table index, page offset.</div></li>
+      <li>32-bit paging에서 page offset은 몇 비트인가?<div class="answer">12비트.</div></li>
+      <li>page size가 4KB일 때 offset이 12비트인 이유를 설명하시오.<div class="answer">4KB는 4096바이트이고, 4096은 <code>2^12</code>이기 때문이다.</div></li>
+      <li><code>CR3</code> 레지스터는 무엇을 가리키는가?<div class="answer">page directory base address.</div></li>
+      <li>page directory entry와 page table entry의 역할을 설명하시오.<div class="answer">PDE는 page table 위치를, PTE는 실제 page frame 위치를 가리킨다.</div></li>
+      <li>page fault가 발생하는 대표적인 이유를 쓰시오.<div class="answer">페이지가 present가 아니거나 접근 권한 위반이 있을 때.</div></li>
+      <li>virtual memory와 physical memory의 차이를 설명하시오.<div class="answer">virtual memory는 프로그램이 보는 주소 공간이고, physical memory는 실제 RAM 주소 공간이다.</div></li>
+      <li>segmentation과 paging의 차이를 간단히 비교하시오.<div class="answer">segmentation은 segment 단위의 base/limit/protection 변환이고, paging은 고정 크기 page 단위의 주소 매핑이다.</div></li>
+    </ol>
+  </section>
+
+  <section id="tf">
+    <h2>함정형 참거짓 <span>True / False Traps</span></h2>
+    <p class="hint">시험 직전에는 이 부분만 빠르게 돌려도 실수 방지 효과가 크다.</p>
+    <div class="toolbar"><button onclick="toggleSection('tf')">참거짓 정답 토글</button></div>
+    <ol class="tf compact">
+      <li><code>NOT</code>은 결과가 0이면 <code>ZF</code>를 1로 만든다.<div class="answer danger">거짓. <code>NOT</code>은 플래그에 영향을 주지 않는다.</div></li>
+      <li><code>TEST</code>는 <code>AND</code>와 같은 논리 연산을 하지만 결과를 목적지에 저장하지 않는다.<div class="answer">참.</div></li>
+      <li><code>CMP</code>는 내부적으로 뺄셈을 수행하지만 피연산자 값을 바꾸지 않는다.<div class="answer">참.</div></li>
+      <li><code>JE</code>와 <code>JZ</code>는 같은 조건을 검사한다.<div class="answer">참.</div></li>
+      <li>signed 비교와 unsigned 비교는 같은 flag 조건을 사용하므로 점프 명령을 바꿀 필요가 없다.<div class="answer danger">거짓. signed와 unsigned 점프는 반드시 구분해야 한다.</div></li>
+      <li><code>LOOPNE</code>는 <code>ECX</code>를 감소시키고, <code>ECX != 0</code>이며 <code>ZF = 0</code>이면 점프한다.<div class="answer">참.</div></li>
+      <li><code>LOOPNE</code>는 점프 여부를 판단하면서 <code>ZF</code> 값을 새로 계산한다.<div class="answer danger">거짓. 직전 명령의 <code>ZF</code>를 사용한다.</div></li>
+      <li><code>SHR</code>은 signed 음수의 부호를 보존한다.<div class="answer danger">거짓. signed 부호 보존 오른쪽 shift는 <code>SAR</code>.</div></li>
+      <li><code>SAR</code>은 오른쪽 shift 때 최상위 비트를 유지하므로 signed 나눗셈에 적합하다.<div class="answer">참.</div></li>
+      <li>32비트 <code>MUL</code>의 결과는 항상 <code>EAX</code> 하나에만 저장된다.<div class="answer danger">거짓. 결과는 <code>EDX:EAX</code>.</div></li>
+      <li>32비트 <code>DIV</code>에서 피제수는 <code>EDX:EAX</code>이다.<div class="answer">참.</div></li>
+      <li>unsigned <code>DIV</code> 전에 <code>EDX</code>를 0으로 만들지 않으면 잘못된 결과나 divide error가 날 수 있다.<div class="answer">참.</div></li>
+      <li>signed <code>IDIV</code> 전에 <code>CDQ</code>는 불필요하다.<div class="answer danger">거짓. 32비트 signed 피제수는 <code>CDQ</code>로 부호 확장해야 한다.</div></li>
+      <li><code>IDIV</code>의 나머지 부호는 divisor의 부호를 따른다.<div class="answer danger">거짓. 피제수의 부호를 따른다.</div></li>
+      <li><code>ADC</code>는 <code>CF</code>까지 더한다.<div class="answer">참.</div></li>
+      <li><code>SBB</code>는 <code>CF</code>까지 뺀다.<div class="answer">참.</div></li>
+      <li>STDCALL은 보통 callee가 stack을 정리한다.<div class="answer">참.</div></li>
+      <li>C calling convention은 보통 caller가 stack을 정리한다.<div class="answer">참.</div></li>
+      <li><code>[ebp+8]</code>은 보통 첫 번째 매개변수이다.<div class="answer">참.</div></li>
+      <li><code>[ebp-4]</code>는 보통 지역 변수 영역이다.<div class="answer">참.</div></li>
+      <li>배열을 프로시저에 전달하면 배열의 모든 원소가 stack에 복사된다.<div class="answer danger">거짓. 보통 배열 시작 주소가 전달된다.</div></li>
+      <li><code>RET 8</code>은 return address 8바이트를 제거한다는 뜻이다.<div class="answer danger">거짓. return 후 매개변수 8바이트를 제거한다.</div></li>
+      <li><code>HeapAlloc</code>이 실패하면 반환값이 0인지 확인해야 한다.<div class="answer">참.</div></li>
+      <li><code>HeapFree</code>한 포인터는 다시 사용해도 안전하다.<div class="answer danger">거짓. use-after-free 위험이 있다.</div></li>
+      <li><code>HEAP_ZERO_MEMORY</code>는 할당된 블록을 0으로 초기화한다.<div class="answer">참.</div></li>
+      <li>page offset이 12비트이면 page size는 4KB이다.<div class="answer">참.</div></li>
+      <li><code>CR3</code>는 page directory의 base address를 가리킨다.<div class="answer">참.</div></li>
+      <li>page fault는 오직 물리 메모리가 완전히 가득 찼을 때만 발생한다.<div class="answer danger">거짓. page not present 또는 권한 위반 등으로 발생할 수 있다.</div></li>
+      <li>segmentation은 segment descriptor를 통해 base, limit, access right 등을 사용한다.<div class="answer">참.</div></li>
+      <li>virtual address와 physical address는 항상 같은 값이다.<div class="answer danger">거짓. 주소 변환 후 달라질 수 있다.</div></li>
+    </ol>
+  </section>
+</main>
+
+<script>
+function toggleSection(id){
+  document.getElementById(id).classList.toggle("show");
+}
+function showAll(){
+  document.querySelectorAll("section").forEach(s=>s.classList.add("show"));
+}
+function hideAll(){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("show"));
+}
+</script>
+</body>
+</html>
