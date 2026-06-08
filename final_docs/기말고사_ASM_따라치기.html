@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>&#49884;&#49828;&#53596; &#54532;&#47196;&#44536;&#47000;&#48141; &#44592;&#47568; ASM &#46384;&#46972;&#52824;&#44592;</title>
+<style>
+:root{--ink:#111827;--paper:#f8fafc;--panel:#fff;--line:#d1d5db;--muted:#6b7280;--brand:#0f766e;--good:#166534;--bad:#991b1b;--code:#0b1020;--code2:#111827}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",Arial,sans-serif;line-height:1.55}button,textarea{font:inherit}button{border:1px solid var(--ink);background:#fff;color:var(--ink);padding:7px 11px;border-radius:6px;cursor:pointer}button:hover{background:var(--ink);color:#fff}button.primary{background:var(--ink);color:#fff}button.primary:hover{background:#fff;color:var(--ink)}button.ghost{border-color:var(--line);color:var(--muted)}header{max-width:1180px;margin:0 auto;padding:28px 20px 18px}h1{margin:0 0 8px;font-size:26px;letter-spacing:0}.sub{margin:0;color:var(--muted);font-size:14px}.topbar{position:sticky;top:0;z-index:10;background:rgba(248,250,252,.96);border-top:1px solid var(--line);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}.topbar-inner{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.progress{height:9px;border:1px solid var(--ink);background:#fff;flex:1 1 220px;min-width:160px}.progress span{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}.status{font-size:13px;color:var(--muted);min-width:120px;text-align:right;font-variant-numeric:tabular-nums}.toc{max-width:1180px;margin:0 auto;padding:14px 20px 0;display:flex;gap:8px;flex-wrap:wrap}.toc a{text-decoration:none;color:var(--ink);border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 9px;font-size:12px}.toc a:hover{border-color:var(--ink)}main{max-width:1180px;margin:0 auto;padding:4px 20px 70px}.set-title{margin:36px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--ink);font-size:20px}.intro{border:1px solid var(--line);background:#fff;border-radius:8px;padding:14px;margin:12px 0 18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin:18px 0;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 14px}.card h3{font-size:15px;margin:0}.badge{font-size:12px;color:var(--muted);white-space:nowrap}.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.pane{min-width:0;padding:14px}.pane+.pane{border-left:1px solid var(--line)}.pane-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;color:var(--muted);font-size:12px;font-weight:700}.code{margin:0;white-space:pre-wrap;word-break:break-word;background:var(--code);color:#e5e7eb;border-radius:6px;padding:13px;min-height:130px;overflow:auto;font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.65}.answer{display:none;background:var(--code2)}.answer.open{display:block}.editor{display:block;width:100%;min-height:220px;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:13px;background:#fbfdff;color:var(--ink);font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.65;tab-size:4}.editor:focus{outline:2px solid var(--brand);outline-offset:1px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.result{margin-top:10px;border:1px solid var(--line);border-radius:6px;padding:10px;font-size:13px;color:var(--muted);background:#fff}.result.good{border-color:var(--good);color:var(--good)}.result.bad{border-color:var(--bad);color:var(--bad)}.diff{margin-top:8px;white-space:pre-wrap;font-family:Consolas,"D2Coding","Courier New",monospace;color:var(--ink);font-size:12px;line-height:1.5}.diff del{background:#fee2e2;text-decoration:none}.diff ins{background:#dcfce7;text-decoration:none}@media(max-width:820px){.workspace{grid-template-columns:1fr}.pane+.pane{border-left:0;border-top:1px solid var(--line)}.status{text-align:left}.topbar-inner button{flex:1 1 auto}}@media print{.topbar,.toc,.tools,.editor,.result{display:none}.workspace{grid-template-columns:1fr}.pane+.pane{border-left:0;border-top:1px solid var(--line)}.answer{display:block}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><h1>&#49884;&#49828;&#53596; &#54532;&#47196;&#44536;&#47000;&#48141; &#44592;&#47568; ASM &#46384;&#46972;&#52824;&#44592;</h1><p class="sub">ASM &#47928;&#51228;&#47484; &#52852;&#46300;&#47196; &#45208;&#45572;&#50612; &#51649;&#51217; &#51077;&#47141;&#54616;&#44256; &#51221;&#45813;&#44284; &#48708;&#44368;&#54624; &#49688; &#51080;&#49845;&#45768;&#45796;. &#51077;&#47141;&#45236;&#50857;&#51008; &#48652;&#46972;&#50864;&#51200;&#50640; &#51088;&#46041; &#51200;&#51109;&#46121;&#45768;&#45796;.</p></header>
+<div class="topbar"><div class="topbar-inner"><button class="primary" id="checkAll">&#51204;&#52404; &#52292;&#51216;</button><button id="showAll">&#51221;&#45813; &#47784;&#46160; &#48372;&#44592;</button><button id="hideAll">&#51221;&#45813; &#47784;&#46160; &#49704;&#44592;&#44592;</button><button class="ghost" id="clearAll">&#51077;&#47141; &#52488;&#44592;&#54868;</button><div class="progress"><span id="progressFill"></span></div><div class="status" id="status">0 / 0</div></div></div>
+<nav class="toc" id="toc"></nav><main id="app"></main>
+<script>
+const DATA = [
+    {
+        "title":  "Core problem code",
+        "source":  "기말고사_핵심문제코드.asm",
+        "intro":  "; 시스템프로그래밍 기말고사 핵심 문제 코드\r\n; 목적: 2023/2024 기출 + 2025 예상문제 반복 유형을 손으로 풀기\r\n; 사용법: 주석의 [문제]를 먼저 풀고, 아래 [정답]을 가려서 확인",
+        "problems":  [
+                         {
+                             "id":  1,
+                             "title":  "[문제 1] 조건부 점프 flag 조건을 쓰시오.",
+                             "prompt":  "; [문제 1] 조건부 점프 flag 조건을 쓰시오.\r\n;\r\n; JA  = __________________________\r\n; JB  = __________________________\r\n; JBE = __________________________\r\n; JE  = __________________________\r\n; JG  = __________________________\r\n; JL  = __________________________\r\n; JGE = __________________________\r\n; JNE = __________________________\r\n;",
+                             "answer":  "; JA  = CF=0 AND ZF=0\r\n; JB  = CF=1\r\n; JBE = CF=1 OR ZF=1\r\n; JE  = ZF=1\r\n; JG  = ZF=0 AND SF=OF\r\n; JL  = SF!=OF\r\n; JGE = SF=OF\r\n; JNE = ZF=0"
+                         },
+                         {
+                             "id":  2,
+                             "title":  "[문제 2] if ((VAR1 \u003c VAR2) OR (VAR3 \u003e= VAR4)) VAR5=1;",
+                             "prompt":  "; [문제 2] if ((VAR1 \u003c VAR2) OR (VAR3 \u003e= VAR4)) VAR5=1;\r\n; 단, signed DWORD. 빈칸을 채우시오.\r\n;     \r\n;     mov eax, VAR1\r\n;     cmp eax, VAR2\r\n;     ______ L_TRUE\r\n;     mov eax, VAR3\r\n;     cmp eax, VAR4\r\n;     ______ L_TRUE\r\n;     jmp L_END\r\n; L_TRUE:\r\n;     mov VAR5, 1\r\n; L_END:\r\n;",
+                             "answer":  "Problem2 PROC\r\n    mov eax, VAR1\r\n    cmp eax, VAR2\r\n    jl  P2_TRUE\r\n    mov eax, VAR3\r\n    cmp eax, VAR4\r\n    jge P2_TRUE\r\n    jmp P2_END\r\nP2_TRUE:\r\n    mov VAR5, 1\r\nP2_END:\r\n    ret\r\nProblem2 ENDP"
+                         },
+                         {
+                             "id":  3,
+                             "title":  "[문제 3] if ((VAR1 \u003c= VAR2) AND (VAR3 != VAR4)) VAR5=1;",
+                             "prompt":  "; [문제 3] if ((VAR1 \u003c= VAR2) AND (VAR3 != VAR4)) VAR5=1;\r\n; else VAR5=0; signed DWORD로 작성하시오.\r\n;\r\nProblem3 PROC\r\n    mov eax,var1\r\n    cmp eax,VAR2\r\n    jg P3_FALSE\r\n    mov ebx,VAR3\r\n    cmp ebx,VAR4\r\n    jg",
+                             "answer":  "Problem3 PROC\r\n    mov eax, VAR1\r\n    cmp eax, VAR2\r\n    jg  P3_FALSE\r\n    mov eax, VAR3\r\n    cmp eax, VAR4\r\n    je  P3_FALSE\r\n    mov VAR5, 1\r\n    jmp P3_END\r\nP3_FALSE:\r\n    mov VAR5, 0\r\nP3_END:\r\n    ret\r\nProblem3 ENDP"
+                         },
+                         {
+                             "id":  4,
+                             "title":  "[문제 4] eax = var * 72를 IMUL 없이 작성하시오.",
+                             "prompt":  "; [문제 4] eax = var * 72를 IMUL 없이 작성하시오.\r\n; 72 = 64 + 8\r\n;",
+                             "answer":  "Problem4 PROC\r\n    mov eax, VAR1\r\n    mov ebx, eax\r\n    shl eax, 6\r\n    shl ebx, 3\r\n    add eax, ebx\r\n    ret\r\nProblem4 ENDP"
+                         },
+                         {
+                             "id":  5,
+                             "title":  "[문제 5] VAR4 = (-VAR1 * 5) / (VAR2 * VAR3)",
+                             "prompt":  "; [문제 5] VAR4 = (-VAR1 * 5) / (VAR2 * VAR3)\r\n; signed DWORD로 작성하시오.\r\n;",
+                             "answer":  "Problem5 PROC\r\n    mov eax, VAR2\r\n    imul eax, VAR3\r\n    mov ebx, eax\r\n\r\n    mov eax, VAR1\r\n    neg eax\r\n    imul eax, 5\r\n    cdq\r\n    idiv ebx\r\n    mov VAR4, eax\r\n    ret\r\nProblem5 ENDP"
+                         },
+                         {
+                             "id":  6,
+                             "title":  "[문제 6] VAR4 = (4 * VAR1) % (VAR2 - VAR3)",
+                             "prompt":  "; [문제 6] VAR4 = (4 * VAR1) % (VAR2 - VAR3)\r\n; signed DWORD로 작성하시오.\r\n;",
+                             "answer":  "Problem6 PROC\r\n    mov eax, VAR1\r\n    shl eax, 2\r\n    mov ebx, VAR2\r\n    sub ebx, VAR3\r\n    cdq\r\n    idiv ebx\r\n    mov VAR4, edx\r\n    ret\r\nProblem6 ENDP"
+                         },
+                         {
+                             "id":  7,
+                             "title":  "[문제 7] STDCALL swap(int *a, int *b)를 작성하시오.",
+                             "prompt":  "; [문제 7] STDCALL swap(int *a, int *b)를 작성하시오.\r\n; enter/leave 사용 금지.\r\n;",
+                             "answer":  "swap PROC\r\n    push ebp\r\n    mov  ebp, esp\r\n    sub  esp, 4\r\n    push eax\r\n    push ebx\r\n    push edx\r\n\r\n    mov  eax, [ebp+8]\r\n    mov  ebx, [ebp+12]\r\n    mov  edx, [eax]\r\n    mov  [ebp-4], edx\r\n    mov  edx, [ebx]\r\n    mov  [eax], edx\r\n    mov  edx, [ebp-4]\r\n    mov  [ebx], edx\r\n\r\n    pop  edx\r\n    pop  ebx\r\n    pop  eax\r\n    mov  esp, ebp\r\n    pop  ebp\r\n    ret  8\r\nswap ENDP"
+                         },
+                         {
+                             "id":  8,
+                             "title":  "[문제 8] 위 swap을 STDCALL로 호출하시오. invoke 사용 금지.",
+                             "prompt":  "; [문제 8] 위 swap을 STDCALL로 호출하시오. invoke 사용 금지.\r\n;",
+                             "answer":  "Problem8 PROC\r\n    push OFFSET y\r\n    push OFFSET x\r\n    call swap\r\n    ret\r\nProblem8 ENDP"
+                         },
+                         {
+                             "id":  9,
+                             "title":  "[문제 9] 다음 .WHILE을 directive 없이 작성하시오.",
+                             "prompt":  "; [문제 9] 다음 .WHILE을 directive 없이 작성하시오.\r\n;\r\n; mov eax, 0\r\n; .WHILE eax \u003c 10\r\n;     inc eax\r\n;     add sum, eax\r\n; .ENDW\r\n;\r\n; 단, eax와 10은 unsigned로 비교한다.\r\n;",
+                             "answer":  "Problem9 PROC\r\n    mov eax, 0\r\nP9_L1:\r\n    cmp eax, 10\r\n    jae P9_L2\r\n    inc eax\r\n    add sum, eax\r\n    jmp P9_L1\r\nP9_L2:\r\n    ret\r\nProblem9 ENDP"
+                         },
+                         {
+                             "id":  10,
+                             "title":  "[문제 10] 1단부터 9단까지 구구단 결과를 Array에 저장하시오.",
+                             "prompt":  "; [문제 10] 1단부터 9단까지 구구단 결과를 Array에 저장하시오.\r\n; 핵심: 외부 loop의 ECX를 내부 loop에서 보존해야 한다.\r\n;",
+                             "answer":  "Problem10 PROC\r\n    mov bl, 0\r\n    mov ecx, 9\r\n    mov esi, 0\r\nP10_OuterLoop:\r\n    inc bl\r\n    mov bh, 0\r\n    push ecx\r\n    mov ecx, 9\r\nP10_InnerLoop:\r\n    inc bh\r\n    mov al, bl\r\n    mul bh\r\n    mov Array[esi], al\r\n    inc esi\r\n    loop P10_InnerLoop\r\n    pop ecx\r\n    loop P10_OuterLoop\r\n    ret\r\nProblem10 ENDP"
+                         },
+                         {
+                             "id":  11,
+                             "title":  "[문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.ㅇ",
+                             "prompt":  "; [문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.ㅇ\r\n; bit 0~4 day, bit 5~8 month, bit 9~15 year offset from 1980.\r\n;",
+                             "answer":  "Problem11 PROC\r\n    mov ax, datestamp\r\n    and ax, 0000000000011111b    ; day = 10\r\n\r\n    mov ax, datestamp\r\n    shr ax, 5\r\n    and ax, 0000000000001111b    ; month = 3\r\n\r\n    mov ax, datestamp\r\n    shr ax, 9\r\n    add ax, 1980                 ; year = 1999\r\n    ret\r\nProblem11 ENDP"
+                         },
+                         {
+                             "id":  12,
+                             "title":  "[문제 12] 실행 결과를 쓰시오.",
+                             "prompt":  "; [문제 12] 실행 결과를 쓰시오.\r\n;\r\n; mov eax, -1\r\n; mov cl, 4\r\n; sar eax, cl\r\n; shl eax, 1\r\n;",
+                             "answer":  " EAX = FFFFFFFEh"
+                         },
+                         {
+                             "id":  13,
+                             "title":  "[문제 13] 실행 결과를 쓰시오.",
+                             "prompt":  "; [문제 13] 실행 결과를 쓰시오.\r\n;\r\n; mov ax, 00FFh\r\n; mov bl, 10h\r\n; div bl\r\n;",
+                             "answer":  " AL=0Fh, AH=0Fh. divide error 없음."
+                         },
+                         {
+                             "id":  14,
+                             "title":  "[문제 14] unsigned 64-bit 덧셈: EDX:EAX = FFFFFFFFh + FFFFFFFFh",
+                             "prompt":  "; [문제 14] unsigned 64-bit 덧셈: EDX:EAX = FFFFFFFFh + FFFFFFFFh\r\n;",
+                             "answer":  "Problem14 PROC\r\n    mov edx, 0\r\n    mov eax, 0FFFFFFFFh\r\n    add eax, 0FFFFFFFFh\r\n    adc edx, 0\r\n    ret\r\nProblem14 ENDP\r\n\r\nmain PROC\r\n    INVOKE ExitProcess, 0\r\nmain ENDP\r\n\r\nEND main"
+                         }
+                     ]
+    },
+    {
+        "title":  "Extra problem set",
+        "source":  "기말고사_추가문제세트.asm",
+        "intro":  "; 시스템프로그래밍 기말고사 추가 문제 세트\r\n; 범위: 6장 조건 처리, 7장 정수 산술, 8장 고급 프로시저, 9장 메모리 관리\r\n; 사용법: [문제]를 먼저 손으로 풀고, 바로 아래 [정답]으로 확인",
+        "problems":  [
+                         {
+                             "id":  1,
+                             "title":  "[추가 문제 1] signed 조건문을 MASM으로 작성하시오.",
+                             "prompt":  "; [추가 문제 1] signed 조건문을 MASM으로 작성하시오.\r\n; if (A \u003e B \u0026\u0026 C \u003c= A) D = 1; else D = 0;\r\n;",
+                             "answer":  "Extra01 PROC\r\n    mov eax, A\r\n    cmp eax, B\r\n    jle E01_FALSE\r\n    mov eax, C\r\n    cmp eax, A\r\n    jg  E01_FALSE\r\n    mov D, 1\r\n    jmp E01_END\r\nE01_FALSE:\r\n    mov D, 0\r\nE01_END:\r\n    ret\r\nExtra01 ENDP"
+                         },
+                         {
+                             "id":  2,
+                             "title":  "[추가 문제 2] unsigned 조건문을 MASM으로 작성하시오.",
+                             "prompt":  "; [추가 문제 2] unsigned 조건문을 MASM으로 작성하시오.\r\n; if (X \u003c Y || Z == 0) Count++;\r\n;",
+                             "answer":  "Extra02 PROC\r\n    mov eax, X\r\n    cmp eax, Y\r\n    jb  E02_TRUE\r\n    cmp Z, 0\r\n    je  E02_TRUE\r\n    jmp E02_END\r\nE02_TRUE:\r\n    inc Count\r\nE02_END:\r\n    ret\r\nExtra02 ENDP"
+                         },
+                         {
+                             "id":  3,
+                             "title":  "[추가 문제 3] 조건부 점프를 고르시오.",
+                             "prompt":  "; [추가 문제 3] 조건부 점프를 고르시오.\r\n; cmp eax, ebx 뒤에 signed eax \u003e= ebx 이면 점프: ______\r\n; cmp eax, ebx 뒤에 unsigned eax \u003c= ebx 이면 점프: ______\r\n; cmp eax, ebx 뒤에 eax != ebx 이면 점프: ______\r\n;",
+                             "answer":  " JGE, JBE, JNE"
+                         },
+                         {
+                             "id":  4,
+                             "title":  "[추가 문제 4] 다음 실행 결과를 쓰시오.",
+                             "prompt":  "; [추가 문제 4] 다음 실행 결과를 쓰시오.\r\n; mov al, 11110000b\r\n; test al, 00001111b\r\n; ; ZF=?, AL=?\r\n;",
+                             "answer":  " ZF=1, AL=11110000b. TEST는 결과를 저장하지 않는다."
+                         },
+                         {
+                             "id":  5,
+                             "title":  "[추가 문제 5] 다음 실행 결과를 쓰시오.",
+                             "prompt":  "; [추가 문제 5] 다음 실행 결과를 쓰시오.\r\n; mov al, 80h\r\n; cmp al, 7Fh\r\n; ; unsigned 관점: AL \u003e 7Fh 인가?\r\n; ; signed 관점: AL \u003e 7Fh 인가?\r\n;",
+                             "answer":  " unsigned는 참, signed는 거짓. 80h는 signed 8-bit에서 -128."
+                         },
+                         {
+                             "id":  6,
+                             "title":  "[추가 문제 6] IMUL 없이 eax = X * 45를 작성하시오.",
+                             "prompt":  "; [추가 문제 6] IMUL 없이 eax = X * 45를 작성하시오.\r\n; 45 = 32 + 8 + 4 + 1\r\n;",
+                             "answer":  "Extra06 PROC\r\n    mov eax, X\r\n    mov ebx, eax\r\n    mov ecx, eax\r\n    mov edx, eax\r\n    shl eax, 5\r\n    shl ebx, 3\r\n    shl ecx, 2\r\n    add eax, ebx\r\n    add eax, ecx\r\n    add eax, edx\r\n    ret\r\nExtra06 ENDP"
+                         },
+                         {
+                             "id":  7,
+                             "title":  "[추가 문제 7] signed 식을 작성하시오.",
+                             "prompt":  "; [추가 문제 7] signed 식을 작성하시오.\r\n; D = (A - B) / C\r\n;",
+                             "answer":  "Extra07 PROC\r\n    mov eax, A\r\n    sub eax, B\r\n    cdq\r\n    idiv C\r\n    mov D, eax\r\n    ret\r\nExtra07 ENDP"
+                         },
+                         {
+                             "id":  8,
+                             "title":  "[추가 문제 8] signed 나머지를 구하시오.",
+                             "prompt":  "; [추가 문제 8] signed 나머지를 구하시오.\r\n; D = (A + B * 2) % C\r\n;",
+                             "answer":  "Extra08 PROC\r\n    mov eax, B\r\n    shl eax, 1\r\n    add eax, A\r\n    cdq\r\n    idiv C\r\n    mov D, edx\r\n    ret\r\nExtra08 ENDP"
+                         },
+                         {
+                             "id":  9,
+                             "title":  "[추가 문제 9] 다음 실행 결과를 쓰시오.",
+                             "prompt":  "; [추가 문제 9] 다음 실행 결과를 쓰시오.\r\n; mov eax, -17\r\n; cdq\r\n; mov ebx, 5\r\n; idiv ebx\r\n; ; EAX=?, EDX=?\r\n;",
+                             "answer":  " EAX=-3, EDX=-2. IDIV의 나머지 부호는 피제수와 같다."
+                         },
+                         {
+                             "id":  10,
+                             "title":  "[추가 문제 10] 다음 코드가 divide error를 낼 수 있는 이유를 쓰시오.",
+                             "prompt":  "; [추가 문제 10] 다음 코드가 divide error를 낼 수 있는 이유를 쓰시오.\r\n; mov eax, 100\r\n; mov edx, 1\r\n; mov ebx, 10\r\n; div ebx\r\n;",
+                             "answer":  " 32비트 DIV의 피제수는 EDX:EAX이다. EDX를 0으로 지우지 않아\r\n; 실제 피제수가 00000001_00000064h가 되므로 몫이 EAX에 안 들어갈 수 있다."
+                         },
+                         {
+                             "id":  11,
+                             "title":  "[추가 문제 11] 64비트 unsigned 덧셈을 작성하시오.",
+                             "prompt":  "; [추가 문제 11] 64비트 unsigned 덧셈을 작성하시오.\r\n; (EDX:EAX) = (EDX:EAX) + (ECX:EBX)\r\n;",
+                             "answer":  "Extra11 PROC\r\n    add eax, ebx\r\n    adc edx, ecx\r\n    ret\r\nExtra11 ENDP"
+                         },
+                         {
+                             "id":  12,
+                             "title":  "[추가 문제 12] 64비트 unsigned 뺄셈을 작성하시오.",
+                             "prompt":  "; [추가 문제 12] 64비트 unsigned 뺄셈을 작성하시오.\r\n; (EDX:EAX) = (EDX:EAX) - (ECX:EBX)\r\n;",
+                             "answer":  "Extra12 PROC\r\n    sub eax, ebx\r\n    sbb edx, ecx\r\n    ret\r\nExtra12 ENDP"
+                         },
+                         {
+                             "id":  13,
+                             "title":  "[추가 문제 13] LOOPNE 실행 조건을 쓰시오.",
+                             "prompt":  "; [추가 문제 13] LOOPNE 실행 조건을 쓰시오.\r\n;",
+                             "answer":  " ECX를 1 감소시킨 뒤, ECX != 0 이고 ZF = 0이면 점프한다.\r\n; LOOPNE 자체는 ZF를 변경하지 않는다."
+                         },
+                         {
+                             "id":  14,
+                             "title":  "[추가 문제 14] .WHILE을 directive 없이 작성하시오.",
+                             "prompt":  "; [추가 문제 14] .WHILE을 directive 없이 작성하시오.\r\n; mov ecx, 0\r\n; .WHILE ecx \u003c= 5\r\n;     inc Count\r\n;     inc ecx\r\n; .ENDW\r\n; 단, unsigned 비교.\r\n;",
+                             "answer":  "Extra14 PROC\r\n    mov ecx, 0\r\nE14_LOOP:\r\n    cmp ecx, 5\r\n    ja  E14_END\r\n    inc Count\r\n    inc ecx\r\n    jmp E14_LOOP\r\nE14_END:\r\n    ret\r\nExtra14 ENDP"
+                         },
+                         {
+                             "id":  15,
+                             "title":  "[추가 문제 15] STDCALL 프로시저 AddTwo(int a, int b)를 작성하시오.",
+                             "prompt":  "; [추가 문제 15] STDCALL 프로시저 AddTwo(int a, int b)를 작성하시오.\r\n; 반환값은 EAX, callee가 stack을 정리한다.\r\n;",
+                             "answer":  "AddTwo PROC\r\n    push ebp\r\n    mov  ebp, esp\r\n    mov  eax, [ebp+8]\r\n    add  eax, [ebp+12]\r\n    pop  ebp\r\n    ret  8\r\nAddTwo ENDP"
+                         },
+                         {
+                             "id":  16,
+                             "title":  "[추가 문제 16] AddTwo(12, 20)을 invoke 없이 호출하시오.",
+                             "prompt":  "; [추가 문제 16] AddTwo(12, 20)을 invoke 없이 호출하시오.\r\n;",
+                             "answer":  "Extra16 PROC\r\n    push 20\r\n    push 12\r\n    call AddTwo\r\n    ret\r\nExtra16 ENDP"
+                         },
+                         {
+                             "id":  17,
+                             "title":  "[추가 문제 17] C calling convention과 STDCALL의 핵심 차이를 쓰시오.",
+                             "prompt":  "; [추가 문제 17] C calling convention과 STDCALL의 핵심 차이를 쓰시오.\r\n;",
+                             "answer":  "; C convention: caller가 stack 정리. 여러 개의 인수를 받는 가변 인자 함수에 적합.\r\n; STDCALL: callee가 ret n으로 stack 정리. Win32 API에서 자주 사용."
+                         },
+                         {
+                             "id":  18,
+                             "title":  "[추가 문제 18] 배열 주소를 매개변수로 받는 프로시저의 EBP 접근을 쓰시오.",
+                             "prompt":  "; [추가 문제 18] 배열 주소를 매개변수로 받는 프로시저의 EBP 접근을 쓰시오.\r\n; push LENGTHOF Buffer\r\n; push OFFSET Buffer\r\n; call Fill\r\n;\r\n; Fill PROC 내부에서 buffer 주소와 count는 각각 어디에 있는가?\r\n;",
+                             "answer":  " buffer 주소 = [ebp+8], count = [ebp+12]"
+                         },
+                         {
+                             "id":  19,
+                             "title":  "[추가 문제 19] Date2 WORD 4A21h에서 day/month/year를 추출하시오.",
+                             "prompt":  "; [추가 문제 19] Date2 WORD 4A21h에서 day/month/year를 추출하시오.\r\n; bit 0-4 day, bit 5-8 month, bit 9-15 year offset from 1980.\r\n;",
+                             "answer":  "Extra19 PROC\r\n    mov ax, Date2\r\n    and ax, 0000000000011111b    ; day = 1\r\n\r\n    mov ax, Date2\r\n    shr ax, 5\r\n    and ax, 0000000000001111b    ; month = 1\r\n\r\n    mov ax, Date2\r\n    shr ax, 9\r\n    add ax, 1980                 ; year = 2017\r\n    ret\r\nExtra19 ENDP"
+                         },
+                         {
+                             "id":  20,
+                             "title":  "[추가 문제 20] 메모리 관리 참거짓.",
+                             "prompt":  "; [추가 문제 20] 메모리 관리 참거짓.\r\n; 1) HeapAlloc이 실패하면 보통 NULL(0)을 반환한다.\r\n; 2) HeapFree 후 같은 포인터를 계속 사용해도 안전하다.\r\n; 3) page fault는 요청한 페이지가 메모리에 없을 때 발생할 수 있다.\r\n; 4) 32-bit linear address의 하위 12비트는 page offset이다.\r\n;",
+                             "answer":  " 1) 참  2) 거짓  3) 참  4) 참\r\n\r\nmain PROC\r\n    INVOKE ExitProcess, 0\r\nmain ENDP\r\n\r\nEND main"
+                         }
+                     ]
+    }
+];
+const UI = {unchecked:'미채점', correct:'정답', wrong:'확인 필요', prompt:'문제', mine:'내 풀이', answer:'정답', copyPrompt:'문제 복사', loadAnswer:'정답을 입력창에 넣기', check:'채점', show:'정답 보기', hide:'정답 숨기기', copyAnswer:'정답 복사', clear:'비우기', placeholder:'여기에 MASM 코드나 답을 직접 따라 치세요.', guide:'입력 후 채점하면 앞뒤 공백을 제거해 비교합니다.', ok:'정답과 일치합니다.', bad:'정답과 다릅니다. 아래 차이를 보고 누락된 줄이나 명령어를 확인하세요.', noAnswer:'정답 없음'};
+const storeKey='sp-final-asm-typing-v1';
+const saved=JSON.parse(localStorage.getItem(storeKey)||'{}');
+const app=document.getElementById('app'),toc=document.getElementById('toc'),statusEl=document.getElementById('status'),progressFill=document.getElementById('progressFill');
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const normalize=s=>String(s).replace(/\r\n/g,'\n').trim();
+const makeId=(si,pi)=>'s'+si+'-p'+pi;
+function render(){let total=0;DATA.forEach((set,si)=>{const sectionId='set-'+si;const link=document.createElement('a');link.href='#'+sectionId;link.textContent=set.source;toc.appendChild(link);const h2=document.createElement('h2');h2.className='set-title';h2.id=sectionId;h2.textContent=set.source;app.appendChild(h2);const intro=document.createElement('pre');intro.className='intro code';intro.textContent=set.intro;app.appendChild(intro);set.problems.forEach(problem=>{total++;const id=makeId(si,problem.id);const card=document.createElement('article');card.className='card';card.id=id;card.innerHTML='<div class="card-head"><h3>'+escapeHtml(problem.title)+'</h3><span class="badge" data-badge>'+UI.unchecked+'</span></div><div class="workspace"><section class="pane"><div class="pane-title"><span>'+UI.prompt+'</span><button class="ghost" data-copy-prompt>'+UI.copyPrompt+'</button></div><pre class="code">'+escapeHtml(problem.prompt)+'</pre></section><section class="pane"><div class="pane-title"><span>'+UI.mine+'</span><button class="ghost" data-load-answer>'+UI.loadAnswer+'</button></div><textarea class="editor" spellcheck="false" placeholder="'+UI.placeholder+'"></textarea><div class="tools"><button class="primary" data-check>'+UI.check+'</button><button data-toggle>'+UI.show+'</button><button class="ghost" data-copy-answer>'+UI.copyAnswer+'</button><button class="ghost" data-clear>'+UI.clear+'</button></div><div class="result" data-result>'+UI.guide+'</div><pre class="code answer" data-answer>'+escapeHtml(problem.answer||UI.noAnswer)+'</pre></section></div>';const editor=card.querySelector('.editor');editor.value=saved[id]||'';editor.addEventListener('input',()=>{saved[id]=editor.value;localStorage.setItem(storeKey,JSON.stringify(saved));updateProgress()});card.querySelector('[data-toggle]').addEventListener('click',e=>{const ans=card.querySelector('[data-answer]');ans.classList.toggle('open');e.currentTarget.textContent=ans.classList.contains('open')?UI.hide:UI.show});card.querySelector('[data-check]').addEventListener('click',()=>checkCard(card,problem.answer));card.querySelector('[data-clear]').addEventListener('click',()=>{editor.value='';saved[id]='';localStorage.setItem(storeKey,JSON.stringify(saved));setResult(card,UI.guide,'');updateProgress()});card.querySelector('[data-copy-answer]').addEventListener('click',()=>navigator.clipboard.writeText(problem.answer||''));card.querySelector('[data-copy-prompt]').addEventListener('click',()=>navigator.clipboard.writeText(problem.prompt||''));card.querySelector('[data-load-answer]').addEventListener('click',()=>{editor.value=problem.answer||'';editor.dispatchEvent(new Event('input'))});app.appendChild(card)})});app.dataset.total=total;updateProgress()}
+function setResult(card,msg,cls,diff=''){const result=card.querySelector('[data-result]');result.className='result'+(cls?' '+cls:'');result.innerHTML=escapeHtml(msg)+(diff?'<div class="diff">'+diff+'</div>':'');card.querySelector('[data-badge]').textContent=cls==='good'?UI.correct:cls==='bad'?UI.wrong:UI.unchecked}
+function checkCard(card,answer){const mine=card.querySelector('.editor').value;const ok=normalize(mine)===normalize(answer||'');if(ok)setResult(card,UI.ok,'good');else setResult(card,UI.bad,'bad',simpleDiff(normalize(mine),normalize(answer||'')));updateProgress()}
+function simpleDiff(a,b){const al=a.split('\n'),bl=b.split('\n'),max=Math.max(al.length,bl.length),out=[];for(let i=0;i<max;i++){if((al[i]||'')===(bl[i]||''))out.push('  '+(al[i]||''));else{if(al[i])out.push('<del>- '+escapeHtml(al[i])+'</del>');if(bl[i])out.push('<ins>+ '+escapeHtml(bl[i])+'</ins>')}}return out.slice(0,80).join('\n')+(out.length>80?'\n... 차이가 길어 앞 80줄만 표시':'')}
+function updateProgress(){const editors=[...document.querySelectorAll('.editor')];const done=editors.filter(e=>e.value.trim()).length;const total=Number(app.dataset.total||editors.length||0);statusEl.textContent=done+' / '+total+' 입력';progressFill.style.width=total?Math.round(done/total*100)+'%':'0%'}
+document.getElementById('checkAll').addEventListener('click',()=>DATA.forEach((set,si)=>set.problems.forEach(p=>checkCard(document.getElementById(makeId(si,p.id)),p.answer))));
+document.getElementById('showAll').addEventListener('click',()=>document.querySelectorAll('[data-answer]').forEach(e=>e.classList.add('open')));
+document.getElementById('hideAll').addEventListener('click',()=>document.querySelectorAll('[data-answer]').forEach(e=>e.classList.remove('open')));
+document.getElementById('clearAll').addEventListener('click',()=>{if(!confirm('모든 입력을 지울까요?'))return;localStorage.removeItem(storeKey);Object.keys(saved).forEach(k=>delete saved[k]);document.querySelectorAll('.editor').forEach(e=>e.value='');document.querySelectorAll('.card').forEach(c=>setResult(c,UI.guide,''));updateProgress()});
+render();
+</script>
+</body>
+</html>

@@ -49,7 +49,7 @@ ExitProcess PROTO, dwExitCode:DWORD
 ; ============================================================
 ; [문제 2] if ((VAR1 < VAR2) OR (VAR3 >= VAR4)) VAR5=1;
 ; 단, signed DWORD. 빈칸을 채우시오.
-;
+;     
 ;     mov eax, VAR1
 ;     cmp eax, VAR2
 ;     ______ L_TRUE
@@ -80,6 +80,15 @@ Problem2 ENDP
 ; [문제 3] if ((VAR1 <= VAR2) AND (VAR3 != VAR4)) VAR5=1;
 ; else VAR5=0; signed DWORD로 작성하시오.
 ;
+Problem3 PROC
+    mov eax,var1
+    cmp eax,VAR2
+    jg P3_FALSE
+    mov ebx,VAR3
+    cmp ebx,VAR4
+    je P3_FALSE
+    mov var5,1
+P3_FALSE: mov var5,0
 ; [정답]
 Problem3 PROC
     mov eax, VAR1
@@ -100,6 +109,10 @@ Problem3 ENDP
 ; [문제 4] eax = var * 72를 IMUL 없이 작성하시오.
 ; 72 = 64 + 8
 ;
+
+PROBLEM4 PROC
+mov eax,var
+
 ; [정답]
 Problem4 PROC
     mov eax, VAR1
