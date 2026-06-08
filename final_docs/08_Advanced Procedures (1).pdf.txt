@@ -1,0 +1,444 @@
+===== PAGE 1 =====
+System Programming
+Advanced Procedures
+Dongwann
+Kang
+Associate Professor
+Department of Computer Science and Engineering
+===== PAGE 2 =====
+Stack Frames
+•
+ 1. Stack Parameters
+–
+ Stack frame 
+•
+ The area of the stack set aside for the followings:
+–
+ Passed arguments
+–
+ Subroutine return address
+–
+ Local variables
+–
+ Saved registers
+–
+ The stack frame is created by the following steps:
+1.
+ Passed arguments, if any, are pushed on the stack
+2.
+ The subroutine is called, causing the subroutine return address to be pushed on the stack
+3.
+ As the subroutine begins to execute, EBP is pushed on the stack
+4.
+ EBP is set equal to ESP
+–
+ From this point on, EBP acts as a base reference for all of the subroutine parameters
+5.
+ If there are local variables, ESP is decremented to reserve space for the variables on the stack
+6.
+ If any registers need to be saved, they are pushed on the stack
+–
+ The structure of a stack frame is affected by the 
+memory model
+and 
+argument passing convention
+–
+ If you want to call functions in the 32
+-
+bit Windows API, you must pass arguments on the stack
+===== PAGE 3 =====
+Stack Frames
+•
+ 2. Disadvantages of Register Parameters
+–
+ Microsoft’s 
+fastcall
+parameter passing convention
+•
+ Simply placing parameters in registers before calling a subroutine
+–
+ This leads to runtime efficiency
+•
+ Unfortunately, these registers are used to hold data values
+•
+ Therefore, any registers used as parameters must first be pushed on the stack before procedure calls, and 
+later restored to their original values after the procedure returns
+•
+ Disadvantages
+–
+ It eliminates the performance advantage by avoiding register parameters
+–
+ Programmers must be very careful that each register’s PUSH is matched by its appropriate POP
+
+===== PAGE 4 =====
+Stack Frames
+•
+ 2. Disadvantages of Register Parameters
+–
+ Stack parameters
+•
+ They offer a flexible approach that does not require register parameters
+•
+ Two general types of arguments are pushed on the stack during subroutine calls:
+–
+ Value arguments (values of variables and constants)
+–
+ Reference arguments (addresses of variables)
+
+===== PAGE 5 =====
+Stack Frames
+•
+ 2. Disadvantages of Register Parameters
+–
+ Passing by Value
+•
+ A copy of the value is pushed on the stack
+•
+ An equivalent function call written in C++ would be
+•
+ The arguments are pushed on the stack in reverse order, which is the standard for the C and C++
+
+===== PAGE 6 =====
+Stack Frames
+•
+ 2. Disadvantages of Register Parameters
+–
+ Passing by Reference
+•
+ An argument passed by reference consists of the address (offset) of an object
+•
+ An equivalent function call written in C++ would be
+
+===== PAGE 7 =====
+Stack Frames
+•
+ 2. Disadvantages of Register Parameters
+–
+ Passing Arrays
+•
+ High
+-
+level languages always pass arrays to subroutines by reference
+–
+ They push the address of an array on the stack
+–
+ The subroutine can then get the address from the stack and use it to access the array
+•
+ Passing an array by value would require each array element to be pushed on the stack separately
+–
+ Such an operation would be very slow, and it would use up precious stack space
+
+===== PAGE 8 =====
+Stack Frames
+•
+ 3. Accessing Stack Parameters
+–
+ Initializing and accessing parameters during function calls (C and C++)
+•
+ It begins with 1) saving the EBP register and 2) pointing EBP to the top of the stack
+–
+ Optionally, it may push certain registers on the stack whose values will be restored when the function returns
+•
+ At the end of the function, 1) the EBP register is restored and 2) the RET instruction returns to the caller
+–
+ Base
+-
+Offset Addressing
+•
+ To access stack parameters, base
+-
+offset addressing is used
+•
+ EBP is the base register and the offset is a constant
+–
+ Explicit Stack Parameters
+•
+ Symbolic constants can be used to refer to stack parameters
+
+===== PAGE 9 =====
+Stack Frames
+•
+ 4. 32
+-
+Bit Calling Conventions
+–
+ Two most common calling conventions for 32
+-
+bit programming in a Windows environment
+1.
+ The C Calling Convention
+•
+ This is used by the C and C++ programming languages
+•
+ Subroutine parameters are pushed on the stack in reverse order
+•
+ When a program calls a subroutine, the combined size of the subroutine parameters is added to the ESP
+•
+ Programs written in C/C++ always remove arguments from the stack in the calling program after a 
+subroutine has returned
+
+===== PAGE 10 =====
+Stack Frames
+•
+ 4. 32
+-
+Bit Calling Conventions
+–
+ Two most common calling conventions for 32
+-
+bit programming in a Windows environment
+2.
+ STDCALL
+Calling Convention
+•
+ An integer parameter is supplied to the RET instruction
+–
+ The integer: the number of bytes of stack space consumed by the procedure’s parameter
+–
+ RET adds its operand to ESP
+•
+ Like C, STDCALL pushes arguments onto the stack in reverse order
+•
+ By having a parameter in the RET instruction, STDCALL reduces the amount of code generated for 
+subroutine calls and ensures that calling programs will never forget to clean up the stack
+
+===== PAGE 11 =====
+Stack Frames
+•
+ 4. 32
+-
+Bit Calling Conventions
+–
+ Saving and Restoring Registers
+•
+ The registers for being saved should be pushed on the stack just after setting EBP to ESP, and just before 
+reserving space for local variables
+
+===== PAGE 12 =====
+Stack Frames
+•
+ 5. Local Variables
+–
+ In high
+-
+level languages, local variables are created, used, and destroyed within a single subroutine
+–
+ They are created on the runtime stack, usually before the EBP
+–
+ They cannot be assigned default values at assembly time, but they can be initialized at runtime
+–
+ If this code is compiled into machine language, a total of 8 bytes is reserved for the two variables
+–
+ Before finishing, the function resets the stack pointer by assigning it the value of EBP
+•
+ The effect is to release the local variables from the stack
+(the C calling convention is used)
+
+===== PAGE 13 =====
+Stack Frames
+•
+ 6. Reference Parameters
+–
+ Reference parameters are usually accessed by procedures using base
+-
+offset addressing
+–
+ ArrayFill
+Example
+•
+ The 
+ArrayFill
+procedure fills an array with a pseudorandom sequence of 16
+-
+bit integers
+•
+ Two arguments: a pointer to the array (passed by reference) and the array length (passed by value)
+
+===== PAGE 14 =====
+Stack Frames
+•
+ 7. LEA (Load Effective Address) Instruction
+–
+ The LEA instruction returns the address of an indirect operand
+•
+ The offset is calculated at runtime
+–
+ ESP is decremented by 32 to keep it aligned on a doubleword boundary
+–
+ OFFSET operator only works with addresses known at compile time
+•
+ The following statement would not assemble:
+
+===== PAGE 15 =====
+Stack Frames
+•
+ 8. ENTER and LEAVE Instructions
+–
+ The ENTER instruction automatically creates a stack frame for a called procedure
+•
+ It reserves stack space for local variables and saves EBP on the stack
+–
+ Pushes EBP on the stack (
+PUSH EBP
+)
+–
+ Sets EBP to the base of the stack frame (
+MOV EBP, ESP
+)
+–
+ Reserves space for local variables (
+SUB ESP, NUMBYTES
+)
+–
+ ENTER has two immediate operands
+•
+ The first is a constant specifying the number of bytes of stack space to reserve for local variables
+–
+ Always rounded up to a multiple of 4 to keep ESP on a doubleword boundary
+•
+ The second specifies the lexical nesting level of the procedure
+
+===== PAGE 16 =====
+Stack Frames
+•
+ 8. ENTER and LEAVE Instructions
+–
+ LEAVE Instruction terminates the stack frame for a procedure
+•
+ It reverses the action of a previous ENTER instruction by restoring ESP and EBP to the values they were 
+assigned when the procedure was called
+
+===== PAGE 17 =====
+Recursion
+•
+ 1. Recursively Calculating a Sum
+–
+ A recursive procedure named 
+CalcSum
+, which sums the integers 1 to n
+•
+ n is an input parameter passed in ECX
+•
+ CalcSum
+returns the sum in EAX
+–
+ The following table shows the return addresses 
+(as labels) pushed on the stack by the CALL instruction, 
+along with the concurrent values of ECX (counter) 
+and EAX (sum)
+
+===== PAGE 18 =====
+Recursion
+•
+ 2. Calculating a Factorial
+–
+ Factorial procedure that uses recursion to calculate a factorial
+•
+ We pass n (an unsigned integer between 0 and 12) on the stack to the Factorial procedure
+•
+ A value is returned in EAX
+–
+ Because EAX is a 32
+-
+bit register, the largest factorial it can hold is 12!
+
+===== PAGE 19 =====
+Recursion
+•
+ 2. Calculating a Factorial
+–
+ Factorial procedure that uses recursion to calculate a factorial
+•
+ We pass n (an unsigned integer between 0 and 12) on the stack to the Factorial procedure
+•
+ A value is returned in EAX
+–
+ Because EAX is a 32
+-
+bit register, the largest factorial it can hold is 12!
+
+===== PAGE 20 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 1. INVOKE Directive
+–
+ This directive pushes arguments on the stack (in the order specified by the MODEL directive) 
+–
+ It then calls a procedure
+–
+ Syntax: 
+–
+ EAX, EDX Overwritten
+•
+ If you pass arguments smaller than 32 bits to a procedure, INVOKE causes the assembler to overwrite EAX and 
+EDX when it widens the arguments before pushing them on the stack
+•
+ You can save and restore EAX and EDX before and after the procedure call
+(Assumed that STDCALL is in effect)
+===== PAGE 21 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 2. ADDR Operator
+–
+ This operator can be used to pass a pointer argument when calling a procedure using INVOKE
+–
+ The argument passed to ADDR must be an assembly time constant
+(Assumed that STDCALL is in effect)
+===== PAGE 22 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 3. PROC Directive
+–
+ Syntax of the PROC Directive: 
+–
+ Parameter Lists
+•
+ The PROC directive permits you to declare a procedure with a comma
+-
+separated list of named parameters
+•
+ Your code can refer to the parameters by name rather than by calculated stack offsets such as [ebp+8]
+–
+ A single parameter has the following syntax: 
+
+===== PAGE 23 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 3. PROC Directive
+–
+ RET Instruction Modified by PROC
+•
+ When PROC is used with one or more parameters and STDCALL is the default protocol, MASM generates 
+the following entry and exit code, assuming PROC has n parameters:
+–
+ Specifying the Parameter Passing Protocol
+•
+ The attributes field of the PROC directive lets you specify the language convention for passing parameters
+•
+ It overrides the default language convention specified in the .MODEL directive
+
+===== PAGE 24 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 4. PROTO Directive
+–
+ The PROTO directive creates a prototype for an existing procedure
+–
+ A prototype declares a procedure’s name and parameter list
+•
+ It allows you to call a procedure before defining it
+–
+ MASM requires a prototype for each procedure called by INVOKE
+•
+ PROTO must appear first before INVOKE
+
+===== PAGE 25 =====
+INVOKE, ADDR, PROC, and PROTO
+•
+ 4. PROTO Directive
+–
+ The PROTO directive creates a prototype for an existing procedure
+–
+ A prototype declares a procedure’s name and parameter list
+•
+ It allows you to call a procedure before defining it
