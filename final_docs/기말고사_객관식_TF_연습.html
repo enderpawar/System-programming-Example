@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템프로그래밍 기말 객관식/TF 연습</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#111827;--muted:#64748b;--line:#d7dce3;--teal:#0f766e;--red:#b91c1c;--green:#166534;--amber:#a16207}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.55}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px}
+h1{margin:0 0 8px;font-size:clamp(24px,3vw,36px);letter-spacing:0}
+.sub{margin:0;color:var(--muted);font-size:14px}
+.bar{position:sticky;top:0;z-index:10;background:rgba(246,247,249,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.bar-inner{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:8px 11px;cursor:pointer}
+button:hover{border-color:var(--teal)}
+button.primary{background:var(--teal);border-color:var(--teal);color:white}
+.score{margin-left:auto;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.progress{height:9px;min-width:160px;flex:1 1 220px;border:1px solid var(--line);background:#fff;border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:var(--teal);transition:width .2s}
+main{max-width:1120px;margin:0 auto;padding:22px 20px 70px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters button.active{background:#e7f7f4;border-color:var(--teal);color:#0f4f4a}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin:0 0 14px;padding:15px}
+.head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.title{font-weight:700}
+.meta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;color:var(--muted);background:#fbfcfe}
+.tag.hot{color:#9f1239;background:#fff1f2;border-color:#fecdd3}
+.tag.mid{color:var(--amber);background:#fffbeb;border-color:#fde68a}
+.q{margin:8px 0 12px;white-space:pre-wrap}
+.choices{display:grid;gap:8px}
+.choice{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:7px;padding:9px 10px}
+.choice.selected{border-color:#1f3a5f;background:#eef2ff}
+.choice.correct{border-color:var(--green);background:#f0fdf4;color:var(--green)}
+.choice.wrong{border-color:var(--red);background:#fff1f2;color:#991b1b}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.explain{display:none;margin-top:10px;border-left:4px solid var(--teal);background:#f0fdfa;color:#134e4a;border-radius:6px;padding:10px;font-size:14px;white-space:pre-wrap}
+.explain.open{display:block}
+code{font-family:Consolas,"D2Coding","Courier New",monospace}
+pre{margin:8px 0 0;background:#101827;color:#e5e7eb;border-radius:7px;padding:12px;overflow:auto;font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.55}
+@media(max-width:760px){.score{margin-left:0}.head{display:block}.meta{justify-content:flex-start;margin-top:8px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>시스템프로그래밍 기말 객관식/TF 연습</h1>
+    <p class="sub">2023/2024 기말 기출 개념 + 올해 출현 확률 높은 변형 개념을 클릭형 문제로 연습합니다.</p>
+  </div>
+</header>
+<div class="bar">
+  <div class="bar-inner">
+    <button class="primary" id="gradeAll">전체 채점</button>
+    <button id="showAll">정답 모두 표시</button>
+    <button id="resetAll">초기화</button>
+    <div class="progress"><span id="progressFill"></span></div>
+    <div class="score" id="score">0 / 0</div>
+  </div>
+</div>
+<main>
+  <div class="filters" id="filters"></div>
+  <section id="quiz"></section>
+</main>
+<script>
+const QUESTIONS = [
+  {type:"MC", cat:"조건/Flag", p:"높음", q:"CMP EAX, EBX 다음 unsigned 관점에서 EAX > EBX일 때 사용하는 jump는?", c:["JA","JG","JB","JL","JE"], a:0, e:"Above/Below 계열은 unsigned 비교다. JA는 CF=0 AND ZF=0."},
+  {type:"MC", cat:"조건/Flag", p:"높음", q:"CMP EAX, EBX 다음 signed 관점에서 EAX < EBX일 때 사용하는 jump는?", c:["JB","JBE","JL","JA","JNE"], a:2, e:"Greater/Less 계열은 signed 비교다. JL은 SF != OF."},
+  {type:"MC", cat:"조건/Flag", p:"높음", q:"JBE의 flag 조건으로 맞는 것은?", c:["CF=0 AND ZF=0","CF=1 OR ZF=1","ZF=0 AND SF=OF","SF!=OF","OF=1"], a:1, e:"JBE는 unsigned <= 이므로 below 또는 equal, 즉 CF=1 OR ZF=1."},
+  {type:"TF", cat:"조건/Flag", p:"높음", q:"TEST 명령은 AND처럼 flag를 계산하지만 목적지 operand 값은 변경하지 않는다.", a:true, e:"TEST는 결과를 저장하지 않고 flag만 갱신한다."},
+  {type:"TF", cat:"조건/Flag", p:"중간", q:"NOT 명령은 결과에 따라 ZF, SF, CF, OF를 갱신한다.", a:false, e:"NOT은 operand bit를 반전하지만 flag는 변경하지 않는다."},
+  {type:"MC", cat:"조건/Flag", p:"높음", q:"mov al, 80h / cmp al, 7Fh 이후 해석으로 맞는 것은?", c:["unsigned도 signed도 AL이 작다","unsigned는 AL이 크고 signed는 AL이 작다","unsigned는 AL이 작고 signed는 AL이 크다","둘 다 같다","항상 overflow error"], a:1, e:"80h는 unsigned로 128, signed 8-bit로 -128이다."},
+
+  {type:"MC", cat:"조건문 변환", p:"높음", q:"signed 조건 if (A <= B && C != D)에서 첫 비교 cmp A,B 뒤 false로 보내는 jump는?", c:["jl","jle","jg","ja","jne"], a:2, e:"A <= B의 반대는 A > B이고 signed 비교이므로 JG."},
+  {type:"MC", cat:"조건문 변환", p:"높음", q:"signed 조건 if (A < B || C >= D)에서 cmp A,B 뒤 true로 보내는 jump는?", c:["jb","jl","jge","jae","jg"], a:1, e:"A < B이고 signed 조건이므로 JL."},
+  {type:"TF", cat:"조건문 변환", p:"높음", q:".WHILE eax < 10에서 eax와 10을 unsigned로 비교할 때 종료 조건으로 JAE를 사용할 수 있다.", a:true, e:"반복 조건 eax < 10의 반대는 eax >= 10이고 unsigned이므로 JAE."},
+  {type:"TF", cat:"조건문 변환", p:"중간", q:"cmp mem1, mem2처럼 메모리 operand 두 개를 직접 비교하는 MASM 코드는 일반적으로 허용된다.", a:false, e:"x86 명령 대부분은 mem-to-mem 직접 연산을 허용하지 않는다. 레지스터를 거쳐야 한다."},
+
+  {type:"MC", cat:"MUL/DIV", p:"높음", q:"MUL r/m8의 암시적 피승수와 결과 위치는?", c:["AX * op -> DX:AX","AL * op -> AX","EAX * op -> EDX:EAX","AH * op -> AL","op * op -> AX"], a:1, e:"8비트 MUL은 AL과 operand를 곱해 AX에 저장한다."},
+  {type:"MC", cat:"MUL/DIV", p:"높음", q:"DIV r/m32에서 피제수, 몫, 나머지 위치로 맞는 것은?", c:["EAX / op -> AL, AH","EDX:EAX / op -> EAX, EDX","DX:AX / op -> AX, DX","EAX:EDX / op -> EDX, EAX","AX / op -> EAX, EDX"], a:1, e:"32비트 DIV/IDIV는 EDX:EAX를 나누고 몫 EAX, 나머지 EDX."},
+  {type:"TF", cat:"MUL/DIV", p:"높음", q:"unsigned DIV 전에는 피제수의 상위 절반인 AH/DX/EDX를 보통 0으로 준비해야 한다.", a:true, e:"상위 절반이 남아 있으면 실제 피제수가 커져 divide error가 날 수 있다."},
+  {type:"TF", cat:"MUL/DIV", p:"높음", q:"signed IDIV 전에는 CBW/CWD/CDQ 같은 부호 확장이 필요하다.", a:true, e:"IDIV는 AX, DX:AX, EDX:EAX 전체를 signed 피제수로 해석한다."},
+  {type:"TF", cat:"MUL/DIV", p:"높음", q:"IDIV의 나머지 부호는 divisor의 부호와 같다.", a:false, e:"IDIV의 나머지 부호는 dividend, 즉 피제수의 부호와 같다."},
+  {type:"MC", cat:"MUL/DIV", p:"높음", q:"mov ax, 00FFh / mov bl, 10h / div bl 이후 AL, AH는?", c:["AL=10h, AH=0Fh","AL=0Fh, AH=0Fh","AL=0Fh, AH=00h","divide error","AL=FFh, AH=10h"], a:1, e:"255 / 16 = 몫 15, 나머지 15."},
+  {type:"MC", cat:"MUL/DIV", p:"중간", q:"CDQ를 직접 구현할 때 EAX가 음수이면 EDX는 어떤 값이 되어야 하는가?", c:["00000000h","00000001h","FFFFFFFFh","80000000h","EAX와 같은 값"], a:2, e:"CDQ는 EAX의 sign bit를 EDX 전체에 확장한다."},
+
+  {type:"MC", cat:"Shift/연산", p:"높음", q:"var * 72를 shift로 만들 때 72의 분해로 가장 적절한 것은?", c:["64+8","32+16+8","128-32","4+8+16","2*36만 가능"], a:0, e:"기출형 최적화는 72=64+8로 두 번 shift 후 add."},
+  {type:"MC", cat:"Shift/연산", p:"높음", q:"var * 45를 shift/add로 만들 때 맞는 분해는?", c:["32+8+4+1","64-16-2-1","16+16+8+5","40+5","2^45"], a:0, e:"45 = 32 + 8 + 4 + 1."},
+  {type:"TF", cat:"Shift/연산", p:"중간", q:"SAR은 오른쪽 shift 시 sign bit를 복제하므로 signed 값을 2의 거듭제곱으로 나눌 때 사용된다.", a:true, e:"SAR은 산술 오른쪽 shift로 부호를 보존한다."},
+  {type:"MC", cat:"Shift/연산", p:"높음", q:"mov eax,-1 / sar eax,4 / shl eax,1 이후 EAX 값은?", c:["00000000h","7FFFFFFEh","FFFFFFFEh","FFFFFFFFh","00000001h"], a:2, e:"-1은 SAR 후에도 FFFFFFFFh, 왼쪽 1비트 shift 후 FFFFFFFEh."},
+  {type:"MC", cat:"Shift/연산", p:"중간", q:"ADC의 의미로 맞는 것은?", c:["dest = dest + src","dest = dest + src + CF","dest = dest - src - CF","dest = src - dest","CF만 변경"], a:1, e:"ADC는 add with carry다."},
+  {type:"MC", cat:"Shift/연산", p:"중간", q:"SBB의 의미로 맞는 것은?", c:["dest = dest - src - CF","dest = dest + src + CF","dest = src - dest","dest = dest - src + CF","ZF만 변경"], a:0, e:"SBB는 subtract with borrow이고 borrow는 CF로 반영된다."},
+
+  {type:"MC", cat:"Stack/호출", p:"높음", q:"C calling convention의 stack 정리 방식은?", c:["callee가 ret n으로 정리","caller가 add esp,n으로 정리","운영체제가 정리","정리하지 않는다","INVOKE만 정리"], a:1, e:"C convention은 caller cleanup이다."},
+  {type:"MC", cat:"Stack/호출", p:"높음", q:"STDCALL의 stack 정리 방식은?", c:["caller가 add esp,n","callee가 ret n","둘 다 정리","정리 금지","pushad가 정리"], a:1, e:"STDCALL은 callee cleanup이라 procedure 끝에 ret 8 같은 형태가 온다."},
+  {type:"TF", cat:"Stack/호출", p:"높음", q:"swap(&x,&y)를 push로 호출할 때 보통 push OFFSET y 후 push OFFSET x 순서로 넣는다.", a:true, e:"인자는 오른쪽에서 왼쪽 순서로 push한다."},
+  {type:"MC", cat:"Stack/호출", p:"높음", q:"표준 stack frame에서 첫 번째 DWORD 매개변수 위치는?", c:["[ebp+4]","[ebp+8]","[ebp+12]","[ebp-4]","[esp-4]"], a:1, e:"[ebp+4]는 return address, 첫 번째 인자는 [ebp+8]."},
+  {type:"MC", cat:"Stack/호출", p:"중간", q:"표준 stack frame에서 첫 번째 local DWORD 위치로 흔한 것은?", c:["[ebp+8]","[ebp+12]","[ebp-4]","[ebp+4]","[eax]"], a:2, e:"local variable은 EBP 아래쪽, 즉 negative offset에 둔다."},
+
+  {type:"MC", cat:"LOOP/문자", p:"높음", q:"중첩 LOOP에서 내부 루프도 ECX를 사용할 때 외부 ECX를 보존하는 대표 방법은?", c:["push ecx / pop ecx","mov ecx,0","push eax / pop eax","cdq","ret 8"], a:0, e:"내부 loop 전 push ecx, 내부 종료 후 pop ecx로 외부 카운터를 복원한다."},
+  {type:"TF", cat:"LOOP/문자", p:"중간", q:"LOOPNE는 ECX를 감소시키고, ECX != 0 그리고 ZF=0이면 jump한다.", a:true, e:"LOOPNE/LOOPNZ의 조건이다."},
+  {type:"TF", cat:"LOOP/문자", p:"중간", q:"LOOPNE 명령 자체가 ZF를 새로 계산해 바꾼다.", a:false, e:"LOOPNE는 ZF를 변경하지 않고 기존 ZF를 검사한다."},
+  {type:"MC", cat:"LOOP/문자", p:"높음", q:"대문자를 소문자로 만들 때 ASCII bit 5를 set하는 Boolean 명령은?", c:["and al,11011111b","or al,00100000b","xor al,00100000b","not al","test al,00100000b"], a:1, e:"소문자는 대문자보다 bit 5가 1이다."},
+  {type:"MC", cat:"LOOP/문자", p:"높음", q:"대소문자 토글에 적합한 Boolean 명령은?", c:["AND","OR","XOR","TEST","CMP"], a:2, e:"XOR mask는 해당 bit를 반전한다."},
+
+  {type:"MC", cat:"REAL4", p:"중간", q:"REAL4 IEEE 754 single precision의 exponent bias는?", c:["15","31","63","127","1023"], a:3, e:"single precision exponent bias는 127."},
+  {type:"MC", cat:"REAL4", p:"중간", q:"REAL4 bit pattern 3FC00000h의 값은?", c:["1.0","1.25","1.5","2.0","-1.5"], a:2, e:"sign=0, exponent=127, fraction=.5 => 1.5."},
+  {type:"MC", cat:"REAL4", p:"중간", q:"0.15625의 REAL4 bit pattern 3E200000h가 메모리에 저장되는 순서는?", c:["3E 20 00 00","00 00 20 3E","20 3E 00 00","00 20 3E 00","3E 00 00 20"], a:1, e:"x86은 little endian이므로 낮은 byte부터 00 00 20 3E."},
+
+  {type:"TF", cat:"Memory", p:"중간", q:"HeapAlloc이 실패하면 보통 NULL, 즉 0을 반환한다.", a:true, e:"실패 확인으로 반환 포인터를 0과 비교한다."},
+  {type:"TF", cat:"Memory", p:"중간", q:"HeapFree 후 같은 포인터를 계속 사용해도 안전하다.", a:false, e:"use-after-free 위험이다."},
+  {type:"TF", cat:"Memory", p:"중간", q:"page fault는 요청한 페이지가 메모리에 없거나 접근 권한 문제가 있을 때 발생할 수 있다.", a:true, e:"단순 cache miss와 구분해야 한다."},
+  {type:"TF", cat:"Memory", p:"중간", q:"32-bit linear address의 하위 12비트는 일반적인 4KB page에서 page offset이다.", a:true, e:"4KB = 2^12이므로 하위 12비트가 offset."},
+  {type:"TF", cat:"Memory", p:"중간", q:"동적 할당된 heap 메모리는 procedure가 ret하면 자동으로 해제된다.", a:false, e:"stack frame과 다르다. heap은 HeapFree 등으로 명시적으로 해제해야 한다."}
+];
+
+let currentFilter = "전체";
+const selected = new Map();
+const revealed = new Set();
+const $ = (id) => document.getElementById(id);
+
+function cats(){
+  return ["전체", ...Array.from(new Set(QUESTIONS.map(q => q.cat)))];
+}
+function shownQuestions(){
+  return QUESTIONS.map((q,i)=>({q,i})).filter(x => currentFilter === "전체" || x.q.cat === currentFilter);
+}
+function renderFilters(){
+  const root = $("filters");
+  root.innerHTML = "";
+  cats().forEach(cat => {
+    const b = document.createElement("button");
+    b.textContent = cat;
+    b.className = cat === currentFilter ? "active" : "";
+    b.onclick = () => { currentFilter = cat; render(); };
+    root.appendChild(b);
+  });
+}
+function render(){
+  renderFilters();
+  const root = $("quiz");
+  root.innerHTML = "";
+  shownQuestions().forEach(({q,i}) => root.appendChild(card(q,i)));
+  updateScore();
+}
+function card(q,i){
+  const article = document.createElement("article");
+  article.className = "card";
+  const hotClass = q.p === "높음" ? "hot" : q.p === "중간" ? "mid" : "";
+  article.innerHTML = `
+    <div class="head">
+      <div class="title">${i+1}. ${q.cat}</div>
+      <div class="meta"><span class="tag ${hotClass}">${q.p}</span><span class="tag">${q.type === "TF" ? "TF" : "5지선다"}</span></div>
+    </div>
+    <div class="q">${escapeHtml(q.q)}</div>
+    <div class="choices"></div>
+    <div class="tools"><button type="button" class="grade-one">채점하기</button><button type="button" class="reveal">정답만 표시</button></div>
+    <div class="explain">${escapeHtml(detailedExplain(q))}</div>
+  `;
+  const choices = article.querySelector(".choices");
+  const arr = q.type === "TF" ? ["True", "False"] : q.c;
+  arr.forEach((text, ci) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "choice";
+    b.textContent = `${q.type === "TF" ? "" : String.fromCharCode(65+ci) + ". "}${text}`;
+    b.onclick = () => {
+      selected.set(i, q.type === "TF" ? ci === 0 : ci);
+      mark(article, q, i);
+      updateScore();
+    };
+    choices.appendChild(b);
+  });
+  article.querySelector(".grade-one").onclick = () => {
+    revealed.add(i);
+    mark(article, q, i);
+    updateScore();
+  };
+  article.querySelector(".reveal").onclick = () => {
+    revealed.add(i);
+    mark(article, q, i);
+    updateScore();
+  };
+  if (revealed.has(i) || selected.has(i)) mark(article, q, i);
+  return article;
+}
+function answerValue(q){ return q.type === "TF" ? q.a : q.a; }
+function isCorrect(q, val){ return q.type === "TF" ? val === q.a : val === q.a; }
+function detailedExplain(q){
+  const extra = {
+    "조건/Flag":"시험 포인트: CMP는 실제 값을 저장하지 않고 dest-src 결과로 flag만 만든다. Above/Below는 unsigned, Greater/Less는 signed로 외우면 대부분의 jump 문제를 바로 풀 수 있다.",
+    "조건문 변환":"시험 포인트: AND 조건은 하나라도 거짓이면 false로 빠지고, OR 조건은 하나라도 참이면 true로 간다. jump는 보통 조건의 반대를 써서 종료 라벨로 보내면 실수가 줄어든다.",
+    "MUL/DIV":"시험 포인트: MUL/DIV는 operand가 하나여도 암시적으로 AL/AX/EAX와 AH/DX/EDX를 사용한다. DIV 전 상위 절반 0, IDIV 전 부호 확장, 나머지는 EDX/DX/AH 위치를 확인한다.",
+    "Shift/연산":"시험 포인트: SHL은 2의 거듭제곱 곱셈, SHR은 unsigned 나눗셈, SAR은 signed 나눗셈에 가깝다. ADC/SBB는 큰 정수를 하위 조각부터 계산할 때 CF를 다음 조각으로 넘기는 명령이다.",
+    "Stack/호출":"시험 포인트: [ebp+4]는 return address, [ebp+8]부터 매개변수다. C convention은 caller cleanup(add esp,n), STDCALL은 callee cleanup(ret n)이다.",
+    "LOOP/문자":"시험 포인트: LOOP는 ECX를 자동 감소시키므로 중첩 루프에서는 외부 ECX 보존이 필요하다. ASCII 대소문자 차이는 bit 5이며 OR/AND/XOR로 set/clear/toggle한다.",
+    "REAL4":"시험 포인트: REAL4는 sign 1비트, exponent 8비트 bias 127, fraction 23비트다. bit pattern을 메모리에 쓸 때 x86은 little endian이라 byte 순서가 뒤집힌다.",
+    "Memory":"시험 포인트: stack frame은 procedure 호출/복귀와 연결되지만 heap allocation은 자동 해제되지 않는다. page fault는 cache miss와 다르고, 일반적인 4KB page의 offset은 하위 12비트다."
+  };
+  return `${q.e}\n\n${extra[q.cat] || ""}`;
+}
+function mark(article,q,i){
+  const buttons = [...article.querySelectorAll(".choice")];
+  const ans = answerValue(q);
+  const val = selected.get(i);
+  buttons.forEach((b,ci) => {
+    b.classList.remove("selected","correct","wrong");
+    const optionValue = q.type === "TF" ? ci === 0 : ci;
+    if (selected.has(i) && optionValue === val) b.classList.add("selected");
+    if (revealed.has(i)) {
+      if (optionValue === ans) b.classList.add("correct");
+      if (selected.has(i) && optionValue === val && !isCorrect(q,val)) b.classList.add("wrong");
+    }
+  });
+  article.querySelector(".explain").classList.toggle("open", revealed.has(i));
+}
+function gradeAll(){
+  QUESTIONS.forEach((_,i)=>revealed.add(i));
+  render();
+}
+function updateScore(){
+  let answered = selected.size;
+  let correct = 0;
+  let graded = 0;
+  selected.forEach((v,i)=>{
+    if (revealed.has(i)) {
+      graded++;
+      if (isCorrect(QUESTIONS[i],v)) correct++;
+    }
+  });
+  $("score").textContent = `${correct} / ${graded} 채점 · ${answered}개 선택`;
+  $("progressFill").style.width = `${Math.round(answered / QUESTIONS.length * 100)}%`;
+}
+function resetAll(){
+  selected.clear();
+  revealed.clear();
+  render();
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $("gradeAll").onclick = gradeAll;
+  $("showAll").onclick = gradeAll;
+  $("resetAll").onclick = resetAll;
+  render();
+});
+</script>
+</body>
+</html>

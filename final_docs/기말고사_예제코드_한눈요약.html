@@ -1,0 +1,1677 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템프로그래밍 기말 예제코드 한눈요약</title>
+<style>
+:root{
+  --bg:#f6f7f9;
+  --panel:#ffffff;
+  --ink:#111827;
+  --muted:#5f6b7a;
+  --line:#d7dce3;
+  --teal:#0f766e;
+  --navy:#1f3a5f;
+  --rose:#9f1239;
+  --amber:#a16207;
+  --code:#101827;
+  --code-ink:#e5e7eb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",system-ui,sans-serif;
+  line-height:1.58;
+}
+header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+}
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 20px;
+}
+.hero{
+  padding:28px 20px 22px;
+}
+h1{
+  margin:0 0 8px;
+  font-size:clamp(25px,3.5vw,40px);
+  line-height:1.18;
+  letter-spacing:0;
+}
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+}
+nav{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(246,247,249,.96);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(8px);
+}
+.nav-inner{
+  max-width:1180px;
+  margin:0 auto;
+  padding:10px 20px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+}
+.nav-inner a{
+  flex:0 0 auto;
+  color:var(--ink);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:7px 10px;
+  text-decoration:none;
+  font-size:13px;
+}
+main{
+  max-width:1180px;
+  margin:0 auto;
+  padding:22px 20px 60px;
+}
+section{
+  margin:0 0 26px;
+}
+h2{
+  margin:0 0 12px;
+  font-size:22px;
+  letter-spacing:0;
+}
+h3{
+  margin:0 0 8px;
+  font-size:16px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.grid.two{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:15px;
+  min-width:0;
+}
+.rank{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#ecfdf5;
+  color:var(--teal);
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:9px;
+}
+.rank.hot{background:#fff1f2;color:var(--rose)}
+.rank.mid{background:#fffbeb;color:var(--amber)}
+.card p{
+  margin:0 0 8px;
+  color:var(--muted);
+  font-size:14px;
+}
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+.chip{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:3px 8px;
+  font-family:Consolas,"D2Coding",monospace;
+  font-size:12px;
+  background:#fbfcfe;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+}
+th,td{
+  border-bottom:1px solid var(--line);
+  padding:9px 10px;
+  text-align:left;
+  vertical-align:top;
+  font-size:14px;
+}
+th{
+  background:#eef2f7;
+  color:#263445;
+}
+tr:last-child td{border-bottom:0}
+code,kbd{
+  font-family:Consolas,"D2Coding","Courier New",monospace;
+}
+pre{
+  margin:10px 0 0;
+  padding:13px;
+  background:var(--code);
+  color:var(--code-ink);
+  border-radius:7px;
+  overflow:auto;
+  font-family:Consolas,"D2Coding","Courier New",monospace;
+  font-size:13px;
+  line-height:1.55;
+  white-space:pre;
+}
+.pattern{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:12px;
+}
+.note{
+  border-left:4px solid var(--teal);
+  background:#f0fdfa;
+  padding:11px 13px;
+  border-radius:6px;
+  color:#164e49;
+  font-size:14px;
+}
+.warn{
+  border-left-color:var(--rose);
+  background:#fff1f2;
+  color:#7f1d1d;
+}
+.list{
+  margin:0;
+  padding-left:20px;
+}
+.list li{
+  margin:5px 0;
+}
+.footer{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:28px;
+}
+.practice-layout{
+  display:grid;
+  grid-template-columns:260px minmax(0,1fr);
+  gap:12px;
+}
+.problem-list{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px;
+  max-height:620px;
+  overflow:auto;
+}
+.problem-btn{
+  width:100%;
+  display:block;
+  text-align:left;
+  border:1px solid transparent;
+  background:#fff;
+  color:var(--ink);
+  border-radius:6px;
+  padding:9px 10px;
+  margin:0 0 4px;
+  cursor:pointer;
+  font:inherit;
+  font-size:13px;
+}
+.problem-btn:hover,.problem-btn.active{
+  border-color:var(--teal);
+  background:#f0fdfa;
+}
+.practice-title{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.practice-title h3{margin:0}
+.practice-meta{
+  color:var(--muted);
+  font-size:13px;
+}
+.editor{
+  width:100%;
+  min-height:260px;
+  resize:vertical;
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:13px;
+  background:#fbfdff;
+  color:var(--ink);
+  font-family:Consolas,"D2Coding","Courier New",monospace;
+  font-size:13px;
+  line-height:1.55;
+  tab-size:4;
+}
+.editor:focus{
+  outline:2px solid var(--teal);
+  outline-offset:1px;
+}
+.practice-tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0;
+}
+.practice-tools button{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:6px;
+  padding:7px 10px;
+  cursor:pointer;
+  font:inherit;
+  font-size:13px;
+}
+.practice-tools button.primary{
+  background:var(--teal);
+  border-color:var(--teal);
+  color:white;
+}
+.result{
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#fff;
+  color:var(--muted);
+  padding:10px;
+  font-size:13px;
+}
+.result.good{border-color:#15803d;color:#166534;background:#f0fdf4}
+.result.bad{border-color:#b91c1c;color:#991b1b;background:#fff1f2}
+.answer-box{display:none}
+.answer-box.open{display:block}
+@media(max-width:900px){
+  .grid,.grid.two,.pattern,.practice-layout{grid-template-columns:1fr}
+  .problem-list{max-height:none}
+}
+@media print{
+  nav{position:static}
+  body{background:#fff}
+  .card,table{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap hero">
+    <h1>시스템프로그래밍 기말 예제코드 한눈요약</h1>
+    <p class="subtitle">final_docs 기준 빈출 코드 유형: 조건 처리, 정수 연산, 스택 프레임, 메모리 관리</p>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#priority">우선순위</a>
+    <a href="#practice">따라치기</a>
+    <a href="#coverage">기출 커버</a>
+    <a href="#jumps">조건 점프</a>
+    <a href="#translate">조건문 변환</a>
+    <a href="#arithmetic">정수 연산</a>
+    <a href="#stack">스택/호출</a>
+    <a href="#more">추가 후보</a>
+    <a href="#memory">메모리</a>
+    <a href="#mistakes">실수 체크</a>
+  </div>
+</nav>
+
+<main>
+  <section id="priority">
+    <h2>1. 출제 가능성 높은 예제코드</h2>
+    <div class="grid two">
+      <article class="card">
+        <span class="rank hot">최우선</span>
+        <h3>swap + calling convention</h3>
+        <p>2023은 C convention, 2024는 STDCALL. <code>ret</code>와 <code>ret 8</code> 차이를 반드시 구분.</p>
+<pre>swap PROC
+    push ebp
+    mov  ebp, esp
+    sub  esp, 4
+    push eax
+    push ebx
+    push edx
+
+    mov  eax, [ebp+8]     ; a
+    mov  ebx, [ebp+12]    ; b
+    mov  edx, [eax]
+    mov  [ebp-4], edx     ; temp = *a
+    mov  edx, [ebx]
+    mov  [eax], edx       ; *a = *b
+    mov  edx, [ebp-4]
+    mov  [ebx], edx       ; *b = temp
+
+    pop  edx
+    pop  ebx
+    pop  eax
+    mov  esp, ebp
+    pop  ebp
+    ret  8                ; STDCALL
+swap ENDP
+
+; 호출
+push OFFSET y
+push OFFSET x
+call swap
+; C convention이면 여기서 add esp, 8</pre>
+      </article>
+      <article class="card">
+        <span class="rank hot">최우선</span>
+        <h3>조건문 ASM 변환</h3>
+        <p>2023/2024 모두 출제. signed라면 <code>JL/JGE</code>, unsigned라면 <code>JB/JAE</code>.</p>
+<pre>; if ((VAR1 &lt; VAR2) || (VAR3 &gt;= VAR4)) VAR5 = 1; signed
+mov eax, VAR1
+cmp eax, VAR2
+jl  L_TRUE
+mov eax, VAR3
+cmp eax, VAR4
+jge L_TRUE
+jmp L_END
+L_TRUE:
+mov VAR5, 1
+L_END:
+
+; .WHILE eax &lt; 10, unsigned
+mov eax, 0
+L1:
+cmp eax, 10
+jae L2
+inc eax
+add sum, eax
+jmp L1
+L2:</pre>
+      </article>
+      <article class="card">
+        <span class="rank hot">최우선</span>
+        <h3>DIV / IDIV</h3>
+        <p>몫은 <code>EAX</code>, 나머지는 <code>EDX</code>. signed 나눗셈 전에는 <code>CDQ</code>.</p>
+<pre>; VAR4 = (-VAR1 * 5) / (VAR2 * VAR3), signed
+mov eax, VAR2
+imul eax, VAR3
+mov ebx, eax
+
+mov eax, VAR1
+neg eax
+imul eax, 5
+cdq
+idiv ebx
+mov VAR4, eax
+
+; VAR4 = (4 * VAR1) % (VAR2 - VAR3), signed
+mov eax, VAR1
+shl eax, 2
+mov ebx, VAR2
+sub ebx, VAR3
+cdq
+idiv ebx
+mov VAR4, edx</pre>
+      </article>
+      <article class="card">
+        <span class="rank mid">높음</span>
+        <h3>SHL + ADD 곱셈</h3>
+        <p>2023의 <code>imul eax,72</code> 최적화 문제. 상수를 2의 거듭제곱 합으로 분해.</p>
+<pre>; eax = var * 72 = var * (64 + 8)
+mov eax, var
+mov ebx, eax
+shl eax, 6
+shl ebx, 3
+add eax, ebx
+
+; eax = X * 45 = X * (32 + 8 + 4 + 1)
+mov eax, X
+mov ebx, eax
+mov ecx, eax
+mov edx, eax
+shl eax, 5
+shl ebx, 3
+shl ecx, 2
+add eax, ebx
+add eax, ecx
+add eax, edx</pre>
+      </article>
+      <article class="card">
+        <span class="rank mid">높음</span>
+        <h3>구구단 중첩 LOOP</h3>
+        <p>2024 출제. 내부 루프가 <code>ECX</code>를 쓰므로 외부 루프 카운터를 보존해야 함.</p>
+<pre>mov bl, 0
+mov ecx, 9
+mov esi, 0
+L1:
+    inc bl
+    mov bh, 0
+    push ecx
+    mov ecx, 9
+L2:
+    inc bh
+    mov al, bl
+    mul bh
+    mov Array[esi], al
+    inc esi
+    loop L2
+    pop ecx
+    loop L1</pre>
+      </article>
+      <article class="card">
+        <span class="rank mid">높음</span>
+        <h3>Boolean 대소문자 변환</h3>
+        <p>2023 출제. Boolean 명령만 쓰라는 조건이 붙으면 <code>ADD/SUB</code> 대신 bit 연산 사용.</p>
+<pre>.data
+array BYTE "sEOULtECH"
+
+.code
+mov ecx, LENGTHOF array
+mov esi, OFFSET array
+L1:
+    mov al, [esi]
+    ; 대문자 -> 소문자: bit 5 set
+    or  al, 00100000b
+    ; 소문자 -> 대문자: bit 5 clear
+    and al, 11011111b
+    ; 대소문자 토글: bit 5 toggle
+    xor al, 00100000b
+    mov [esi], al
+    inc esi
+    loop L1</pre>
+      </article>
+      <article class="card">
+        <span class="rank mid">높음</span>
+        <h3>CDQ 직접 구현</h3>
+        <p>2023 출제. <code>IDIV</code> 전 EAX의 부호를 EDX 전체에 확장.</p>
+<pre>mov eax, dwvar1
+test eax, eax
+mov edx, 0
+jns L1
+mov edx, 0FFFFFFFFh
+L1:
+idiv dwvar2</pre>
+      </article>
+      <article class="card">
+        <span class="rank mid">높음</span>
+        <h3>bit scan 방식 unsigned 곱셈</h3>
+        <p>2024 출제. multiplier의 각 bit를 보면서 필요한 <code>VAR1 &lt;&lt; n</code>을 더함.</p>
+<pre>mov ebx, VAR2
+mov ecx, 32
+mov edx, 0
+L1:
+    shl ebx, 1
+    jnc L2
+    dec ecx
+    mov eax, VAR1
+    shl eax, cl
+    add edx, eax
+    inc ecx
+L2:
+    loop L1</pre>
+      </article>
+    </div>
+  </section>
+
+  <section id="practice">
+    <h2>2. 손코딩 따라치기 연습</h2>
+    <p class="note">왼쪽에서 문제를 고르고, 오른쪽 입력칸에 코드를 직접 써라. 채점은 대소문자와 빈 줄, 연속 공백, 주석을 느슨하게 무시한다. 라벨명은 정답과 다르면 오답으로 잡힐 수 있으니 시험처럼 일관되게 쓰는 연습을 한다.</p>
+    <div class="practice-layout">
+      <aside class="problem-list" id="problemList"></aside>
+      <article class="card">
+        <div class="practice-title">
+          <div>
+            <h3 id="practiceTitle">문제 선택</h3>
+            <div class="practice-meta" id="practiceMeta">왼쪽 목록에서 문제를 선택하세요.</div>
+          </div>
+          <span class="rank hot" id="practiceRank">연습</span>
+        </div>
+        <pre id="practicePrompt">문제를 선택하면 지시문이 표시됩니다.</pre>
+        <textarea class="editor" id="practiceInput" spellcheck="false" placeholder="여기에 직접 코드를 입력하세요."></textarea>
+        <div class="practice-tools">
+          <button class="primary" id="checkAnswer" type="button">채점</button>
+          <button id="showAnswer" type="button">정답 보기</button>
+          <button id="hideAnswer" type="button">정답 숨기기</button>
+          <button id="clearAnswer" type="button">입력 지우기</button>
+        </div>
+        <div class="result" id="practiceResult">아직 채점하지 않았습니다.</div>
+        <pre class="answer-box" id="practiceAnswer"></pre>
+      </article>
+    </div>
+  </section>
+
+  <section id="coverage">
+    <h2>2. 2023/2024 기말 기출 커버리지</h2>
+    <table>
+      <thead><tr><th>기출</th><th>문항</th><th>대비 위치</th><th>주의</th></tr></thead>
+      <tbody>
+        <tr><td>2023</td><td>Boolean 명령으로 대소문자 변환</td><td>추가 후보: Boolean 문자열/비트 처리</td><td>문자열 순회 루프까지 같이 암기</td></tr>
+        <tr><td>2023</td><td>CMP signed/unsigned flag 설명</td><td>조건 점프 표</td><td><code>JA/JB</code>와 <code>JG/JL</code> 구분</td></tr>
+        <tr><td>2023</td><td><code>imul eax,72</code>를 shift로 최적화</td><td>정수 연산: SHL + ADD</td><td><code>72=64+8</code></td></tr>
+        <tr><td>2023</td><td>MUL/DIV/IMUL 설명 참거짓</td><td>정수 연산 표</td><td><code>MUL</code> immediate 불가, <code>DIV</code> overflow 가능</td></tr>
+        <tr><td>2023</td><td><code>CDQ</code> 직접 구현</td><td>기출 보강 코드</td><td><code>test eax,eax</code>, 음수면 <code>edx=FFFFFFFFh</code></td></tr>
+        <tr><td>2023</td><td>메모리 관리 참거짓</td><td>메모리 관리 코드와 개념</td><td>heap/stack/linear/physical/page</td></tr>
+        <tr><td>2023</td><td>C convention <code>swap</code> 작성/호출</td><td>스택 프레임과 호출 규약</td><td>caller가 <code>add esp,8</code></td></tr>
+        <tr><td>2023</td><td><code>.WHILE</code>을 jump로 변환</td><td>조건문 변환 패턴</td><td>unsigned면 종료 조건 <code>jae</code></td></tr>
+        <tr><td>2023</td><td>산술식 <code>(-VAR1*5)/(VAR2*VAR3)</code></td><td>정수 연산 핵심 코드</td><td><code>cdq</code> 후 <code>idiv</code></td></tr>
+        <tr><td>2023</td><td>SAL/SAR, IMUL, JA 실행 결과</td><td>기출 보강 코드</td><td>register와 flag 추적</td></tr>
+        <tr><td>2024</td><td>REAL4 메모리/값 해석</td><td>추가 후보: REAL4 해석</td><td>bias 127, little endian</td></tr>
+        <tr><td>2024</td><td>메모리 관리 참거짓</td><td>메모리 관리 코드와 개념</td><td>cache miss와 page fault 구분</td></tr>
+        <tr><td>2024</td><td>STDCALL <code>swap</code> 작성/호출</td><td>스택 프레임과 호출 규약</td><td>callee가 <code>ret 8</code></td></tr>
+        <tr><td>2024</td><td>조건 점프 flag 조건</td><td>조건 점프 표</td><td><code>JA/JB/JE/JG/JL/JNE</code></td></tr>
+        <tr><td>2024</td><td><code>LOOPNE</code>, 범위초과 immediate, Irvine 출력, DIV 추적</td><td>기출 보강 코드</td><td>어셈블 오류와 실행 오류 구분</td></tr>
+        <tr><td>2024</td><td>구구단 배열 저장</td><td>조건문 변환 패턴: 중첩 LOOP</td><td>내부 루프 전 <code>push ecx</code>, 후 <code>pop ecx</code></td></tr>
+        <tr><td>2024</td><td>shift로 unsigned 곱셈 구현</td><td>기출 보강 코드</td><td><code>SHL EBX,1</code> 뒤 <code>JNC</code></td></tr>
+        <tr><td>2024</td><td>OR 조건문, 나머지 산술식</td><td>조건문 변환/정수 연산</td><td><code>jl/jge</code>, 나머지는 <code>edx</code></td></tr>
+      </tbody>
+    </table>
+    <p class="note warn">이 표 기준으로 보면 기존 요약은 대부분 커버했지만, 아래 “기출 보강 코드”까지 같이 봐야 만점 방어에 가깝다.</p>
+  </section>
+
+  <section id="jumps">
+    <h2>3. 조건 점프 표</h2>
+    <table>
+      <thead>
+        <tr><th>의미</th><th>Unsigned</th><th>Signed</th><th>조건</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>&gt;</code></td><td><code>JA</code></td><td><code>JG</code></td><td><code>JA: CF=0 AND ZF=0</code>, <code>JG: ZF=0 AND SF=OF</code></td></tr>
+        <tr><td><code>&gt;=</code></td><td><code>JAE</code></td><td><code>JGE</code></td><td><code>JAE: CF=0</code>, <code>JGE: SF=OF</code></td></tr>
+        <tr><td><code>&lt;</code></td><td><code>JB</code></td><td><code>JL</code></td><td><code>JB: CF=1</code>, <code>JL: SF!=OF</code></td></tr>
+        <tr><td><code>&lt;=</code></td><td><code>JBE</code></td><td><code>JLE</code></td><td><code>JBE: CF=1 OR ZF=1</code>, <code>JLE: ZF=1 OR SF!=OF</code></td></tr>
+        <tr><td><code>==</code></td><td><code>JE/JZ</code></td><td><code>JE/JZ</code></td><td><code>ZF=1</code></td></tr>
+        <tr><td><code>!=</code></td><td><code>JNE/JNZ</code></td><td><code>JNE/JNZ</code></td><td><code>ZF=0</code></td></tr>
+      </tbody>
+    </table>
+    <p class="note">기억법: Above/Below는 unsigned, Greater/Less는 signed. <code>cmp left, right</code> 다음 jump는 <code>left ? right</code> 기준으로 읽는다.</p>
+  </section>
+
+  <section id="translate">
+    <h2>4. 조건문 변환 패턴</h2>
+    <div class="pattern">
+      <article class="card">
+        <h3>OR 조건: 하나라도 참이면 true label</h3>
+<pre>; if ((VAR1 &lt; VAR2) || (VAR3 &gt;= VAR4)) VAR5 = 1; signed
+mov eax, VAR1
+cmp eax, VAR2
+jl  L_TRUE
+mov eax, VAR3
+cmp eax, VAR4
+jge L_TRUE
+jmp L_END
+L_TRUE:
+mov VAR5, 1
+L_END:</pre>
+      </article>
+      <article class="card">
+        <h3>AND 조건: 하나라도 거짓이면 false label</h3>
+<pre>; if ((VAR1 &lt;= VAR2) &amp;&amp; (VAR3 != VAR4)) VAR5=1; else VAR5=0
+mov eax, VAR1
+cmp eax, VAR2
+jg  L_FALSE
+mov eax, VAR3
+cmp eax, VAR4
+je  L_FALSE
+mov VAR5, 1
+jmp L_END
+L_FALSE:
+mov VAR5, 0
+L_END:</pre>
+      </article>
+      <article class="card">
+        <h3>.WHILE directive 없이 작성</h3>
+<pre>; .WHILE eax &lt; 10, unsigned
+mov eax, 0
+L1:
+cmp eax, 10
+jae L2
+inc eax
+add sum, eax
+jmp L1
+L2:</pre>
+      </article>
+      <article class="card">
+        <h3>중첩 LOOP: ECX 보존</h3>
+<pre>mov ecx, 9
+OuterLoop:
+    push ecx
+    mov ecx, 9
+InnerLoop:
+    ; inner work
+    loop InnerLoop
+    pop ecx
+    loop OuterLoop</pre>
+      </article>
+    </div>
+  </section>
+
+  <section id="arithmetic">
+    <h2>5. 정수 연산 핵심 코드</h2>
+    <div class="grid two">
+      <article class="card">
+        <h3>SHL + ADD 곱셈</h3>
+<pre>; eax = VAR1 * 72 = VAR1 * (64 + 8)
+mov eax, VAR1
+mov ebx, eax
+shl eax, 6
+shl ebx, 3
+add eax, ebx</pre>
+      </article>
+      <article class="card">
+        <h3>signed 식 + 나눗셈</h3>
+<pre>; VAR4 = (-VAR1 * 5) / (VAR2 * VAR3)
+mov eax, VAR2
+imul eax, VAR3
+mov ebx, eax
+
+mov eax, VAR1
+neg eax
+imul eax, 5
+cdq
+idiv ebx
+mov VAR4, eax</pre>
+      </article>
+      <article class="card">
+        <h3>signed 나머지</h3>
+<pre>; VAR4 = (4 * VAR1) % (VAR2 - VAR3)
+mov eax, VAR1
+shl eax, 2
+mov ebx, VAR2
+sub ebx, VAR3
+cdq
+idiv ebx
+mov VAR4, edx</pre>
+      </article>
+      <article class="card">
+        <h3>64-bit 덧셈 / 뺄셈</h3>
+<pre>; (EDX:EAX) = (EDX:EAX) + (ECX:EBX)
+add eax, ebx
+adc edx, ecx
+
+; (EDX:EAX) = (EDX:EAX) - (ECX:EBX)
+sub eax, ebx
+sbb edx, ecx</pre>
+      </article>
+      <article class="card">
+        <h3>CDQ 직접 구현</h3>
+<pre>; cdq와 같은 효과: EAX 부호를 EDX 전체로 확장
+mov eax, dwvar1
+test eax, eax
+mov edx, 0
+jns L1
+mov edx, 0FFFFFFFFh
+L1:
+idiv dwvar2</pre>
+      </article>
+      <article class="card">
+        <h3>bit scan 방식 unsigned 곱셈</h3>
+<pre>; EDX = VAR1 * VAR2
+mov ebx, VAR2
+mov ecx, 32
+mov edx, 0
+L1:
+    shl ebx, 1
+    jnc L2
+    dec ecx
+    mov eax, VAR1
+    shl eax, cl
+    add edx, eax
+    inc ecx
+L2:
+    loop L1</pre>
+      </article>
+    </div>
+
+    <table>
+      <thead><tr><th>명령</th><th>8비트</th><th>16비트</th><th>32비트</th><th>시험 포인트</th></tr></thead>
+      <tbody>
+        <tr><td><code>MUL/IMUL</code></td><td><code>AL * op -> AX</code></td><td><code>AX * op -> DX:AX</code></td><td><code>EAX * op -> EDX:EAX</code></td><td>곱은 피연산자의 두 배 크기</td></tr>
+        <tr><td><code>DIV/IDIV</code></td><td><code>AX / op -> AL, AH</code></td><td><code>DX:AX / op -> AX, DX</code></td><td><code>EDX:EAX / op -> EAX, EDX</code></td><td>몫/나머지 위치 암기</td></tr>
+        <tr><td><code>DIV</code> 준비</td><td><code>AH=0</code></td><td><code>DX=0</code></td><td><code>EDX=0</code></td><td>상위 절반을 0으로 클리어</td></tr>
+        <tr><td><code>IDIV</code> 준비</td><td><code>CBW</code></td><td><code>CWD</code></td><td><code>CDQ</code></td><td>피제수를 부호 확장</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="stack">
+    <h2>6. 스택 프레임과 호출 규약</h2>
+    <div class="pattern">
+      <article class="card">
+        <h3>표준 스택 프레임</h3>
+<pre>MyProc PROC
+    push ebp
+    mov  ebp, esp
+    sub  esp, 8
+
+    mov  eax, [ebp+8]     ; 첫 번째 매개변수
+    mov  ebx, [ebp+12]    ; 두 번째 매개변수
+    mov  [ebp-4], eax     ; 지역 변수
+
+    mov  esp, ebp
+    pop  ebp
+    ret  8                ; STDCALL
+MyProc ENDP</pre>
+      </article>
+      <article class="card">
+        <h3>STDCALL swap</h3>
+<pre>swap PROC
+    push ebp
+    mov  ebp, esp
+    sub  esp, 4
+    push eax
+    push ebx
+    push edx
+
+    mov  eax, [ebp+8]
+    mov  ebx, [ebp+12]
+    mov  edx, [eax]
+    mov  [ebp-4], edx
+    mov  edx, [ebx]
+    mov  [eax], edx
+    mov  edx, [ebp-4]
+    mov  [ebx], edx
+
+    pop  edx
+    pop  ebx
+    pop  eax
+    mov  esp, ebp
+    pop  ebp
+    ret  8
+swap ENDP</pre>
+      </article>
+    </div>
+
+    <table>
+      <thead><tr><th>구분</th><th>인자 push 순서</th><th>스택 정리</th><th>호출 예</th></tr></thead>
+      <tbody>
+        <tr><td>C convention</td><td>오른쪽 인자부터</td><td>caller가 <code>add esp, n</code></td><td><code>push OFFSET y</code>, <code>push OFFSET x</code>, <code>call swap</code>, <code>add esp,8</code></td></tr>
+        <tr><td>STDCALL</td><td>오른쪽 인자부터</td><td>callee가 <code>ret n</code></td><td><code>push OFFSET y</code>, <code>push OFFSET x</code>, <code>call swap</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="more">
+    <h2>7. 빠지기 쉬운 추가 출제 후보</h2>
+    <div class="grid two">
+      <article class="card">
+        <h3>Boolean 문자열/비트 처리</h3>
+<pre>; 대문자/소문자 bit 5 토글
+xor al, 00100000b
+
+; 대문자 -> 소문자
+or  al, 00100000b
+
+; 소문자 -> 대문자
+and al, 11011111b
+
+; 특정 bit 검사: 결과 저장 없이 flag만 변경
+test al, 00100000b
+jz   bit_is_zero</pre>
+      </article>
+      <article class="card">
+        <h3>TEST / CMP / flag 결과 추적</h3>
+<pre>mov al, 11110000b
+test al, 00001111b
+; ZF=1, AL은 변하지 않음
+
+mov al, 80h
+cmp al, 7Fh
+; unsigned: AL &gt; 7Fh 참
+; signed:   AL &gt; 7Fh 거짓, 80h는 -128</pre>
+      </article>
+      <article class="card">
+        <h3>LOOPE / LOOPNE 조건</h3>
+<pre>; LOOPNE / LOOPNZ
+; ECX를 1 감소시킨 뒤
+; ECX != 0 그리고 ZF = 0 이면 jump
+
+; LOOPE / LOOPZ
+; ECX를 1 감소시킨 뒤
+; ECX != 0 그리고 ZF = 1 이면 jump</pre>
+      </article>
+      <article class="card">
+        <h3>ArrayFill 참조 매개변수</h3>
+<pre>main PROC
+    push count
+    push OFFSET array
+    call ArrayFill
+main ENDP
+
+ArrayFill PROC
+    push ebp
+    mov  ebp, esp
+    pushad
+
+    mov  esi, [ebp+8]     ; pArray
+    mov  ecx, [ebp+12]    ; count
+L1:
+    call RandomRange
+    mov  [esi], ax
+    add  esi, TYPE WORD
+    loop L1
+
+    popad
+    pop  ebp
+    ret  8
+ArrayFill ENDP</pre>
+      </article>
+      <article class="card">
+        <h3>INVOKE / ADDR / PROC / PROTO</h3>
+<pre>ArrayFill PROTO,
+    pArray:PTR WORD,
+    count:DWORD
+
+.data
+buffer BYTE 80 DUP(?)
+array  WORD 100 DUP(?)
+
+.code
+INVOKE ReadString, ADDR buffer, LENGTHOF buffer
+INVOKE ArrayFill, ADDR array, LENGTHOF array
+
+ArrayFill PROC USES esi ecx,
+    pArray:PTR WORD,
+    count:DWORD
+    mov esi, pArray
+    mov ecx, count
+    ret
+ArrayFill ENDP</pre>
+      </article>
+      <article class="card">
+        <h3>ENTER / LEAVE / LEA</h3>
+<pre>MySub PROC
+    enter 8, 0
+    mov DWORD PTR [ebp-4], 10
+    mov DWORD PTR [ebp-8], 20
+    leave
+    ret
+MySub ENDP
+
+; OFFSET으로 표현할 수 없는 런타임 주소
+sub esp, 32
+lea esi, [esp]</pre>
+      </article>
+      <article class="card">
+        <h3>재귀 Factorial</h3>
+<pre>Factorial PROC USES ebx,
+    n:DWORD
+
+    mov eax, 1
+    cmp n, 1
+    ja  L1
+    jmp L2
+
+L1:
+    dec n
+    INVOKE Factorial, n
+    mov ebx, n
+    inc n
+    mul ebx
+
+L2:
+    ret
+Factorial ENDP</pre>
+      </article>
+      <article class="card">
+        <h3>REAL4 해석</h3>
+<pre>; IEEE 754 single precision
+; sign 1비트, exponent 8비트, fraction 23비트
+; exponent bias = 127
+
+; 예: 3FC00000h
+; sign=0, exponent=127, fraction=.5
+; 값 = 1.5 * 2^0 = 1.5
+
+; 메모리 저장은 little endian
+; 3FC00000h -> 00 00 C0 3F</pre>
+      </article>
+      <article class="card">
+        <h3>기출 실행 결과 추적</h3>
+<pre>; 2023: AL 추적
+mov al, 32      ; 20h
+sal al, 2       ; 80h
+sar al, 2       ; E0h, signed shift
+
+; 2023: IMUL
+mov al, 23
+mov bl, 6
+imul bl         ; AX = 008Ah, OF=1
+
+; 2024: LOOPNE
+mov eax, -50    ; FFFFFFCEh
+mov ecx, -1
+L1: inc al
+loopne L1       ; LOOPNE 자체는 ZF 변경 안 함
+
+; 2024: Irvine 출력 후 DIV
+; Message가 '*' 10개 출력.
+; 이후 AL=-1, AH=0, CL=8 이면 AX=00FFh, DIV CL 가능.
+; 몫 AL=1Fh, 나머지 AH=07h</pre>
+      </article>
+      <article class="card">
+        <h3>어셈블 오류 가능 문항</h3>
+<pre>; 8비트 레지스터에 범위를 넘는 즉치값은 문제 가능
+mov al, -130    ; SBYTE 범위 밖
+mov bl, +130    ; signed 8-bit 관점 범위 밖
+
+; 시험에서는 "어셈블 과정에서 오류"인지
+; "실행 과정에서 divide error"인지 구분해서 써야 한다.</pre>
+      </article>
+    </div>
+  </section>
+
+  <section id="memory">
+    <h2>8. 메모리 관리 코드와 개념</h2>
+    <div class="grid two">
+      <article class="card">
+        <h3>Heap API 호출 순서</h3>
+<pre>INVOKE GetProcessHeap
+mov hHeap, eax
+
+INVOKE HeapAlloc, hHeap, 0, 1000
+mov pArray, eax
+cmp pArray, 0
+je  allocation_failed
+
+INVOKE HeapFree, hHeap, 0, pArray</pre>
+      </article>
+      <article class="card">
+        <h3>참/거짓 빈출</h3>
+        <ul class="list">
+          <li><code>HeapAlloc</code> 실패 시 보통 <code>0</code> 반환.</li>
+          <li><code>HeapFree</code> 후 같은 포인터를 계속 쓰면 위험.</li>
+          <li>page fault는 요청 페이지가 메모리에 없거나 접근 권한 문제가 있을 때 발생 가능.</li>
+          <li>32-bit linear address의 하위 12비트는 page offset.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="mistakes">
+    <h2>9. 시험 직전 실수 체크</h2>
+    <div class="grid two">
+      <div class="note warn">
+        <strong>감점 포인트</strong>
+        <ul class="list">
+          <li>signed 문제에 <code>JA/JB</code> 사용.</li>
+          <li>unsigned 문제에 <code>JG/JL</code> 사용.</li>
+          <li><code>cmp mem, mem</code> 형태 작성.</li>
+          <li><code>DIV</code> 전 <code>EDX/DX/AH</code>를 안 지움.</li>
+          <li><code>IDIV</code> 전 <code>CDQ/CWD/CBW</code> 누락.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <strong>마지막 암기</strong>
+        <ul class="list">
+          <li><code>ADC = add + CF</code>, <code>SBB = sub - CF</code>.</li>
+          <li><code>TEST</code>는 결과 저장 없이 flag만 변경.</li>
+          <li><code>NOT</code>은 flag 변경 없음.</li>
+          <li><code>IDIV</code> 나머지 부호는 피제수 부호와 같다.</li>
+          <li>STDCALL은 <code>ret 8</code>, C convention은 caller의 <code>add esp,8</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer">참고 파일: final_docs/기말고사_핵심문제코드.asm, final_docs/기말고사_추가문제세트.asm, Chapter 06/07 example Practice 파일.</p>
+  </section>
+  <script>
+const PRACTICE = [
+  {
+    id:"swap_stdcall",
+    rank:"최우선",
+    title:"STDCALL swap(int *a, int *b)",
+    meta:"2024 기출형. enter/leave 사용 금지, callee가 ret 8.",
+    prompt:`C 코드와 같은 동작을 하는 STDCALL swap 프로시저를 작성하시오.
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}`,
+    answer:`swap PROC
+    push ebp
+    mov  ebp, esp
+    sub  esp, 4
+    push eax
+    push ebx
+    push edx
+
+    mov  eax, [ebp+8]
+    mov  ebx, [ebp+12]
+    mov  edx, [eax]
+    mov  [ebp-4], edx
+    mov  edx, [ebx]
+    mov  [eax], edx
+    mov  edx, [ebp-4]
+    mov  [ebx], edx
+
+    pop  edx
+    pop  ebx
+    pop  eax
+    mov  esp, ebp
+    pop  ebp
+    ret  8
+swap ENDP`
+  },
+  {
+    id:"swap_call_stdcall",
+    rank:"최우선",
+    title:"STDCALL swap 호출",
+    meta:"invoke 사용 금지. STDCALL이므로 caller cleanup 없음.",
+    prompt:`다음 C 호출과 같은 MASM 호출 코드를 작성하시오.
+
+int x = 1;
+int y = 2;
+swap(&x, &y);`,
+    answer:`push OFFSET y
+push OFFSET x
+call swap`
+  },
+  {
+    id:"swap_call_c",
+    rank:"높음",
+    title:"C convention swap 호출",
+    meta:"2023 기출형. caller가 add esp, 8로 정리.",
+    prompt:`C calling convention으로 swap(&x, &y)를 호출하시오. invoke는 사용하지 않는다.`,
+    answer:`push OFFSET y
+push OFFSET x
+call swap
+add esp, 8`
+  },
+  {
+    id:"if_or",
+    rank:"최우선",
+    title:"OR 조건문 변환",
+    meta:"2024 기출형. signed DWORD 기준.",
+    prompt:`다음 C/C++ 코드를 MASM 조건 점프 코드로 작성하시오.
+
+if ((VAR1 < VAR2) || (VAR3 >= VAR4))
+    VAR5 = 1;`,
+    answer:`mov eax, VAR1
+cmp eax, VAR2
+jl  L_TRUE
+mov eax, VAR3
+cmp eax, VAR4
+jge L_TRUE
+jmp L_END
+L_TRUE:
+mov VAR5, 1
+L_END:`
+  },
+  {
+    id:"if_and",
+    rank:"최우선",
+    title:"AND 조건문 변환",
+    meta:"올해 변형 가능성 높음. signed DWORD 기준.",
+    prompt:`다음 C/C++ 코드를 MASM 조건 점프 코드로 작성하시오.
+
+if ((VAR1 <= VAR2) && (VAR3 != VAR4))
+    VAR5 = 1;
+else
+    VAR5 = 0;`,
+    answer:`mov eax, VAR1
+cmp eax, VAR2
+jg  L_FALSE
+mov eax, VAR3
+cmp eax, VAR4
+je  L_FALSE
+mov VAR5, 1
+jmp L_END
+L_FALSE:
+mov VAR5, 0
+L_END:`
+  },
+  {
+    id:"while_unsigned",
+    rank:"높음",
+    title:".WHILE unsigned 변환",
+    meta:"2023 기출형. 종료 조건을 반대로 점프.",
+    prompt:`다음 .WHILE을 directive 없이 작성하시오. eax와 10은 unsigned로 비교한다.
+
+mov eax, 0
+.WHILE eax < 10
+    inc eax
+    add sum, eax
+.ENDW`,
+    answer:`mov eax, 0
+L1:
+cmp eax, 10
+jae L2
+inc eax
+add sum, eax
+jmp L1
+L2:`
+  },
+  {
+    id:"mul_72",
+    rank:"최우선",
+    title:"SHL+ADD: var * 72",
+    meta:"2023 기출형. IMUL 없이 작성.",
+    prompt:`eax = var * 72를 IMUL 없이 작성하시오.
+힌트: 72 = 64 + 8`,
+    answer:`mov eax, var
+mov ebx, eax
+shl eax, 6
+shl ebx, 3
+add eax, ebx`
+  },
+  {
+    id:"mul_45",
+    rank:"높음",
+    title:"SHL+ADD: var * 45",
+    meta:"올해 변형 가능성 높음. 45 = 32 + 8 + 4 + 1.",
+    prompt:`eax = var * 45를 IMUL 없이 작성하시오.`,
+    answer:`mov eax, var
+mov ebx, eax
+mov ecx, eax
+mov edx, eax
+shl eax, 5
+shl ebx, 3
+shl ecx, 2
+add eax, ebx
+add eax, ecx
+add eax, edx`
+  },
+  {
+    id:"expr_div",
+    rank:"최우선",
+    title:"signed 식: (-VAR1*5)/(VAR2*VAR3)",
+    meta:"2023 기출형. CDQ 후 IDIV.",
+    prompt:`다음 식을 signed DWORD 기준 MASM 코드로 작성하시오.
+
+VAR4 = (-VAR1 * 5) / (VAR2 * VAR3)`,
+    answer:`mov eax, VAR2
+imul eax, VAR3
+mov ebx, eax
+
+mov eax, VAR1
+neg eax
+imul eax, 5
+cdq
+idiv ebx
+mov VAR4, eax`
+  },
+  {
+    id:"expr_mod",
+    rank:"최우선",
+    title:"signed 나머지: (4*VAR1)%(VAR2-VAR3)",
+    meta:"2024 기출형. 나머지는 EDX.",
+    prompt:`다음 식을 signed DWORD 기준 MASM 코드로 작성하시오.
+
+VAR4 = (4 * VAR1) % (VAR2 - VAR3)`,
+    answer:`mov eax, VAR1
+shl eax, 2
+mov ebx, VAR2
+sub ebx, VAR3
+cdq
+idiv ebx
+mov VAR4, edx`
+  },
+  {
+    id:"expr_div_7",
+    rank:"높음",
+    title:"signed 식 변형: (-VAR1*7)/(VAR2-VAR3)",
+    meta:"올해 변형 가능성 높음.",
+    prompt:`다음 식을 signed DWORD 기준 MASM 코드로 작성하시오.
+
+VAR4 = (-VAR1 * 7) / (VAR2 - VAR3)`,
+    answer:`mov eax, VAR1
+neg eax
+imul eax, 7
+mov ebx, VAR2
+sub ebx, VAR3
+cdq
+idiv ebx
+mov VAR4, eax`
+  },
+  {
+    id:"cdq_manual",
+    rank:"최우선",
+    title:"CDQ 직접 구현",
+    meta:"2023 기출형. EAX 부호를 EDX로 확장.",
+    prompt:`CDQ 명령을 직접 구현한 뒤 IDIV를 수행하는 코드를 작성하시오.
+입력: EAX에는 dwvar1을 로드한다. 제수는 dwvar2이다.`,
+    answer:`mov eax, dwvar1
+test eax, eax
+mov edx, 0
+jns L1
+mov edx, 0FFFFFFFFh
+L1:
+idiv dwvar2`
+  },
+  {
+    id:"gugudan",
+    rank:"높음",
+    title:"구구단 중첩 LOOP",
+    meta:"2024 기출형. 외부 ECX 보존.",
+    prompt:`1단부터 9단까지 구구단 결과를 Array BYTE 81 DUP(0)에 저장하시오.
+핵심: 내부 loop에서 ECX를 다시 쓰므로 외부 ECX를 보존한다.`,
+    answer:`mov bl, 0
+mov ecx, 9
+mov esi, 0
+L1:
+    inc bl
+    mov bh, 0
+    push ecx
+    mov ecx, 9
+L2:
+    inc bh
+    mov al, bl
+    mul bh
+    mov Array[esi], al
+    inc esi
+    loop L2
+    pop ecx
+    loop L1`
+  },
+  {
+    id:"bitscan_mul",
+    rank:"높음",
+    title:"bit scan unsigned 곱셈",
+    meta:"2024 기출형. VAR2의 bit를 보며 VAR1을 shift/add.",
+    prompt:`부호 없는 32비트 정수 VAR1과 VAR2의 곱을 shift 연산으로 구하고 결과를 EDX에 저장하시오.`,
+    answer:`mov ebx, VAR2
+mov ecx, 32
+mov edx, 0
+L1:
+    shl ebx, 1
+    jnc L2
+    dec ecx
+    mov eax, VAR1
+    shl eax, cl
+    add edx, eax
+    inc ecx
+L2:
+    loop L1`
+  },
+  {
+    id:"boolean_case",
+    rank:"높음",
+    title:"Boolean 대소문자 변환 핵심",
+    meta:"2023 기출형. Boolean 명령만 사용 조건 주의.",
+    prompt:`AL에 들어 있는 영문자의 대소문자 변환에 필요한 Boolean 명령 패턴을 작성하시오.
+대문자->소문자, 소문자->대문자, 대소문자 토글을 모두 쓰시오.`,
+    answer:`or  al, 00100000b
+and al, 11011111b
+xor al, 00100000b`
+  },
+  {
+    id:"jump_flags",
+    rank:"최우선",
+    title:"조건 점프 flag 조건",
+    meta:"2024 기출형. 표를 보지 않고 바로 써야 함.",
+    prompt:`다음 조건부 점프의 flag 조건을 쓰시오.
+
+JA =
+JB =
+JBE =
+JE =
+JG =
+JL =
+JGE =
+JNE =`,
+    answer:`JA = CF=0 AND ZF=0
+JB = CF=1
+JBE = CF=1 OR ZF=1
+JE = ZF=1
+JG = ZF=0 AND SF=OF
+JL = SF!=OF
+JGE = SF=OF
+JNE = ZF=0`
+  },
+  {
+    id:"test_cmp_trace",
+    rank:"높음",
+    title:"TEST/CMP 실행 결과",
+    meta:"Boolean/CMP flag 추적 예상.",
+    prompt:`다음 코드 실행 결과를 쓰시오.
+
+mov al, 11110000b
+test al, 00001111b
+
+답안 형식:
+ZF=?
+AL=?`,
+    answer:`ZF=1
+AL=11110000b`
+  },
+  {
+    id:"signed_unsigned_cmp",
+    rank:"높음",
+    title:"signed/unsigned 비교 해석",
+    meta:"같은 bit pattern을 signed와 unsigned로 다르게 읽는 문제.",
+    prompt:`다음 코드 이후 unsigned 관점과 signed 관점에서 AL > 7Fh 인지 쓰시오.
+
+mov al, 80h
+cmp al, 7Fh
+
+답안 형식:
+unsigned=?
+signed=?`,
+    answer:`unsigned=참
+signed=거짓`
+  },
+  {
+    id:"mul_div_rules",
+    rank:"최우선",
+    title:"MUL/DIV 크기 규칙",
+    meta:"기출 참거짓/빈칸형. 몫과 나머지 위치 암기.",
+    prompt:`MUL/DIV 크기 규칙을 채우시오.
+
+MUL r/m8  :
+MUL r/m16 :
+MUL r/m32 :
+DIV r/m8  :
+DIV r/m16 :
+DIV r/m32 :`,
+    answer:`MUL r/m8  : AL*op -> AX
+MUL r/m16 : AX*op -> DX:AX
+MUL r/m32 : EAX*op -> EDX:EAX
+DIV r/m8  : AX/op -> AL, AH
+DIV r/m16 : DX:AX/op -> AX, DX
+DIV r/m32 : EDX:EAX/op -> EAX, EDX`
+  },
+  {
+    id:"adc_sbb",
+    rank:"중간",
+    title:"ADC/SBB 확장 연산",
+    meta:"확장 덧셈/뺄셈 후보. Carry/Borrow 전달.",
+    prompt:`64비트 unsigned 덧셈과 뺄셈을 작성하시오.
+
+(EDX:EAX) = (EDX:EAX) + (ECX:EBX)
+(EDX:EAX) = (EDX:EAX) - (ECX:EBX)`,
+    answer:`add eax, ebx
+adc edx, ecx
+sub eax, ebx
+sbb edx, ecx`
+  },
+  {
+    id:"date_field",
+    rank:"중간",
+    title:"bit-field 날짜 추출",
+    meta:"shift/mask 응용. datestamp WORD 266Ah.",
+    prompt:`datestamp WORD 266Ah에서 day, month, year를 추출하는 코드를 작성하시오.
+bit 0~4 day, bit 5~8 month, bit 9~15 year offset from 1980.`,
+    answer:`mov ax, datestamp
+and ax, 0000000000011111b
+
+mov ax, datestamp
+shr ax, 5
+and ax, 0000000000001111b
+
+mov ax, datestamp
+shr ax, 9
+add ax, 1980`
+  },
+  {
+    id:"sar_shl_trace",
+    rank:"높음",
+    title:"SAR/SHL 실행 결과",
+    meta:"2023/예상 반복. 산술 shift의 sign bit 보존.",
+    prompt:`다음 코드 실행 후 EAX 값을 쓰시오.
+
+mov eax, -1
+mov cl, 4
+sar eax, cl
+shl eax, 1`,
+    answer:`EAX=FFFFFFFEh`
+  },
+  {
+    id:"imul_trace",
+    rank:"높음",
+    title:"IMUL 실행 결과",
+    meta:"OF 조건을 묻기 좋음.",
+    prompt:`다음 코드 실행 후 AX와 OF 값을 쓰시오.
+
+mov al, 23
+mov bl, 6
+imul bl`,
+    answer:`AX=008Ah
+OF=1`
+  },
+  {
+    id:"div_trace",
+    rank:"높음",
+    title:"DIV 실행 결과",
+    meta:"몫/나머지 위치 확인.",
+    prompt:`다음 코드 실행 후 AL, AH 값을 쓰시오. divide error가 있는지도 쓰시오.
+
+mov ax, 00FFh
+mov bl, 10h
+div bl`,
+    answer:`AL=0Fh
+AH=0Fh
+divide error 없음`
+  },
+  {
+    id:"loopne_rule",
+    rank:"중간",
+    title:"LOOPNE 조건",
+    meta:"LOOPNE 자체는 flag를 바꾸지 않음.",
+    prompt:`LOOPNE의 실행 조건을 쓰시오.`,
+    answer:`ECX를 1 감소시킨 뒤 ECX != 0 그리고 ZF = 0 이면 jump`
+  },
+  {
+    id:"real4_convert",
+    rank:"중간",
+    title:"REAL4 변환",
+    meta:"2024 기출형. bias 127, little endian.",
+    prompt:`0.15625를 REAL4로 표현했을 때 bit pattern과 메모리 저장 byte 순서를 쓰시오.
+
+답안 형식:
+bit pattern=?
+memory=?`,
+    answer:`bit pattern=3E200000h
+memory=00 00 20 3E`
+  },
+  {
+    id:"real4_decode",
+    rank:"중간",
+    title:"REAL4 해석",
+    meta:"bit pattern을 10진수로 해석.",
+    prompt:`REAL4 bit pattern 3FC00000h가 나타내는 10진수 값을 쓰시오.`,
+    answer:`1.5`
+  },
+  {
+    id:"heap_true_false",
+    rank:"중간",
+    title:"Heap/page 참거짓",
+    meta:"2023/2024 반복. 개념형 만점 방어.",
+    prompt:`다음 문장의 참/거짓을 쓰시오.
+
+1. HeapAlloc이 실패하면 보통 0을 반환한다.
+2. HeapFree 후 같은 포인터를 계속 사용해도 안전하다.
+3. page fault는 요청한 페이지가 메모리에 없을 때 발생할 수 있다.
+4. 32-bit linear address의 하위 12비트는 page offset이다.
+
+답안 형식:
+1=?
+2=?
+3=?
+4=?`,
+    answer:`1=참
+2=거짓
+3=참
+4=참`
+  }
+];
+
+let currentPractice = 0;
+const $ = (id) => document.getElementById(id);
+
+function storageKey(id){ return "final-cheatsheet-practice-" + id; }
+
+function normalizeAsm(src){
+  return src
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(line => line.replace(/;.*/, "").trim().replace(/\s+/g, " ").toLowerCase())
+    .filter(Boolean)
+    .join("\n");
+}
+
+function annotateAnswer(src){
+  const notes = [
+    [/^push ebp$/i, "기존 EBP를 저장해서 표준 stack frame을 시작"],
+    [/^mov\s+ebp,\s*esp$/i, "EBP를 현재 stack top으로 맞춰 매개변수/지역변수 기준점으로 사용"],
+    [/^sub\s+esp,\s*4$/i, "지역 변수 temp 1개 DWORD 공간 확보"],
+    [/^push\s+eax$/i, "사용할 register 보존"],
+    [/^push\s+ebx$/i, "사용할 register 보존"],
+    [/^push\s+edx$/i, "사용할 register 보존"],
+    [/^pop\s+edx$/i, "보존했던 register를 역순으로 복원"],
+    [/^pop\s+ebx$/i, "보존했던 register를 역순으로 복원"],
+    [/^pop\s+eax$/i, "보존했던 register를 역순으로 복원"],
+    [/^mov\s+esp,\s*ebp$/i, "지역 변수 공간을 해제하고 ESP를 frame 시작점으로 복원"],
+    [/^pop\s+ebp$/i, "호출자 EBP 복원"],
+    [/^ret\s+8$/i, "STDCALL: callee가 인자 2개, 총 8바이트를 정리"],
+    [/^ret$/i, "C convention이면 caller가 stack을 정리하므로 ret만 사용"],
+    [/^add\s+esp,\s*8$/i, "C convention: caller가 push한 인자 8바이트 정리"],
+    [/^push\s+offset\s+y$/i, "오른쪽 인자 &y를 먼저 push"],
+    [/^push\s+offset\s+x$/i, "왼쪽 인자 &x를 나중에 push해서 [ebp+8]이 첫 인자가 되게 함"],
+    [/^call\s+swap$/i, "swap procedure 호출"],
+    [/^cmp\s+/i, "두 operand를 빼서 flag만 설정, 값은 저장하지 않음"],
+    [/^jl\s+/i, "signed < 조건에서 jump"],
+    [/^jg\s+/i, "signed > 조건에서 jump"],
+    [/^jge\s+/i, "signed >= 조건에서 jump"],
+    [/^jbe\s+/i, "unsigned <= 조건에서 jump"],
+    [/^jae\s+/i, "unsigned >= 조건에서 jump"],
+    [/^jb\s+/i, "unsigned < 조건에서 jump"],
+    [/^je\s+/i, "ZF=1, 같으면 jump"],
+    [/^jne\s+/i, "ZF=0, 다르면 jump"],
+    [/^jns\s+/i, "SF=0, 음수가 아니면 jump"],
+    [/^jnc\s+/i, "CF=0, shift로 나온 bit가 0이면 jump"],
+    [/^jmp\s+/i, "무조건 jump"],
+    [/^loop\s+/i, "ECX를 1 감소시키고 ECX가 0이 아니면 반복"],
+    [/^loopne\s+/i, "ECX 감소 후 ECX!=0 그리고 ZF=0이면 반복, ZF 자체는 변경하지 않음"],
+    [/^shl\s+/i, "왼쪽 shift, 2의 거듭제곱 곱셈에 사용"],
+    [/^sar\s+/i, "산술 오른쪽 shift, sign bit를 복제"],
+    [/^shr\s+/i, "논리 오른쪽 shift, 상위 bit를 0으로 채움"],
+    [/^and\s+/i, "bit clear 또는 mask 추출에 사용"],
+    [/^or\s+/i, "bit set에 사용"],
+    [/^xor\s+/i, "bit toggle에 사용"],
+    [/^test\s+/i, "AND처럼 flag만 계산하고 operand 값은 변경하지 않음"],
+    [/^imul\s+/i, "signed multiplication"],
+    [/^mul\s+/i, "unsigned multiplication, AL/AX/EAX를 암시적으로 사용"],
+    [/^div\s+/i, "unsigned division, 몫/나머지 위치 확인"],
+    [/^idiv\s+/i, "signed division, 실행 전 CBW/CWD/CDQ 또는 직접 부호 확장 필요"],
+    [/^cdq$/i, "EAX의 sign bit를 EDX 전체로 확장해서 EDX:EAX 피제수 준비"],
+    [/^neg\s+/i, "부호 반전"],
+    [/^adc\s+/i, "덧셈 결과에 CF를 더해 상위 조각으로 carry 전달"],
+    [/^sbb\s+/i, "뺄셈 결과에서 CF를 빼 상위 조각으로 borrow 전달"],
+    [/^inc\s+/i, "1 증가, LOOP 카운터나 multiplier 증가에 사용"],
+    [/^dec\s+/i, "1 감소, shift count 보정 등에 사용"],
+    [/^mov\s+var4,\s*edx$/i, "나머지를 저장하는 문제이므로 EDX를 저장"],
+    [/^mov\s+var4,\s*eax$/i, "몫 또는 계산 결과를 저장"],
+    [/^mov\s+edx,\s*0ffffffffh$/i, "EAX가 음수일 때 CDQ 효과를 직접 구현"],
+    [/^mov\s+edx,\s*0$/i, "EAX가 양수일 때 상위 절반을 0으로 준비"],
+    [/^ja\s*=/i, "unsigned > 조건"],
+    [/^jg\s*=/i, "signed > 조건"],
+    [/^mul\s+r\/m/i, "MUL 크기 규칙 암기 항목"],
+    [/^div\s+r\/m/i, "DIV 크기 규칙 암기 항목"],
+    [/^zf=/i, "Zero Flag 결과"],
+    [/^of=/i, "Overflow Flag 결과"],
+    [/^ax=/i, "16비트 결과 register"],
+    [/^eax=/i, "32비트 결과 register"],
+    [/^al=/i, "8비트 quotient 또는 low byte"],
+    [/^ah=/i, "8비트 division remainder"],
+    [/^bit pattern=/i, "REAL4 32비트 IEEE 754 bit pattern"],
+    [/^memory=/i, "x86 little endian 순서로 저장된 byte 배열"],
+    [/^[1-4]=/i, "참/거짓 답안"]
+  ];
+  return src.split("\n").map(line => {
+    const raw = line;
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith(";") || trimmed.includes(";")) return raw;
+    const found = notes.find(([re]) => re.test(trimmed));
+    if (!found) return raw;
+    const pad = raw.length < 34 ? " ".repeat(34 - raw.length) : "  ";
+    return `${raw}${pad}; ${found[1]}`;
+  }).join("\n");
+}
+
+function renderProblemList(){
+  const list = $("problemList");
+  list.innerHTML = "";
+  PRACTICE.forEach((p, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "problem-btn" + (i === currentPractice ? " active" : "");
+    btn.innerHTML = `<strong>${i + 1}. ${p.title}</strong><br><span class="practice-meta">${p.rank}</span>`;
+    btn.addEventListener("click", () => selectPractice(i));
+    list.appendChild(btn);
+  });
+}
+
+function selectPractice(index){
+  currentPractice = index;
+  const p = PRACTICE[index];
+  $("practiceTitle").textContent = `${index + 1}. ${p.title}`;
+  $("practiceMeta").textContent = p.meta;
+  $("practiceRank").textContent = p.rank;
+  $("practicePrompt").textContent = p.prompt;
+  $("practiceAnswer").textContent = annotateAnswer(p.answer);
+  $("practiceAnswer").classList.remove("open");
+  $("practiceInput").value = localStorage.getItem(storageKey(p.id)) || "";
+  $("practiceResult").className = "result";
+  $("practiceResult").textContent = "아직 채점하지 않았습니다.";
+  renderProblemList();
+}
+
+function checkPractice(){
+  const p = PRACTICE[currentPractice];
+  const user = normalizeAsm($("practiceInput").value);
+  const answer = normalizeAsm(p.answer);
+  const result = $("practiceResult");
+  if (!user) {
+    result.className = "result bad";
+    result.textContent = "입력한 코드가 없습니다.";
+    return;
+  }
+  if (user === answer) {
+    result.className = "result good";
+    result.textContent = "정답입니다. 공백/대소문자를 제외한 핵심 코드가 일치합니다.";
+    return;
+  }
+  const userLines = user.split("\n");
+  const answerLines = answer.split("\n");
+  let same = 0;
+  const max = Math.max(userLines.length, answerLines.length);
+  for (let i = 0; i < max; i++) {
+    if (userLines[i] && userLines[i] === answerLines[i]) same++;
+  }
+  result.className = "result bad";
+  result.textContent = `아직 다릅니다. 줄 단위 단순 비교: ${same}/${answerLines.length}줄 일치. 정답을 열어 빠진 줄, jump 조건, ret/add esp, CDQ/EDX 위치를 확인하세요.`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderProblemList();
+  selectPractice(0);
+  $("practiceInput").addEventListener("input", () => {
+    const p = PRACTICE[currentPractice];
+    localStorage.setItem(storageKey(p.id), $("practiceInput").value);
+  });
+  $("checkAnswer").addEventListener("click", checkPractice);
+  $("showAnswer").addEventListener("click", () => $("practiceAnswer").classList.add("open"));
+  $("hideAnswer").addEventListener("click", () => $("practiceAnswer").classList.remove("open"));
+  $("clearAnswer").addEventListener("click", () => {
+    const p = PRACTICE[currentPractice];
+    $("practiceInput").value = "";
+    localStorage.removeItem(storageKey(p.id));
+    $("practiceResult").className = "result";
+    $("practiceResult").textContent = "입력을 지웠습니다.";
+  });
+});
+  </script>
+</main>
+</body>
+</html>
