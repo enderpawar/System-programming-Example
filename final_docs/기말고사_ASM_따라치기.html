@@ -34,7 +34,7 @@ const DATA = [
                          {
                              "id":  3,
                              "title":  "[문제 3] if ((VAR1 \u003c= VAR2) AND (VAR3 != VAR4)) VAR5=1;",
-                             "prompt":  "; [문제 3] if ((VAR1 \u003c= VAR2) AND (VAR3 != VAR4)) VAR5=1;\r\n; else VAR5=0; signed DWORD로 작성하시오.\r\n;\r\nProblem3 PROC\r\n    mov eax,var1\r\n    cmp eax,VAR2\r\n    jg P3_FALSE\r\n    mov ebx,VAR3\r\n    cmp ebx,VAR4\r\n    jg",
+                             "prompt":  "; [문제 3] if ((VAR1 \u003c= VAR2) AND (VAR3 != VAR4)) VAR5=1;\r\n; else VAR5=0; signed DWORD로 작성하시오.\r\n;",
                              "answer":  "Problem3 PROC\r\n    mov eax, VAR1\r\n    cmp eax, VAR2\r\n    jg  P3_FALSE\r\n    mov eax, VAR3\r\n    cmp eax, VAR4\r\n    je  P3_FALSE\r\n    mov VAR5, 1\r\n    jmp P3_END\r\nP3_FALSE:\r\n    mov VAR5, 0\r\nP3_END:\r\n    ret\r\nProblem3 ENDP"
                          },
                          {
@@ -81,8 +81,8 @@ const DATA = [
                          },
                          {
                              "id":  11,
-                             "title":  "[문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.ㅇ",
-                             "prompt":  "; [문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.ㅇ\r\n; bit 0~4 day, bit 5~8 month, bit 9~15 year offset from 1980.\r\n;",
+                             "title":  "[문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.",
+                             "prompt":  "; [문제 11] datestamp WORD 266Ah에서 일/월/연도를 추출하시오.\r\n; bit 0~4 day, bit 5~8 month, bit 9~15 year offset from 1980.\r\n;",
                              "answer":  "Problem11 PROC\r\n    mov ax, datestamp\r\n    and ax, 0000000000011111b    ; day = 10\r\n\r\n    mov ax, datestamp\r\n    shr ax, 5\r\n    and ax, 0000000000001111b    ; month = 3\r\n\r\n    mov ax, datestamp\r\n    shr ax, 9\r\n    add ax, 1980                 ; year = 1999\r\n    ret\r\nProblem11 ENDP"
                          },
                          {

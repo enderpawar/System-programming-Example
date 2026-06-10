@@ -330,6 +330,7 @@ pre{
     <a href="#stack">스택/호출</a>
     <a href="#more">추가 후보</a>
     <a href="#memory">메모리</a>
+    <a href="#routine">학습 루틴</a>
     <a href="#mistakes">실수 체크</a>
   </div>
 </nav>
@@ -998,8 +999,66 @@ INVOKE HeapFree, hHeap, 0, pArray</pre>
     </div>
   </section>
 
+  <section id="routine">
+    <h2>9. 만점 방어용 학습 루틴</h2>
+    <div class="grid two">
+      <article class="card">
+        <h3>1회전: 답안 골격 암기</h3>
+        <p>처음에는 이해보다 답안 형태를 고정한다. 시험장에서 손이 먼저 나가야 하는 코드는 아래 순서로 외운다.</p>
+        <ul class="list">
+          <li><code>cmp left, right</code> 다음 jump는 항상 <code>left ? right</code> 기준으로 읽기.</li>
+          <li>AND 조건문은 거짓이면 탈출, OR 조건문은 참이면 실행부로 점프.</li>
+          <li>signed 나눗셈은 <code>cdq</code> 다음 <code>idiv</code>, 나머지는 <code>edx</code>.</li>
+          <li>STDCALL은 callee가 <code>ret 8</code>, C convention은 caller가 <code>add esp, 8</code>.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>2회전: 답 가리고 재현</h3>
+        <p>HTML을 읽는 것만으로는 부족하다. 아래 항목은 빈 종이에 3분 안에 써야 한다.</p>
+        <ul class="list">
+          <li>조건 점프 표: <code>JA/JB/JBE/JG/JL/JGE/JNE</code>.</li>
+          <li><code>MUL/DIV</code> 8/16/32비트 결과 위치 표.</li>
+          <li><code>swap PROC</code> 전체 프롤로그, 본문, 에필로그.</li>
+          <li><code>REAL4</code> 해석 절차: sign, exponent-bias, fraction, little endian.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>3회전: 변형 대응</h3>
+        <p>기출과 숫자, 부등호, calling convention만 바뀌는 문제를 대비한다.</p>
+<pre>; 변형 1: signed AND
+if (A > B && C <= D) X = 1; else X = 0;
+; 첫 조건의 반대: jle FALSE
+; 둘째 조건의 반대: jg FALSE
+
+; 변형 2: unsigned OR
+if (A < B || C >= D) X = 1;
+; 첫 조건 참: jb TRUE
+; 둘째 조건 참: jae TRUE
+
+; 변형 3: signed remainder
+D = (A - B * 2) % C
+; EAX에 피제수, CDQ, IDIV C, EDX 저장</pre>
+      </article>
+      <article class="card">
+        <h3>실전 검산 순서</h3>
+        <p>답안을 다 쓴 뒤 아래 6개만 확인해도 감점 대부분을 막을 수 있다.</p>
+        <ol class="list">
+          <li>문제에 signed/unsigned 표시가 있는가?</li>
+          <li><code>cmp mem, mem</code>을 쓰지 않았는가?</li>
+          <li><code>DIV</code> 전 상위 절반을 0으로 만들었는가?</li>
+          <li><code>IDIV</code> 전 부호 확장을 했는가?</li>
+          <li>나머지를 묻는 문제에서 <code>eax</code>가 아니라 <code>edx</code>를 저장했는가?</li>
+          <li>호출 규약에 맞게 <code>ret</code>, <code>ret n</code>, <code>add esp,n</code>을 골랐는가?</li>
+        </ol>
+      </article>
+    </div>
+    <div class="note">
+      추천 학습법: 예제코드 한눈요약을 20분 읽고, ASM 따라치기에서 답을 가린 채 40분 쓰고, 객관식/TF로 개념 구멍을 15분 확인한다. 마지막에는 빈칸연습 전체가 아니라 오답 난 챕터만 반복한다.
+    </div>
+  </section>
+
   <section id="mistakes">
-    <h2>9. 시험 직전 실수 체크</h2>
+    <h2>10. 시험 직전 실수 체크</h2>
     <div class="grid two">
       <div class="note warn">
         <strong>감점 포인트</strong>

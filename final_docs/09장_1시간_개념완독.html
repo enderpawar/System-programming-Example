@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9장 Memory Management 1시간 개념완독</title>
+<style>
+:root{
+  --bg:#f7f8fa;
+  --paper:#ffffff;
+  --ink:#111827;
+  --muted:#5b6675;
+  --line:#d8dee8;
+  --green:#0f766e;
+  --blue:#1d4ed8;
+  --red:#be123c;
+  --amber:#a16207;
+  --code:#101827;
+  --code-ink:#e5e7eb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  line-height:1.62;
+}
+header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+}
+.wrap{
+  max-width:1120px;
+  margin:0 auto;
+  padding:0 20px;
+}
+.hero{
+  padding:30px 20px 22px;
+}
+h1{
+  margin:0 0 8px;
+  font-size:clamp(25px,3.4vw,40px);
+  line-height:1.2;
+  letter-spacing:0;
+}
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+}
+nav{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:rgba(247,248,250,.96);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(8px);
+}
+.nav-inner{
+  max-width:1120px;
+  margin:0 auto;
+  padding:10px 20px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+}
+.nav-inner a{
+  flex:0 0 auto;
+  color:var(--ink);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:7px 10px;
+  text-decoration:none;
+  font-size:13px;
+}
+main{
+  max-width:1120px;
+  margin:0 auto;
+  padding:24px 20px 70px;
+}
+section{margin:0 0 28px}
+h2{
+  margin:0 0 12px;
+  font-size:22px;
+  letter-spacing:0;
+}
+h3{
+  margin:0 0 8px;
+  font-size:16px;
+}
+p{margin:0 0 10px}
+ul,ol{margin:8px 0 0; padding-left:22px}
+li{margin:5px 0}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:15px;
+  min-width:0;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#ecfdf5;
+  color:var(--green);
+  font-size:12px;
+  font-weight:700;
+}
+.badge.blue{background:#eff6ff;color:var(--blue)}
+.badge.red{background:#fff1f2;color:var(--red)}
+.badge.amber{background:#fffbeb;color:var(--amber)}
+.muted{color:var(--muted)}
+.lead{
+  border-left:4px solid var(--green);
+  background:#f0fdfa;
+  color:#134e4a;
+  border-radius:6px;
+  padding:12px 14px;
+}
+.time{
+  display:grid;
+  grid-template-columns:96px 1fr;
+  gap:10px;
+  align-items:start;
+  border-top:1px solid var(--line);
+  padding:11px 0;
+}
+.time:first-child{border-top:0; padding-top:0}
+.minute{
+  font-weight:800;
+  color:var(--green);
+  font-family:Consolas,"D2Coding",monospace;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+}
+th,td{
+  border-bottom:1px solid var(--line);
+  padding:10px;
+  text-align:left;
+  vertical-align:top;
+}
+th{background:#f1f5f9}
+tr:last-child td{border-bottom:0}
+.formula{
+  background:var(--code);
+  color:var(--code-ink);
+  border-radius:8px;
+  padding:14px;
+  font-family:Consolas,"D2Coding","Courier New",monospace;
+  overflow-x:auto;
+}
+.flow{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+}
+.step{
+  min-height:88px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:12px;
+}
+.step strong{display:block; margin-bottom:4px}
+.checklist label{
+  display:block;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+  margin:8px 0;
+}
+.quiz details{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:12px;
+  margin:8px 0;
+}
+.quiz summary{cursor:pointer; font-weight:700}
+.answer{margin-top:8px; color:#134e4a}
+.small{font-size:13px}
+@media(max-width:880px){
+  .grid,.grid.two,.flow{grid-template-columns:1fr}
+  .time{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap hero">
+    <h1>9장 Memory Management 1시간 개념완독</h1>
+    <p class="subtitle">참고: final_docs/09_Memory Management (1).pdf. 목표는 “완벽 암기”가 아니라 시험장에서 용어와 흐름을 바로 떠올리는 것입니다.</p>
+  </div>
+</header>
+<nav>
+  <div class="nav-inner">
+    <a href="#route">60분 루트</a>
+    <a href="#heap">동적 메모리</a>
+    <a href="#x86">x86 용어</a>
+    <a href="#linear">선형 주소</a>
+    <a href="#paging">페이징</a>
+    <a href="#descriptor">디스크립터</a>
+    <a href="#quiz">확인 문제</a>
+  </div>
+</nav>
+<main>
+  <section>
+    <p class="lead"><strong>9장의 핵심 한 문장:</strong> 프로그램은 힙 관리자에게 동적 메모리를 요청하고, x86 보호 모드에서는 논리 주소가 선형 주소로 바뀐 뒤 페이징을 거쳐 물리 주소가 된다.</p>
+  </section>
+
+  <section id="route">
+    <h2>60분 완독 루트</h2>
+    <div class="card">
+      <div class="time">
+        <div class="minute">00-05분</div>
+        <div><strong>전체 지도 보기</strong><br>9장은 두 덩어리입니다. 앞부분은 Windows 힙 API, 뒷부분은 x86 주소 변환입니다.</div>
+      </div>
+      <div class="time">
+        <div class="minute">05-20분</div>
+        <div><strong>Dynamic Memory Allocation</strong><br>GetProcessHeap, HeapCreate, HeapAlloc, HeapFree, HeapDestroy의 역할만 먼저 외웁니다.</div>
+      </div>
+      <div class="time">
+        <div class="minute">20-35분</div>
+        <div><strong>x86 기본 용어</strong><br>Multitasking, Segment, Segmentation, Segment descriptor, Segment selector, Logical address를 표로 암기합니다.</div>
+      </div>
+      <div class="time">
+        <div class="minute">35-50분</div>
+        <div><strong>주소 변환 흐름</strong><br>논리 주소 -> 선형 주소 -> 물리 주소. 이 순서 하나를 그림처럼 외웁니다.</div>
+      </div>
+      <div class="time">
+        <div class="minute">50-60분</div>
+        <div><strong>셀프 테스트</strong><br>아래 확인 문제를 답을 가리고 풀고, 틀린 용어만 다시 봅니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="heap">
+    <h2>1. Dynamic Memory Allocation</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">개념</span>
+        <h3>동적 메모리 할당</h3>
+        <p>객체나 배열이 실행 중에 만들어질 때 필요한 저장 공간을 예약하는 기법입니다. 보통 heap allocation이라고 부릅니다.</p>
+      </div>
+      <div class="card">
+        <span class="badge blue">관리자</span>
+        <h3>Heap manager</h3>
+        <p>프로그램 시작 시 운영체제에서 큰 메모리 블록을 얻고, free list로 빈 블록을 관리합니다.</p>
+      </div>
+      <div class="card">
+        <span class="badge amber">흐름</span>
+        <h3>할당과 해제</h3>
+        <p>할당은 충분히 큰 빈 블록을 찾아 예약 표시하고 포인터를 반환합니다. 해제는 블록을 다시 free list로 돌려놓습니다.</p>
+      </div>
+    </div>
+    <h3>Windows Heap API 암기표</h3>
+    <table>
+      <thead><tr><th>API</th><th>역할</th><th>시험용 암기 포인트</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GetProcessHeap</strong></td><td>현재 프로그램의 기존 힙 핸들을 가져옵니다.</td><td>반환값은 EAX의 heap handle.</td></tr>
+        <tr><td><strong>HeapCreate</strong></td><td>현재 프로그램을 위한 private heap을 새로 만듭니다.</td><td>초기/최대 힙 크기는 page boundary로 올림. 필요 시 커질 수 있음.</td></tr>
+        <tr><td><strong>HeapAlloc</strong></td><td>기존 힙에서 메모리 블록을 할당합니다.</td><td>반환값은 EAX의 새 저장 공간 포인터. HEAP_ZERO_MEMORY를 쓰면 0으로 초기화.</td></tr>
+        <tr><td><strong>HeapFree</strong></td><td>이전에 할당한 메모리 블록을 해제합니다.</td><td>기본 dwFlags는 NULL.</td></tr>
+        <tr><td><strong>HeapDestroy</strong></td><td>HeapCreate로 만든 private heap을 제거합니다.</td><td>private heap 전용 마무리 함수.</td></tr>
+        <tr><td><strong>GetLastError</strong></td><td>API 오류의 세부 정보를 얻습니다.</td><td>HeapCreate, HeapDestroy, GetProcessHeap 오류 확인에 사용.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="x86">
+    <h2>2. x86 Memory Management 기본 용어</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3>멀티태스킹과 세그먼트</h3>
+        <ul>
+          <li><strong>Multitasking:</strong> 여러 프로그램이 동시에 실행되는 것처럼 CPU 시간을 나누어 쓰는 방식.</li>
+          <li><strong>Segment:</strong> 프로그램이 쓰는 가변 크기 메모리 영역. 코드나 데이터를 담습니다.</li>
+          <li><strong>Segmentation:</strong> 세그먼트끼리 분리해 프로그램들이 서로 간섭하지 않게 하는 보호 장치.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>주소 관련 용어</h3>
+        <ul>
+          <li><strong>Segment descriptor:</strong> 세그먼트의 base address, 접근 권한, 크기 제한, 타입, 용도를 설명합니다.</li>
+          <li><strong>Segment selector:</strong> CS, DS, SS, ES, FS, GS 같은 세그먼트 레지스터에 저장되는 16비트 값.</li>
+          <li><strong>Logical address:</strong> segment selector와 32비트 offset의 조합.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="linear">
+    <h2>3. Logical Address -> Linear Address</h2>
+    <div class="card">
+      <p>멀티태스킹 운영체제에서는 각 프로그램이 자기 데이터 영역을 가진 것처럼 보입니다. 예를 들어 세 프로그램이 모두 offset 200h에 변수를 가져도 실제 주소는 충돌하면 안 됩니다.</p>
+      <div class="formula">32-bit linear address = segment base address + 32-bit offset</div>
+      <p class="muted small">segment selector는 descriptor table의 segment descriptor를 가리키고, descriptor 안에 segment base address가 있습니다.</p>
+    </div>
+  </section>
+
+  <section id="paging">
+    <h2>4. Paging과 Page Translation</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="badge blue">왜 쓰나</span>
+        <h3>메모리보다 큰 실행 환경</h3>
+        <p>프로그램 전체를 한 번에 메모리에 올리지 않고 필요한 page만 메모리에 두어 여러 프로그램을 실행할 수 있게 합니다.</p>
+      </div>
+      <div class="card">
+        <span class="badge">단위</span>
+        <h3>Page</h3>
+        <p>프로그램 메모리를 작은 단위로 나눈 것입니다. 보통 4KB page를 사용합니다.</p>
+      </div>
+      <div class="card">
+        <span class="badge red">예외</span>
+        <h3>Page fault</h3>
+        <p>요청한 page가 메모리에 없으면 page fault가 발생하고, 운영체제가 디스크에서 필요한 page를 가져온 뒤 실행을 재개합니다.</p>
+      </div>
+    </div>
+    <h3>32비트 선형 주소의 분해</h3>
+    <div class="formula">[ 10-bit directory ][ 10-bit table ][ 12-bit offset ]</div>
+    <div class="flow">
+      <div class="step"><strong>1</strong>선형 주소가 선형 주소 공간의 한 위치를 가리킵니다.</div>
+      <div class="step"><strong>2</strong>directory 필드가 page directory entry의 인덱스가 됩니다.</div>
+      <div class="step"><strong>3</strong>page directory entry가 page table의 base address를 담습니다.</div>
+      <div class="step"><strong>4</strong>table 필드가 page table entry의 인덱스가 됩니다.</div>
+      <div class="step"><strong>5</strong>page base address + offset = 실제 physical address.</div>
+    </div>
+    <p class="muted small">CR3 레지스터는 page directory의 시작 주소를 담습니다.</p>
+  </section>
+
+  <section id="descriptor">
+    <h2>5. Descriptor Table과 Segment Descriptor</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3>GDT와 LDT</h3>
+        <ul>
+          <li><strong>GDT:</strong> 운영체제가 부팅 중 protected mode로 전환할 때 생성하는 전역 descriptor table.</li>
+          <li><strong>LDT:</strong> 멀티태스킹 OS에서 각 task나 program에 보통 배정되는 local descriptor table.</li>
+          <li><strong>LDTR:</strong> 프로그램의 LDT 주소를 담는 레지스터.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Segment Descriptor 필드</h3>
+        <ul>
+          <li><strong>Base address:</strong> 4GB 선형 주소 공간에서 세그먼트 시작 위치.</li>
+          <li><strong>Privilege level:</strong> 0~3. 0이 가장 높은 권한이며 보통 OS kernel code.</li>
+          <li><strong>Segment type:</strong> 데이터/스택/코드, 읽기/쓰기/실행, 성장 방향 등을 표현.</li>
+          <li><strong>Present flag:</strong> 세그먼트가 물리 메모리에 있는지 표시.</li>
+          <li><strong>Granularity flag:</strong> segment limit을 byte 단위로 볼지 4096-byte 단위로 볼지 결정.</li>
+          <li><strong>Segment limit:</strong> 세그먼트 크기 제한. granularity에 따라 1B~1MB 또는 4KB~4GB 범위.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>마지막 3분 암기 체크리스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> HeapAlloc은 메모리 블록을 할당하고 포인터를 EAX에 반환한다.</label>
+      <label><input type="checkbox"> HeapFree는 할당된 블록을 free list로 돌려보내는 역할이다.</label>
+      <label><input type="checkbox"> 논리 주소는 segment selector + 32-bit offset이다.</label>
+      <label><input type="checkbox"> 선형 주소는 segment base address + offset이다.</label>
+      <label><input type="checkbox"> paging을 쓰면 linear address가 physical address로 변환된다.</label>
+      <label><input type="checkbox"> page translation에서 32비트 주소는 10비트 directory, 10비트 table, 12비트 offset으로 나뉜다.</label>
+      <label><input type="checkbox"> CR3는 page directory의 시작 주소를 담는다.</label>
+    </div>
+  </section>
+
+  <section id="quiz" class="quiz">
+    <h2>확인 문제</h2>
+    <details>
+      <summary>1. HeapCreate와 GetProcessHeap의 차이는?</summary>
+      <p class="answer">GetProcessHeap은 프로그램의 기존 힙 핸들을 가져오고, HeapCreate는 새 private heap을 만든다.</p>
+    </details>
+    <details>
+      <summary>2. HEAP_ZERO_MEMORY 옵션의 효과는?</summary>
+      <p class="answer">HeapAlloc으로 받은 메모리 블록을 모두 0으로 초기화한다.</p>
+    </details>
+    <details>
+      <summary>3. Segment descriptor에는 어떤 정보가 들어가는가?</summary>
+      <p class="answer">base address, access rights/privilege, size limit, type, usage, present flag, granularity 등 세그먼트를 설명하는 정보가 들어간다.</p>
+    </details>
+    <details>
+      <summary>4. 논리 주소에서 선형 주소를 계산하는 공식은?</summary>
+      <p class="answer">32-bit linear address = segment base address + 32-bit offset.</p>
+    </details>
+    <details>
+      <summary>5. page fault는 언제 발생하는가?</summary>
+      <p class="answer">요청한 page가 현재 물리 메모리에 없을 때 발생한다. 운영체제가 디스크에서 page를 가져온 뒤 프로그램을 재개한다.</p>
+    </details>
+    <details>
+      <summary>6. page directory, page table, page는 각각 무엇인가?</summary>
+      <p class="answer">page directory는 page-directory entry 배열, page table은 page-table entry 배열, page는 4KB 또는 4MB 주소 공간 단위이다.</p>
+    </details>
+    <details>
+      <summary>7. 32비트 linear address의 세 필드는?</summary>
+      <p class="answer">10-bit directory, 10-bit table, 12-bit offset.</p>
+    </details>
+  </section>
+</main>
+</body>
+</html>

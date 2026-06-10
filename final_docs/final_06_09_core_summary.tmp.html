@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기말 06-09장 핵심개념 빈출정리</title>
+<style>
+:root{
+  --bg:#f6f7f9;--paper:#fff;--ink:#111827;--muted:#5b6675;--line:#d7dce3;
+  --teal:#0f766e;--blue:#1f3a5f;--red:#b91c1c;--amber:#a16207;--green:#166534;
+  --code:#111827;--code-ink:#e5e7eb;--soft:#f0fdfa;--warn:#fff7ed;--hot:#fff1f2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.65}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px}
+h1{margin:0 0 8px;font-size:clamp(25px,3.5vw,40px);line-height:1.2;letter-spacing:0}
+.sub{margin:0;color:var(--muted);font-size:15px}
+nav{position:sticky;top:0;z-index:10;background:rgba(246,247,249,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;overflow-x:auto}
+.nav-inner a{flex:0 0 auto;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:7px;padding:7px 10px;font-size:13px}
+.nav-inner a:hover{border-color:var(--teal);color:var(--teal)}
+main{max-width:1180px;margin:0 auto;padding:22px 20px 70px}
+section{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin:0 0 18px;padding:18px}
+h2{margin:0 0 12px;font-size:24px;letter-spacing:0}
+h3{margin:20px 0 8px;font-size:18px;letter-spacing:0}
+p{margin:8px 0;color:#243041}
+ul,ol{margin:8px 0 12px;padding-left:22px}
+li{margin:5px 0}
+.lead{font-size:16px;color:#263446}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mini{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fbfcfe}
+.hot{border-left:5px solid var(--red);background:var(--hot);padding:10px 12px;border-radius:7px;margin:10px 0}
+.must{border-left:5px solid var(--teal);background:var(--soft);padding:10px 12px;border-radius:7px;margin:10px 0}
+.warn{border-left:5px solid var(--amber);background:var(--warn);padding:10px 12px;border-radius:7px;margin:10px 0}
+.tag{display:inline-block;border:1px solid #fecdd3;background:#fff1f2;color:#9f1239;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:800;margin-right:6px}
+.tag.musttag{border-color:#99d7ce;background:#ecfdf5;color:#0f766e}
+.tag.mid{border-color:#fde68a;background:#fffbeb;color:#92400e}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:14px}
+th,td{border:1px solid var(--line);padding:8px 9px;vertical-align:top}
+th{background:#eef2f7;text-align:left}
+code{font-family:Consolas,"D2Coding","Courier New",monospace}
+pre{margin:10px 0 14px;background:var(--code);color:var(--code-ink);border-radius:8px;padding:13px;overflow:auto;font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.55}
+.answer{color:var(--green);font-weight:800}
+.bad{color:var(--red);font-weight:800}
+.check{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.check div{background:#fff;border:1px solid var(--line);border-radius:7px;padding:9px}
+@media(max-width:820px){.grid,.check{grid-template-columns:1fr}section{padding:14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>기말 06-09장 핵심개념 빈출정리</h1>
+    <p class="sub">내일 시험 직전용. 2023/2024 기말 출제 스타일 기준으로 빈출 개념을 특별 표시하고, 헷갈리는 지점을 이해 중심으로 정리했습니다.</p>
+  </div>
+</header>
+<nav>
+  <div class="nav-inner">
+    <a href="#strategy">출제패턴</a>
+    <a href="#ch06">06 조건 처리</a>
+    <a href="#ch07">07 정수 산술</a>
+    <a href="#ch08">08 고급 프로시저</a>
+    <a href="#ch09">09 메모리 관리</a>
+    <a href="#last">마지막 체크</a>
+  </div>
+</nav>
+<main>
+<section id="strategy">
+  <h2>0. 출제패턴 먼저 잡기</h2>
+  <p class="lead">이 교수님 기말은 “개념을 아는지”보다 “그 개념을 코드 빈칸과 실행 결과에 정확히 적용하는지”를 묻는 쪽입니다.</p>
+  <div class="grid">
+    <div class="mini">
+      <h3><span class="tag">빈출</span>반복 출제된 형태</h3>
+      <ul>
+        <li><code>CMP</code> 직후 signed/unsigned flag 조건 쓰기</li>
+        <li>C/C++ 조건문을 jump label 구조로 바꾸기</li>
+        <li><code>MUL/DIV/IDIV</code> 실행 후 레지스터, 오류 여부 판단</li>
+        <li><code>swap</code>을 C convention 또는 STDCALL로 작성/호출</li>
+        <li>heap, stack, paging 설명 중 틀린 문장 고르기</li>
+        <li>REAL4 bit pattern과 little endian 메모리 순서</li>
+      </ul>
+    </div>
+    <div class="mini">
+      <h3><span class="tag musttag">전략</span>점수 따는 순서</h3>
+      <ol>
+        <li>조건 점프 표와 <code>MUL/DIV</code> 표를 먼저 외운다.</li>
+        <li>코드 빈칸은 “반대 조건으로 탈출”인지 “참이면 이동”인지 label부터 본다.</li>
+        <li>나눗셈 문제는 먼저 <code>DIV</code>인지 <code>IDIV</code>인지 표시한다.</li>
+        <li>프로시저 문제는 <code>[ebp+8]</code>, <code>[ebp+12]</code>, <code>ret</code>/<code>ret 8</code>만 실수하지 않는다.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="ch06">
+  <h2>1. 06장 Conditional Processing</h2>
+  <div class="hot"><span class="tag">빈출</span>2023: <code>CMP</code> signed/unsigned 설명, Boolean 문자열 변환, <code>.WHILE</code> 변환. 2024: <code>JA/JB/JE/JG/JL/JNE</code> flag 조건, <code>JG</code>/<code>LOOPNE</code> 실행 결과.</div>
+
+  <h3>1-1. Boolean 명령어는 “결과 저장 여부”가 핵심</h3>
+  <table>
+    <tr><th>명령어</th><th>이해</th><th>flag</th><th>시험 포인트</th></tr>
+    <tr><td><code>AND</code></td><td>원하는 bit를 0으로 끄는 마스크</td><td><code>CF=0</code>, <code>OF=0</code>, <code>SF/ZF/PF</code> 갱신</td><td>소문자->대문자: bit 5 clear</td></tr>
+    <tr><td><code>OR</code></td><td>원하는 bit를 1로 켜는 마스크</td><td><code>CF=0</code>, <code>OF=0</code>, <code>SF/ZF/PF</code> 갱신</td><td>대문자->소문자: bit 5 set</td></tr>
+    <tr><td><code>XOR</code></td><td>1인 bit만 toggle</td><td><code>CF=0</code>, <code>OF=0</code>, <code>SF/ZF/PF</code> 갱신</td><td>대소문자 서로 바꾸기</td></tr>
+    <tr><td><code>NOT</code></td><td>모든 bit 반전</td><td>flag 변경 없음</td><td>참거짓 선지 단골 함정</td></tr>
+    <tr><td><code>TEST</code></td><td><code>AND</code>처럼 flag만 계산</td><td>결과 저장 없음, <code>CF=0</code>, <code>OF=0</code></td><td>특정 bit 검사</td></tr>
+    <tr><td><code>CMP</code></td><td><code>dest - src</code>처럼 flag만 계산</td><td>operand 변경 없음</td><td>조건 점프 직전 거의 항상 등장</td></tr>
+  </table>
+  <pre>; ASCII 대소문자 핵심: bit 5
+and al, 11011111b    ; 소문자 -> 대문자
+or  al, 00100000b    ; 대문자 -> 소문자
+xor al, 00100000b    ; 대문자 <-> 소문자 toggle
+test al,00100000b    ; bit 5가 1인지 검사, al은 안 바뀜</pre>
+
+  <h3>1-2. 조건 점프 표는 그대로 써야 한다</h3>
+  <div class="must"><span class="tag musttag">무조건 암기</span><code>JA/JB</code>는 unsigned, <code>JG/JL</code>은 signed. <code>cmp left, right</code> 다음 조건은 항상 <code>left ? right</code> 기준으로 읽습니다.</div>
+  <table>
+    <tr><th>관계</th><th>unsigned jump</th><th>flag 조건</th><th>signed jump</th><th>flag 조건</th></tr>
+    <tr><td><code>></code></td><td><code>JA</code></td><td><code>CF=0 AND ZF=0</code></td><td><code>JG</code></td><td><code>ZF=0 AND SF=OF</code></td></tr>
+    <tr><td><code>>=</code></td><td><code>JAE</code></td><td><code>CF=0</code></td><td><code>JGE</code></td><td><code>SF=OF</code></td></tr>
+    <tr><td><code><</code></td><td><code>JB</code></td><td><code>CF=1</code></td><td><code>JL</code></td><td><code>SF!=OF</code></td></tr>
+    <tr><td><code><=</code></td><td><code>JBE</code></td><td><code>CF=1 OR ZF=1</code></td><td><code>JLE</code></td><td><code>ZF=1 OR SF!=OF</code></td></tr>
+    <tr><td><code>==</code></td><td><code>JE/JZ</code></td><td><code>ZF=1</code></td><td><code>JE/JZ</code></td><td><code>ZF=1</code></td></tr>
+    <tr><td><code>!=</code></td><td><code>JNE/JNZ</code></td><td><code>ZF=0</code></td><td><code>JNE/JNZ</code></td><td><code>ZF=0</code></td></tr>
+  </table>
+  <div class="warn"><span class="tag mid">함정</span><code>80h</code>는 unsigned로 128이지만 signed byte로는 -128입니다. 그래서 같은 <code>CMP</code>라도 <code>JA</code>와 <code>JG</code> 결과가 달라질 수 있습니다.</div>
+
+  <h3>1-3. C 조건문을 ASM으로 바꾸는 법</h3>
+  <p>기출 빈칸은 label 흐름을 봐야 합니다. IF문은 보통 조건의 반대를 써서 false로 보냅니다.</p>
+  <pre>; if (a <= b && c != d) x = 1; else x = 0;  signed
+mov eax, a
+cmp eax, b
+jg  L_FALSE       ; a <= b의 반대는 a > b
+mov eax, c
+cmp eax, d
+je  L_FALSE       ; c != d의 반대는 c == d
+mov x, 1
+jmp L_END
+L_FALSE:
+mov x, 0
+L_END:</pre>
+  <pre>; if (a < b || c >= d) x = 1;  signed
+mov eax, a
+cmp eax, b
+jl  L_TRUE        ; OR는 하나라도 참이면 true
+mov eax, c
+cmp eax, d
+jge L_TRUE
+jmp L_END
+L_TRUE:
+mov x, 1
+L_END:</pre>
+
+  <h3>1-4. LOOPNE/LOOPE</h3>
+  <table>
+    <tr><th>명령어</th><th>동작</th></tr>
+    <tr><td><code>LOOPE/LOOPZ</code></td><td><code>ECX</code>를 1 감소시킨 뒤 <code>ECX != 0</code>이고 <code>ZF=1</code>이면 점프</td></tr>
+    <tr><td><code>LOOPNE/LOOPNZ</code></td><td><code>ECX</code>를 1 감소시킨 뒤 <code>ECX != 0</code>이고 <code>ZF=0</code>이면 점프</td></tr>
+  </table>
+  <div class="warn"><span class="tag mid">주의</span><code>LOOPNE</code> 자체가 <code>ZF</code>를 새로 만들지 않습니다. 직전의 <code>INC</code>, <code>CMP</code>, <code>TEST</code> 등이 만든 ZF를 그대로 봅니다.</div>
+</section>
+
+<section id="ch07">
+  <h2>2. 07장 Integer Arithmetic</h2>
+  <div class="hot"><span class="tag">빈출</span>2023: <code>imul eax,72</code> shift 최적화, <code>MUL/DIV</code> 참거짓, <code>CDQ</code> 직접 구현, 산술식 변환. 2024: <code>DIV</code> 실행 결과, 구구단 빈칸, shift 곱셈, 나머지 식 변환.</div>
+
+  <h3>2-1. Shift와 Rotate</h3>
+  <table>
+    <tr><th>명령어</th><th>핵심 이해</th><th>시험 활용</th></tr>
+    <tr><td><code>SHL/SAL</code></td><td>왼쪽 shift, 빈 LSB는 0, 빠진 MSB는 <code>CF</code></td><td>unsigned 곱하기 <code>2^n</code></td></tr>
+    <tr><td><code>SHR</code></td><td>오른쪽 logical shift, 빈 MSB는 0</td><td>unsigned 나누기 <code>2^n</code></td></tr>
+    <tr><td><code>SAR</code></td><td>오른쪽 arithmetic shift, sign bit 복제</td><td>signed 나누기 <code>2^n</code></td></tr>
+    <tr><td><code>ROL/ROR</code></td><td>빠진 bit가 반대편으로 돌아옴</td><td>nibble 교환, bit 회전 추적</td></tr>
+  </table>
+  <pre>; var * 72 = var * (64 + 8)
+mov eax, var
+mov ebx, eax
+shl eax, 6
+shl ebx, 3
+add eax, ebx</pre>
+  <div class="must"><span class="tag musttag">이해</span>상수 곱셈 최적화는 2의 거듭제곱 합으로 분해합니다. 72는 64+8, 84는 64+16+4처럼 쪼갭니다.</div>
+
+  <h3>2-2. MUL/IMUL 결과 위치</h3>
+  <table>
+    <tr><th>operand 크기</th><th>암시 피승수</th><th>결과</th><th>예</th></tr>
+    <tr><td>8비트</td><td><code>AL</code></td><td><code>AX</code></td><td><code>mul bl</code></td></tr>
+    <tr><td>16비트</td><td><code>AX</code></td><td><code>DX:AX</code></td><td><code>mul bx</code></td></tr>
+    <tr><td>32비트</td><td><code>EAX</code></td><td><code>EDX:EAX</code></td><td><code>mul ebx</code></td></tr>
+  </table>
+  <ul>
+    <li><code>MUL</code>은 unsigned, operand 1개, immediate 사용 불가.</li>
+    <li>결과의 상위 절반이 0이 아니면 <code>CF=1</code>, <code>OF=1</code>.</li>
+    <li>1-operand <code>IMUL</code>은 signed이며 결과 위치는 <code>MUL</code>과 같다.</li>
+    <li>2/3-operand <code>IMUL</code>은 결과가 목적지 크기로 잘릴 수 있다.</li>
+  </ul>
+
+  <h3>2-3. DIV/IDIV는 표가 전부다</h3>
+  <table>
+    <tr><th>제수 크기</th><th>피제수</th><th>몫</th><th>나머지</th></tr>
+    <tr><td>8비트</td><td><code>AX</code></td><td><code>AL</code></td><td><code>AH</code></td></tr>
+    <tr><td>16비트</td><td><code>DX:AX</code></td><td><code>AX</code></td><td><code>DX</code></td></tr>
+    <tr><td>32비트</td><td><code>EDX:EAX</code></td><td><code>EAX</code></td><td><code>EDX</code></td></tr>
+  </table>
+  <div class="hot"><span class="tag">빈출</span><code>DIV</code> 전에는 상위 절반을 0으로 만든다. <code>IDIV</code> 전에는 부호 확장한다. 몫이 목적지 크기를 넘으면 divide error입니다.</div>
+  <pre>; unsigned 32-bit division
+mov eax, dividend
+mov edx, 0
+div ebx              ; eax=quotient, edx=remainder
+
+; signed 32-bit division
+mov eax, dividend
+cdq                  ; eax sign을 edx 전체로 확장
+idiv ebx             ; eax=quotient, edx=remainder</pre>
+  <table>
+    <tr><th>부호 확장</th><th>의미</th></tr>
+    <tr><td><code>CBW</code></td><td><code>AL -> AX</code></td></tr>
+    <tr><td><code>CWD</code></td><td><code>AX -> DX:AX</code></td></tr>
+    <tr><td><code>CDQ</code></td><td><code>EAX -> EDX:EAX</code></td></tr>
+  </table>
+  <pre>; VAR4 = (4 * VAR1) % (VAR2 - VAR3), signed DWORD
+mov eax, VAR1
+shl eax, 2
+mov ebx, VAR2
+sub ebx, VAR3
+cdq
+idiv ebx
+mov VAR4, edx        ; 나머지는 EDX</pre>
+
+  <h3>2-4. ADC/SBB</h3>
+  <p>큰 정수를 여러 조각으로 계산할 때 carry/borrow를 다음 조각으로 넘깁니다.</p>
+  <pre>adc dest, src         ; dest = dest + src + CF
+sbb dest, src         ; dest = dest - src - CF</pre>
+</section>
+
+<section id="ch08">
+  <h2>3. 08장 Advanced Procedures</h2>
+  <div class="hot"><span class="tag">빈출</span>2023: C calling convention의 <code>swap</code> 작성/호출. 2024: STDCALL의 <code>swap</code> 작성/호출. 두 해 모두 <code>enter/leave</code> 금지 조건이 붙었습니다.</div>
+
+  <h3>3-1. Stack frame 위치</h3>
+  <pre>push ebp
+mov  ebp, esp
+sub  esp, local_size
+...
+mov  esp, ebp
+pop  ebp
+ret</pre>
+  <table>
+    <tr><th>위치</th><th>내용</th></tr>
+    <tr><td><code>[ebp]</code></td><td>이전 EBP</td></tr>
+    <tr><td><code>[ebp+4]</code></td><td>return address</td></tr>
+    <tr><td><code>[ebp+8]</code></td><td>첫 번째 parameter</td></tr>
+    <tr><td><code>[ebp+12]</code></td><td>두 번째 parameter</td></tr>
+    <tr><td><code>[ebp-4]</code></td><td>첫 번째 local DWORD</td></tr>
+  </table>
+  <div class="warn"><span class="tag mid">실수</span><code>[ebp+4]</code>는 첫 번째 인자가 아니라 return address입니다. 첫 번째 인자는 무조건 <code>[ebp+8]</code>부터 시작합니다.</div>
+
+  <h3>3-2. C calling convention vs STDCALL</h3>
+  <table>
+    <tr><th>구분</th><th>C calling convention</th><th>STDCALL</th></tr>
+    <tr><td>push 순서</td><td>오른쪽 인자부터</td><td>오른쪽 인자부터</td></tr>
+    <tr><td>stack 정리</td><td>caller가 정리</td><td>callee가 정리</td></tr>
+    <tr><td>반환</td><td><code>ret</code> 후 <code>add esp,n</code></td><td><code>ret n</code></td></tr>
+    <tr><td><code>swap(&x,&y)</code> 호출</td><td><code>push OFFSET y</code><br><code>push OFFSET x</code><br><code>call swap</code><br><code>add esp,8</code></td><td><code>push OFFSET y</code><br><code>push OFFSET x</code><br><code>call swap</code></td></tr>
+  </table>
+
+  <h3>3-3. swap 템플릿</h3>
+  <pre>; void swap(int *a, int *b)
+swap PROC
+    push ebp
+    mov  ebp, esp
+    sub  esp, 4          ; temp
+    push eax
+    push ebx
+    push edx
+
+    mov  eax, [ebp+8]    ; eax = a
+    mov  ebx, [ebp+12]   ; ebx = b
+    mov  edx, [eax]      ; edx = *a
+    mov  [ebp-4], edx    ; temp = *a
+    mov  edx, [ebx]      ; edx = *b
+    mov  [eax], edx      ; *a = *b
+    mov  edx, [ebp-4]
+    mov  [ebx], edx      ; *b = temp
+
+    pop  edx
+    pop  ebx
+    pop  eax
+    mov  esp, ebp
+    pop  ebp
+    ret  8               ; STDCALL이면 ret 8, C convention이면 ret
+swap ENDP</pre>
+  <div class="must"><span class="tag musttag">이해</span><code>a</code>, <code>b</code>는 int 값이 아니라 int의 주소입니다. 그래서 <code>mov eax,[ebp+8]</code>로 주소를 꺼내고, <code>[eax]</code>로 실제 int 값을 접근합니다.</div>
+
+  <h3>3-4. 배열과 LEA</h3>
+  <ul>
+    <li>배열은 보통 값 전체가 아니라 시작 주소를 reference parameter로 전달한다.</li>
+    <li><code>LEA</code>는 메모리를 읽는 명령이 아니라 주소 계산 결과를 레지스터에 넣는다.</li>
+  </ul>
+  <pre>lea eax, [esi+ecx*4+12] ; eax = esi + ecx*4 + 12, 메모리 읽기 아님</pre>
+</section>
+
+<section id="ch09">
+  <h2>4. 09장 Memory Management</h2>
+  <div class="hot"><span class="tag">빈출</span>2023/2024 모두 heap, stack, logical/linear/physical address, page fault 설명의 옳고 그름을 물었습니다. 2024에는 REAL4 저장/해석도 출제되었습니다.</div>
+
+  <h3>4-1. Stack, Data, Heap 구분</h3>
+  <table>
+    <tr><th>영역</th><th>무엇이 위치하나</th><th>시험 함정</th></tr>
+    <tr><td>Data segment</td><td>전역 변수, static 데이터</td><td>프로시저 호출과 무관하게 존재</td></tr>
+    <tr><td>Stack</td><td>return address, parameters, local variables, saved registers</td><td>지역변수는 return 과정에서 stack pointer 조정으로 사라짐</td></tr>
+    <tr><td>Heap</td><td>동적 할당 메모리</td><td>procedure return만으로 자동 해제되지 않음</td></tr>
+  </table>
+  <div class="warn"><span class="tag mid">오답 선지</span>“동적 할당된 변수와 지역 변수는 모두 stack에 위치한다”는 틀립니다. 지역변수는 stack, 동적 할당 메모리는 heap입니다.</div>
+
+  <h3>4-2. Win32 heap API</h3>
+  <table>
+    <tr><th>API</th><th>의미</th></tr>
+    <tr><td><code>GetProcessHeap</code></td><td>현재 프로세스의 기존 heap handle 반환</td></tr>
+    <tr><td><code>HeapCreate</code></td><td>새 private heap 생성</td></tr>
+    <tr><td><code>HeapAlloc</code></td><td>heap에서 memory block 할당, 포인터 반환</td></tr>
+    <tr><td><code>HeapFree</code></td><td>할당한 block 반환</td></tr>
+    <tr><td><code>HeapDestroy</code></td><td><code>HeapCreate</code>로 만든 heap 제거</td></tr>
+  </table>
+  <ul>
+    <li><code>HEAP_ZERO_MEMORY</code>: 할당된 block을 0으로 초기화한다.</li>
+    <li><code>HeapAlloc</code> 실패 시 반환 포인터가 0인지 확인해야 한다.</li>
+    <li><code>HeapFree</code> 후 같은 포인터를 계속 쓰면 use-after-free 문제다.</li>
+  </ul>
+
+  <h3>4-3. Logical, Linear, Physical address</h3>
+  <table>
+    <tr><th>주소</th><th>뜻</th></tr>
+    <tr><td>Logical address</td><td>segment selector + offset</td></tr>
+    <tr><td>Linear address</td><td>segment descriptor의 base address + 32-bit offset</td></tr>
+    <tr><td>Physical address</td><td>실제 메모리 주소. paging이 켜져 있으면 linear address가 page translation을 거쳐 변환됨</td></tr>
+  </table>
+  <div class="must"><span class="tag musttag">순서</span>logical address -> segmentation -> linear address -> paging/page translation -> physical address</div>
+
+  <h3>4-4. Paging과 page fault</h3>
+  <ul>
+    <li>page는 보통 4KB 단위다.</li>
+    <li>4KB = <code>2^12</code>이므로 page offset은 하위 12비트다.</li>
+    <li>요청 page가 메모리에 없거나 접근 권한 문제가 있으면 page fault가 발생할 수 있다.</li>
+    <li>cache miss는 page fault가 아니다.</li>
+  </ul>
+  <pre>linear address = 12345ABCh
+4KB page offset = 하위 12비트 = ABCh</pre>
+
+  <h3>4-5. REAL4 IEEE 754</h3>
+  <table>
+    <tr><th>필드</th><th>크기</th><th>의미</th></tr>
+    <tr><td>sign</td><td>1비트</td><td>0은 양수, 1은 음수</td></tr>
+    <tr><td>exponent</td><td>8비트</td><td>bias 127</td></tr>
+    <tr><td>fraction</td><td>23비트</td><td>정규화된 1.x의 x 부분</td></tr>
+  </table>
+  <pre>0.15625 = 0.00101b = 1.01b * 2^-3
+sign = 0
+exponent = -3 + 127 = 124 = 7Ch
+fraction = 010000...
+bit pattern = 3E200000h
+x86 memory = 00 00 20 3E    ; little endian</pre>
+  <div class="hot"><span class="tag">빈출</span>REAL4 문제는 bit pattern을 구한 뒤 메모리에 적을 때 byte 순서를 뒤집는 것이 핵심입니다. <code>3E200000h</code>는 낮은 주소부터 <code>00 00 20 3E</code>입니다.</div>
+</section>
+
+<section id="last">
+  <h2>5. 시험 직전 마지막 체크리스트</h2>
+  <div class="check">
+    <div><span class="answer">01</span> <code>JA/JB/JAE/JBE</code>는 unsigned.</div>
+    <div><span class="answer">02</span> <code>JG/JL/JGE/JLE</code>는 signed.</div>
+    <div><span class="answer">03</span> <code>CMP</code>는 결과 저장 안 함. flag만 바꿈.</div>
+    <div><span class="answer">04</span> <code>TEST</code>도 결과 저장 안 함. bit 검사.</div>
+    <div><span class="answer">05</span> <code>NOT</code>은 flag 변경 없음.</div>
+    <div><span class="answer">06</span> <code>DIV</code> 전 상위 절반은 0.</div>
+    <div><span class="answer">07</span> <code>IDIV</code> 전 <code>CBW/CWD/CDQ</code>.</div>
+    <div><span class="answer">08</span> 나머지는 <code>AH/DX/EDX</code>.</div>
+    <div><span class="answer">09</span> <code>MUL r/m8</code>: <code>AL * op -> AX</code>.</div>
+    <div><span class="answer">10</span> <code>DIV r/m32</code>: <code>EDX:EAX / op -> EAX, EDX</code>.</div>
+    <div><span class="answer">11</span> C convention: caller가 <code>add esp,n</code>.</div>
+    <div><span class="answer">12</span> STDCALL: callee가 <code>ret n</code>.</div>
+    <div><span class="answer">13</span> 첫 번째 인자: <code>[ebp+8]</code>.</div>
+    <div><span class="answer">14</span> 첫 번째 local DWORD: <code>[ebp-4]</code>.</div>
+    <div><span class="answer">15</span> heap은 return으로 자동 해제되지 않음.</div>
+    <div><span class="answer">16</span> REAL4 memory는 little endian.</div>
+  </div>
+  <div class="hot"><span class="tag">마지막 10분</span>조건 점프 표, <code>MUL/DIV</code> 표, <code>ret</code>/<code>ret 8</code>, REAL4 little endian만 다시 보세요. 새 문제를 길게 풀기보다 실수 방지에 집중하는 쪽이 점수에 더 직접적입니다.</div>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시스템프로그래밍 기말 6-9장 신규 오지선다</title>
+<style>
+:root{--bg:#f5f7fa;--panel:#fff;--ink:#111827;--muted:#64748b;--line:#d8dee8;--teal:#0f766e;--blue:#1f3a5f;--red:#b91c1c;--green:#166534;--amber:#a16207}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.55}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.wrap{max-width:1160px;margin:0 auto;padding:24px 20px}
+h1{margin:0 0 8px;font-size:clamp(24px,3vw,36px);letter-spacing:0}
+.sub{margin:0;color:var(--muted);font-size:14px}
+.bar{position:sticky;top:0;z-index:10;background:rgba(245,247,250,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.bar-inner{max-width:1160px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:8px 11px;cursor:pointer}
+button:hover{border-color:var(--teal)}
+button.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.score{margin-left:auto;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.progress{height:9px;min-width:150px;flex:1 1 220px;border:1px solid var(--line);background:#fff;border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:var(--teal);transition:width .2s}
+main{max-width:1160px;margin:0 auto;padding:22px 20px 70px}
+.note{margin:0 0 16px;border-left:4px solid var(--teal);background:#eefdfa;color:#134e4a;border-radius:6px;padding:12px 14px;font-size:14px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters button.active{background:#e7f7f4;border-color:var(--teal);color:#0f4f4a}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin:0 0 14px;padding:15px}
+.head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.title{font-weight:800}
+.meta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;color:var(--muted);background:#fbfcfe}
+.tag.hot{color:#9f1239;background:#fff1f2;border-color:#fecdd3}
+.tag.mid{color:var(--amber);background:#fffbeb;border-color:#fde68a}
+.q{margin:8px 0 12px;white-space:pre-wrap}
+.choices{display:grid;gap:8px}
+.choice{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:7px;padding:9px 10px}
+.choice.selected{border-color:var(--blue);background:#eef2ff}
+.choice.correct{border-color:var(--green);background:#f0fdf4;color:var(--green)}
+.choice.wrong{border-color:var(--red);background:#fff1f2;color:#991b1b}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.explain{display:none;margin-top:10px;border-left:4px solid var(--teal);background:#f0fdfa;color:#134e4a;border-radius:6px;padding:10px;font-size:14px;white-space:pre-wrap}
+.explain.open{display:block}
+code{font-family:Consolas,"D2Coding","Courier New",monospace}
+pre{margin:8px 0 0;background:#111827;color:#e5e7eb;border-radius:7px;padding:12px;overflow:auto;font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.55}
+@media(max-width:760px){.score{margin-left:0}.head{display:block}.meta{justify-content:flex-start;margin-top:8px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>기말 6-9장 신규 오지선다</h1>
+    <p class="sub">2023/2024 기말의 빈칸, 실행 결과, flag 조건식, 코드 변환 유형을 5지선다로 재구성한 고난도 연습입니다.</p>
+  </div>
+</header>
+<div class="bar">
+  <div class="bar-inner">
+    <button class="primary" id="gradeAll">전체 채점</button>
+    <button id="showAll">정답 모두 표시</button>
+    <button id="resetAll">초기화</button>
+    <div class="progress"><span id="progressFill"></span></div>
+    <div class="score" id="score">0 / 0</div>
+  </div>
+</div>
+<main>
+  <p class="note">출제 스타일 분석: 단순 정의보다 코드 빈칸, signed/unsigned 해석 차이, flag 조건식, LOOP/DIV 실행 결과, calling convention별 stack 정리, REAL4 little endian, heap/paging의 틀린 설명 판별이 자주 나옵니다. 모든 문항은 한 개의 정답만 있습니다.</p>
+  <div class="filters" id="filters"></div>
+  <section id="quiz"></section>
+</main>
+<script>
+const QUESTIONS = [
+  {cat:"기출형 분석", p:"유형", q:"2023/2024 기말고사의 출제 스타일과 가장 가까운 문항 구성은?", c:["명령어 이름과 뜻을 1:1로 묻는 단순 암기형","긴 이론 설명만 제시하고 정의를 고르는 형식","주어진 C/ASM 코드의 빈칸, flag 조건, 실행 후 레지스터 값을 묻는 형식","Irvine32 함수 목록을 외우는 형식","운영체제 일반론을 서술하게 하는 형식"], a:2, e:"두 기출 모두 코드 빈칸, flag 조건식, 실행 결과, calling convention별 stack 처리, 메모리 설명의 옳고 그름 판별이 중심이다."},
+
+  {cat:"6장 Boolean/조건", p:"상", q:"다음 코드는 영문 알파벳의 대소문자를 서로 바꾸려는 루프이다. 빈칸에 들어갈 Boolean 명령으로 가장 적절한 것은?\n<pre>.data\narray BYTE \"aSMx86Z\"\n.code\nmov ecx, LENGTHOF array\nmov esi, OFFSET array\nL1:\n    __________\n    inc esi\n    loop L1</pre>", c:["and BYTE PTR [esi], 11011111b","or BYTE PTR [esi], 00100000b","xor BYTE PTR [esi], 00100000b","not BYTE PTR [esi]","test BYTE PTR [esi], 00100000b"], a:2, e:"대문자와 소문자의 차이는 bit 5이다. XOR 00100000b는 bit 5를 toggle하므로 대문자는 소문자로, 소문자는 대문자로 바뀐다."},
+  {cat:"6장 Boolean/조건", p:"상", q:"<code>CMP op1, op2</code> 직후 관계 판정 설명으로 옳은 것은?", c:["signed op1 > op2는 CF=0 AND ZF=0이다.","unsigned op1 < op2는 SF<>OF이다.","signed op1 <= op2는 ZF=1 OR SF<>OF이다.","unsigned op1 >= op2는 SF=OF이다.","signed op1 != op2는 CF=1 OR ZF=1이다."], a:2, e:"signed less/equal은 JLE 조건이며 ZF=1 OR SF<>OF이다. CF는 unsigned 비교에서 핵심적으로 사용된다."},
+  {cat:"6장 Boolean/조건", p:"상", q:"다음 실행 직후 BL 값은?\n<pre>mov al, 80h\ncmp al, 7Fh\nmov bl, 0\njg  L1\nmov bl, 1\nL1:</pre>", c:["00h","01h","7Fh","80h","컴파일 오류"], a:1, e:"AL=80h는 signed 8비트로 -128, 7Fh는 127이다. JG는 signed greater이므로 분기하지 않고 BL은 1이 된다."},
+  {cat:"6장 Boolean/조건", p:"상", q:"다음 C 조건을 signed DWORD 변수에 대해 구현하려고 한다. 빈칸 2개에 들어갈 jump 조합으로 가장 적절한 것은?\n<pre>if ((VAR1 < VAR2) || (VAR3 >= VAR4))\n    VAR5 = 1;</pre><pre>mov eax, VAR1\ncmp eax, VAR2\n____ L1\nmov eax, VAR3\ncmp eax, VAR4\n____ L1\njmp L2\nL1: mov VAR5, 1\nL2:</pre>", c:["JL / JL","JB / JAE","JLE / JG","JL / JGE","JA / JBE"], a:3, e:"첫 조건 VAR1 < VAR2가 참이면 L1로 간다. 둘째 조건 VAR3 >= VAR4도 참이면 L1로 가야 한다. signed 비교이므로 JL과 JGE를 사용한다."},
+  {cat:"6장 Boolean/조건", p:"상", q:"다음 MASM directive를 직접 jump로 바꾸려 한다. L1 직후에 들어갈 종료 조건으로 맞는 것은? x와 limit는 unsigned DWORD이다.\n<pre>.WHILE x <= limit\n    inc x\n.ENDW</pre><pre>L1:\n    mov eax, x\n    cmp eax, limit\n    ______ L2\n    inc x\n    jmp L1\nL2:</pre>", c:["ja","jg","jbe","jle","jne"], a:0, e:"반복 조건 x <= limit의 반대는 unsigned x > limit이다. 따라서 JA L2가 종료 분기이다."},
+  {cat:"6장 Boolean/조건", p:"중상", q:"다음 코드 실행 후 EAX 값은? LOOPNE는 ZF를 새로 계산하지 않는다고 가정한다.\n<pre>mov eax, 000000FEh\nmov ecx, 3\nL1: inc al\n    loopne L1</pre>", c:["000000FFh","00000000h","00000001h","000000FEh","무한 루프"], a:1, e:"INC AL: FE->FF이면 ZF=0, ECX=2라 반복. 다음 INC AL: FF->00이면 ZF=1, LOOPNE는 ECX를 1로 줄인 뒤 ZF=1이므로 중단한다. EAX는 00000000h."},
+  {cat:"6장 Boolean/조건", p:"중상", q:"다음 설명 중 옳지 않은 것을 고르면?", c:["TEST는 AND 결과를 저장하지 않고 flag만 갱신한다.","NOT은 operand bit를 반전하지만 flag를 변경하지 않는다.","AND, OR, XOR는 일반적으로 CF와 OF를 clear한다.","CMP는 destination-source 결과를 destination에 저장한다.","XOR mask를 두 번 적용하면 원래 값으로 돌아온다."], a:3, e:"CMP는 내부적으로 뺄셈을 수행해 flag를 갱신하지만 결과를 destination에 저장하지 않는다."},
+
+  {cat:"7장 Shift/MUL/DIV", p:"상", q:"다음 곱셈을 IMUL 없이 shift/add로 최적화할 때 가장 적은 항으로 맞는 분해는?\n<pre>mov eax, var\nimul eax, 84</pre>", c:["64+16+4","128-32-8-4","32+32+16+4","64+8+8+4","21*4이므로 shr 2"], a:0, e:"84=64+16+4이므로 원값을 6, 4, 2비트 left shift한 결과를 더하면 된다. 128-32-8-4도 가능하지만 항이 더 많다."},
+  {cat:"7장 Shift/MUL/DIV", p:"상", q:"다음 코드 실행 직후 AX와 OF/CF 상태로 맞는 것은?\n<pre>mov al, 70\nmov bl, 3\nimul bl</pre>", c:["AX=00D2h, OF=0 CF=0","AX=00D2h, OF=1 CF=1","AX=FFD2h, OF=0 CF=0","AX=00D2h, OF=1 CF=0","divide error"], a:1, e:"70*3=210=00D2h이다. 8비트 signed 결과 범위(-128~127)에 맞지 않아 하위 8비트 D2h의 sign extension(FFD2h)과 AX가 다르므로 OF/CF가 1이다."},
+  {cat:"7장 Shift/MUL/DIV", p:"상", q:"다음 코드의 실행 결과로 가장 정확한 것은?\n<pre>mov ax, 0400h\nmov bl, 04h\ndiv bl</pre>", c:["AL=00h AH=00h","AL=04h AH=00h","AL=FFh AH=04h","divide error","컴파일 오류"], a:3, e:"8비트 DIV는 AX / r/m8의 몫을 AL에 저장한다. 0400h/04h=0100h=256으로 AL 범위를 초과하므로 divide error가 발생한다."},
+  {cat:"7장 Shift/MUL/DIV", p:"상", q:"다음 signed division 실행 후 AL, AH 값은?\n<pre>mov ax, -17\nmov bl, 5\nidiv bl</pre>", c:["AL=FDh AH=FEh","AL=FCh AH=03h","AL=03h AH=FEh","AL=FDh AH=02h","divide error"], a:0, e:"IDIV에서 -17 / 5는 몫 -3, 나머지 -2이다. 8비트 2의 보수로 -3=FDh, -2=FEh이다. 나머지 부호는 피제수와 같다."},
+  {cat:"7장 Shift/MUL/DIV", p:"중상", q:"CDQ를 직접 흉내 내는 코드로 가장 적절한 것은? EAX는 이미 피제수의 하위 32비트이다.", c:["mov edx,0 / cmp eax,0 / jge L1 / mov edx,0FFFFFFFFh / L1:","mov edx,eax / shl edx,31 / L1:","mov edx,0FFFFFFFFh / cmp eax,0 / jl L1 / mov edx,0FFFFFFFFh / L1:","xor edx,edx / test eax,eax / jz L1 / mov edx,eax / L1:","mov edx,0 / cmp eax,0 / jle L1 / mov edx,0FFFFFFFFh / L1:"], a:0, e:"CDQ는 EAX가 음수이면 EDX=FFFFFFFFh, 음수가 아니면 EDX=00000000h로 만든다. cmp/test 후 signed 조건 분기가 필요하다."},
+  {cat:"7장 Shift/MUL/DIV", p:"상", q:"다음 코드 실행 후 AL과 CF는?\n<pre>mov al, 96h\nshl al, 1\nsar al, 2</pre>", c:["AL=0Bh CF=0","AL=0Bh CF=1","AL=25h CF=1","AL=CBh CF=0","AL=E5h CF=0"], a:1, e:"96h SHL 1 -> 2Ch이고 최초 CF는 1이다. 이어서 2Ch를 SAR 2 하면 0Bh가 된다. 마지막으로 빠진 bit는 원래 bit1=1이므로 최종 CF=1이다."},
+  {cat:"7장 Shift/MUL/DIV", p:"중상", q:"다음 코드 실행 직후 AL과 CF는?\n<pre>mov al, 96h\nrol al, 4</pre>", c:["AL=69h CF=1","AL=69h CF=0","AL=96h CF=1","AL=2Dh CF=0","AL=6Ah CF=1"], a:0, e:"ROL 4는 nibble을 교환해 69h가 된다. count가 4일 때 CF는 마지막으로 MSB에서 rotate된 bit이며 원래 bit4=1이므로 CF=1이다."},
+  {cat:"7장 Shift/MUL/DIV", p:"중상", q:"32비트 unsigned 곱셈을 bit-scan 방식으로 구현할 때 다음 빈칸에 가장 적절한 것은?\n<pre>mov ebx, VAR2\nmov ecx, 32\nmov edx, 0\nL1: shl ebx, 1\n    ____ L2\n    mov eax, VAR1\n    shl eax, cl\n    add edx, eax\nL2: loop L1</pre>", c:["jnc","jc","jz","jo","jge"], a:0, e:"SHL EBX,1에서 원래 최상위 bit가 CF로 나온다. 그 bit가 0이면 더하지 않고 L2로 가야 하므로 JNC L2가 적절하다. 단, 실제 완성 코드에서는 CL 값 보정도 함께 고려해야 한다."},
+
+  {cat:"8장 Stack/Procedure", p:"상", q:"다음 C 함수의 stack frame에서 <code>b</code>와 지역변수 <code>temp</code>의 위치 조합으로 가장 적절한 것은? DWORD 기준, enter/leave 미사용.\n<pre>void f(int a, int b){\n  int temp;\n}</pre><pre>push ebp\nmov ebp, esp\nsub esp, 4</pre>", c:["b=[ebp+8], temp=[ebp-4]","b=[ebp+12], temp=[ebp-4]","b=[ebp-4], temp=[ebp+12]","b=[ebp+4], temp=[ebp-8]","b=[esp+8], temp=[ebp+4]"], a:1, e:"[ebp+4]는 return address, [ebp+8]은 첫 번째 인자 a, [ebp+12]는 두 번째 인자 b이다. 지역 DWORD 하나는 [ebp-4]에 둘 수 있다."},
+  {cat:"8장 Stack/Procedure", p:"상", q:"STDCALL을 사용하는 <code>swap(int *a, int *b)</code> 프로시저의 마지막 부분으로 가장 적절한 것은?", c:["mov esp, ebp / pop ebp / ret","mov esp, ebp / pop ebp / ret 8","pop ebp / add esp, 8 / ret","ret 4","add esp, 8 / ret 8"], a:1, e:"STDCALL은 callee가 parameter stack을 정리한다. 포인터 2개는 8바이트이므로 epilogue 후 ret 8이 맞다."},
+  {cat:"8장 Stack/Procedure", p:"상", q:"C calling convention으로 <code>swap(&x, &y)</code>를 호출하는 코드로 맞는 것은?", c:["push OFFSET x / push OFFSET y / call swap / ret 8","push OFFSET y / push OFFSET x / call swap / add esp, 8","push x / push y / call swap / add esp, 8","push OFFSET y / push OFFSET x / call swap","call swap / add esp, 8 / push OFFSET y / push OFFSET x"], a:1, e:"C calling convention은 오른쪽 인자부터 push하고 caller가 add esp,8로 정리한다. &x, &y이므로 값이 아니라 OFFSET을 push한다."},
+  {cat:"8장 Stack/Procedure", p:"상", q:"STDCALL로 <code>swap(&x, &y)</code>를 직접 호출하고 <code>invoke</code>를 쓰지 않을 때 맞는 코드는?", c:["push OFFSET y / push OFFSET x / call swap","push OFFSET y / push OFFSET x / call swap / add esp,8","push OFFSET x / push OFFSET y / call swap","push x / push y / call swap","call swap / ret 8"], a:0, e:"인자 push 순서는 C와 같이 오른쪽에서 왼쪽이다. 하지만 STDCALL은 callee가 ret 8로 정리하므로 caller의 add esp,8이 없어야 한다."},
+  {cat:"8장 Stack/Procedure", p:"중상", q:"다음 프로시저에서 <code>mov esp, ebp</code>를 생략하고 <code>pop ebp</code>를 수행하면 생기는 문제로 가장 적절한 것은?\n<pre>push ebp\nmov ebp, esp\nsub esp, 8\n; local variables 사용\npop ebp\nret</pre>", c:["지역변수 공간 때문에 ESP가 낮아져 있어 pop ebp가 저장된 EBP가 아닌 지역변수 값을 꺼낼 수 있다.","ret 명령은 항상 EBP를 자동 복원하므로 문제 없다.","sub esp,8은 EFLAGS만 바꾸므로 영향 없다.","pop ebp는 [ebp]에서 직접 꺼내므로 ESP와 무관하다.","지역변수는 data segment에 있으므로 문제 없다."], a:0, e:"local variable 공간을 해제하지 않으면 ESP가 저장된 EBP 위치를 가리키지 않는다. 보통 mov esp,ebp 후 pop ebp를 수행한다."},
+  {cat:"8장 Stack/Procedure", p:"중상", q:"다음 중 reference parameter로 전달된 배열 첫 원소에 7을 저장하는 코드 조각으로 가장 적절한 것은? 첫 번째 인자가 배열 주소이다.", c:["mov esi,[ebp+8] / mov DWORD PTR [esi],7","mov esi,[ebp-4] / mov DWORD PTR [esi],7","mov [ebp+8],7","mov esi,OFFSET [ebp+8] / mov [esi],7","mov esi,[ebp+4] / mov [esi],7"], a:0, e:"첫 번째 인자는 [ebp+8]에 있으며 그 값이 배열 시작 주소이다. 주소를 ESI에 읽은 뒤 [ESI]에 저장한다."},
+  {cat:"8장 Stack/Procedure", p:"중상", q:"다음 <code>LEA</code> 사용의 효과로 맞는 것은?\n<pre>lea eax, [esi+ecx*4+12]</pre>", c:["메모리 [esi+ecx*4+12]의 DWORD 값을 읽는다.","ESI+ECX*4+12라는 주소 계산 결과를 EAX에 넣는다.","EAX에 있는 주소로 ECX*4+12를 저장한다.","ECX를 4비트 왼쪽 shift한다.","EFLAGS를 결과에 맞게 갱신한다."], a:1, e:"LEA는 load effective address이다. 메모리 읽기가 아니라 주소 산술 결과를 레지스터에 넣는다."},
+
+  {cat:"9장 REAL4/메모리", p:"상", q:"REAL4 값 0.15625의 IEEE 754 single precision bit pattern은 <code>3E200000h</code>이다. x86 메모리 offset 100부터 저장될 byte 순서는?", c:["3E 20 00 00","00 00 20 3E","20 3E 00 00","00 20 3E 00","3E 00 00 20"], a:1, e:"x86은 little endian이므로 최하위 byte부터 저장한다. 3E200000h는 00 00 20 3E 순서로 저장된다."},
+  {cat:"9장 REAL4/메모리", p:"상", q:"REAL4 bit pattern <code>BF400000h</code>가 나타내는 값은?", c:["-0.75","-1.5","-2.5","1.5","-3.0"], a:1, e:"sign=1, exponent=127, fraction=.5이므로 값은 -(1.5)*2^0 = -1.5이다."},
+  {cat:"9장 REAL4/메모리", p:"상", q:"다음 메모리 관리 설명 중 옳지 않은 것은?", c:["지역변수는 일반적으로 stack frame 안에 확보된다.","HeapAlloc으로 받은 메모리는 procedure return만으로 자동 해제되지 않는다.","segment descriptor의 base와 offset을 더해 linear address를 얻는다.","paging을 사용하면 linear address가 page translation을 거쳐 physical address가 된다.","cache miss가 발생하면 그것은 곧 page fault이다."], a:4, e:"cache miss와 page fault는 다르다. page fault는 필요한 page가 메모리에 없거나 접근 문제가 있을 때 발생할 수 있다."},
+  {cat:"9장 REAL4/메모리", p:"중상", q:"32비트 linear address <code>12345ABCh</code>를 4KB page 기준으로 나눌 때 page offset은?", c:["ABCh","5ABCh","12345h","123h","45ABCh"], a:0, e:"4KB page는 2^12 byte이므로 하위 12비트가 offset이다. 12345ABCh의 하위 12비트는 ABCh이다."},
+  {cat:"9장 REAL4/메모리", p:"상", q:"다음 중 Win32 heap API 설명으로 맞는 것은?", c:["GetProcessHeap은 새 private heap을 만들고 포인터를 EAX에 반환한다.","HeapCreate로 만든 private heap은 HeapDestroy로 제거할 수 있다.","HeapAlloc은 실패해도 항상 유효한 포인터를 반환한다.","HeapFree는 반환된 포인터를 계속 사용해도 안전하게 만든다.","HEAP_ZERO_MEMORY는 할당 크기를 page 크기로 강제 고정한다."], a:1, e:"HeapCreate는 private heap을 생성하고 HeapDestroy는 이를 파괴한다. HeapAlloc 실패 반환값은 확인해야 하며, HeapFree 이후 포인터 사용은 위험하다."},
+  {cat:"9장 REAL4/메모리", p:"중상", q:"logical address, linear address, physical address의 관계 설명으로 가장 정확한 것은?", c:["logical address는 항상 physical address와 같다.","segment selector와 offset이 결합되어 linear address가 되고, paging이 켜지면 linear address가 physical address로 변환된다.","physical address가 먼저 만들어지고 page table을 거쳐 logical address가 된다.","32비트 protected mode에서는 segment selector가 32비트 offset보다 크다.","page translation은 heap allocation에서만 수행된다."], a:1, e:"보호 모드에서 logical address는 segment selector+offset이다. segmentation으로 linear address를 만들고 paging이 적용되면 physical address로 변환된다."},
+  {cat:"9장 REAL4/메모리", p:"중상", q:"다음 중 2023/2024 기출식 '옳지 않은 설명 고르기'로 출제될 때 틀린 설명은?", c:["하나의 page 안에서 연속한 linear address들은 page offset이 연속된다.","서로 다른 linear page들은 물리 메모리에서 반드시 연속할 필요가 없다.","HeapAlloc으로 받은 포인터가 0이면 할당 실패로 볼 수 있다.","전역 변수는 일반적으로 data segment에 위치한다.","동적 할당된 변수와 지역 변수는 모두 stack segment에 위치한다."], a:4, e:"지역변수는 stack frame에 위치하지만 동적 할당 메모리는 heap 영역에 위치한다. 둘을 모두 stack이라고 하면 틀리다."},
+  {cat:"종합 실행추적", p:"최상", q:"다음 코드 실행 직후 DL 값은? 모든 명령은 정상 실행된다고 가정한다.\n<pre>mov al, -10\nmov bl, 6\nimul bl\nmov dl, ah\ncmp ax, 0FFC4h\nje L1\nmov dl, 0\nL1:</pre>", c:["00h","FFh","C4h","06h","F6h"], a:1, e:"-10*6=-60이고 16비트 표현은 FFC4h이다. AH=FFh가 DL에 들어가며 CMP AX,FFC4h가 같으므로 DL은 FFh로 유지된다."},
+  {cat:"종합 실행추적", p:"최상", q:"다음 빈칸에 들어갈 명령 조합으로 가장 적절한 것은? signed DWORD에 대해 <code>VAR4 = (-VAR1 * 7) / (VAR2 + VAR3)</code>를 계산한다.\n<pre>mov eax, VAR1\nneg eax\nmov ebx, eax\nshl eax, 3\nsub eax, ebx\nmov ebx, VAR2\nadd ebx, VAR3\n____\n____\nmov VAR4, eax</pre>", c:["cdq / idiv ebx","mov edx,0 / div ebx","cwd / idiv ebx","cbw / div bl","xor edx,edx / idiv ebx"], a:0, e:"분자는 signed 32비트 결과로 EAX에 있다. signed 나눗셈 전에는 CDQ로 EDX:EAX를 sign-extend하고 IDIV EBX를 수행해야 한다."},
+
+  {cat:"교수님식 함정", p:"최상", q:"다음 코드에서 의도는 AL이 0이 될 때까지 반복하는 것이다. 실제 동작 설명으로 맞는 것은?\n<pre>mov ecx, 5\nmov al, 2\nL1: dec al\n    loopne L1</pre>", c:["AL이 0이 되면 반드시 즉시 종료한다.","DEC가 ZF를 바꾸고 LOOPNE가 그 ZF를 검사하므로 AL=0에서 종료될 수 있다.","LOOPNE가 ZF를 새로 계산하므로 AL 값과 무관하다.","LOOPNE는 ECX를 감소시키지 않는다.","DEC는 ZF를 바꾸지 않으므로 ECX가 0될 때까지 무조건 반복한다."], a:1, e:"함정은 LOOPNE가 ZF를 계산하는 명령이 아니라는 점이다. 하지만 직전 DEC AL이 ZF를 갱신하므로 LOOPNE는 그 ZF를 검사한다."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 코드 실행 직후 BL 값은?\n<pre>mov al, 255\nadd al, 1\nmov bl, 0\njg L1\nmov bl, 1\nL1:</pre>", c:["00h","01h","FFh","컴파일 오류","overflow 예외 발생"], a:1, e:"ADD 결과 AL=00h, ZF=1이다. JG는 signed greater 조건 ZF=0 AND SF=OF이므로 분기하지 않는다. BL=1."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 코드 실행 직후 BL 값은?\n<pre>mov al, 255\nadd al, 1\nmov bl, 0\nja L1\nmov bl, 1\nL1:</pre>", c:["00h","01h","FFh","컴파일 오류","overflow 예외 발생"], a:1, e:"JA는 unsigned > 조건 CF=0 AND ZF=0이다. 255+1은 CF=1, ZF=1이므로 JA가 성립하지 않는다. signed/unsigned jump를 섞는 함정이다."},
+  {cat:"교수님식 함정", p:"상", q:"다음 설명 중 가장 위험한 함정 설명은?", c:["MUL r/m8은 AL을 암시적 피승수로 사용한다.","DIV r/m8은 AX를 피제수로 사용한다.","IDIV의 나머지는 피제수와 같은 부호를 갖는다.","IMUL r/m8 결과가 AX에 들어가므로 OF와 CF는 항상 0이다.","DIV에서 몫이 목적지 레지스터 크기를 넘으면 divide error가 발생한다."], a:3, e:"IMUL/MUL은 결과 저장 공간이 두 배 크더라도, 하위 절반만으로 sign/zero extension이 되지 않으면 CF/OF가 1이 될 수 있다."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 코드가 <code>VAR4 = (4*VAR1) % (VAR2-VAR3)</code>를 unsigned로 계산할 때 빈칸에 가장 적절한 것은?\n<pre>mov eax, VAR1\nshl eax, 2\nmov ebx, VAR2\nsub ebx, VAR3\n____\ndiv ebx\nmov VAR4, edx</pre>", c:["cdq","cwd","mov edx,0","mov eax,0","cbw"], a:2, e:"unsigned DIV r/m32는 EDX:EAX를 피제수로 사용한다. 상위 32비트 EDX를 0으로 만들어야 한다. CDQ는 signed용이라 EAX가 음수처럼 보이면 EDX=FFFFFFFFh가 되어 틀릴 수 있다."},
+  {cat:"교수님식 함정", p:"상", q:"다음 중 <code>ret 8</code>을 쓰면 안 되는 경우는?", c:["STDCALL 프로시저가 DWORD 인자 2개를 받을 때","Windows API 스타일 callee cleanup일 때","C calling convention 프로시저가 DWORD 인자 2개를 받을 때","callee가 stack parameter 8바이트를 정리해야 할 때","직접 push 2번 후 STDCALL 함수를 call했을 때"], a:2, e:"C calling convention은 caller cleanup이다. callee가 ret 8을 하면 caller가 다시 add esp,8을 할 때 stack이 깨질 수 있다."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 swap 코드 조각의 문제로 맞는 것은?\n<pre>swap PROC\n push ebp\n mov  ebp, esp\n sub  esp, 4\n push eax\n mov  eax, [ebp+8]\n mov  [ebp-4], eax\n pop  eax\n mov  esp, ebp\n pop  ebp\n ret 8\nswap ENDP</pre>", c:["push eax가 [ebp-4]를 덮기 때문에 temp 공간이 없다.","[ebp-4]는 temp 공간이고 push eax는 [ebp-8]에 저장되므로 이 부분만으로는 덮지 않는다.","sub esp,4는 stack이 위로 자라게 한다.","[ebp+8]은 return address이다.","ret 8은 push eax까지 제거한다."], a:1, e:"자주 나오는 오해다. sub esp,4 후 push eax를 하면 ESP는 [ebp-8]로 내려간다. [ebp-4]는 여전히 local temp다."},
+  {cat:"교수님식 함정", p:"상", q:"다음 중 x86 little endian 때문에 실제 메모리 덤프에서 헷갈리기 쉬운 설명으로 맞는 것은?", c:["DWORD 12345678h는 낮은 주소부터 12 34 56 78로 저장된다.","REAL4 bit pattern 3F800000h는 낮은 주소부터 00 00 80 3F로 저장된다.","little endian은 bit 순서까지 반대로 저장한다.","문자열 BYTE \"AB\"는 낮은 주소부터 42 41로 저장된다.","WORD 00FFh는 낮은 주소부터 00 FF로 저장된다."], a:1, e:"little endian은 byte 순서를 낮은 byte부터 저장한다. bit 순서를 뒤집는 것이 아니며 문자열의 byte 순서는 작성 순서대로다."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 메모리 설명 중 가장 그럴듯하지만 틀린 것은?", c:["한 page 안에서 offset이 연속하면 그 page frame 안의 physical address도 연속이다.","서로 다른 virtual page가 서로 연속한 physical frame에 배치된다는 보장은 없다.","page fault는 필요한 page가 메모리에 없을 때 발생할 수 있다.","cache miss와 page fault는 같은 개념이므로 시험에서는 같은 답으로 처리한다.","linear address는 paging 전 단계의 주소이다."], a:3, e:"cache miss는 캐시에 없다는 뜻이고 page fault는 page translation/메모리 적재/권한 문제와 관련된다. 교수님 기출에서도 이 혼동을 직접 찌른다."},
+  {cat:"교수님식 함정", p:"최상", q:"다음 코드 실행 직후 EAX 값은?\n<pre>mov eax, -1\nmov ecx, 2\nshr eax, 1\nsar eax, 1</pre>", c:["FFFFFFFFh","7FFFFFFFh","3FFFFFFFh","BFFFFFFFh","00000000h"], a:2, e:"처음 SHR은 logical shift이므로 FFFFFFFFh -> 7FFFFFFFh가 된다. 이후 SAR은 현재 sign bit가 0인 양수로 보고 오른쪽 shift하므로 3FFFFFFFh가 된다."}
+];
+
+let currentFilter = "전체";
+const selected = new Map();
+const revealed = new Set();
+const $ = (id) => document.getElementById(id);
+
+function cats(){return ["전체", ...Array.from(new Set(QUESTIONS.map(q => q.cat)))];}
+function shownQuestions(){return QUESTIONS.map((q,i)=>({q,i})).filter(x => currentFilter==="전체" || x.q.cat===currentFilter);}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function decodeEntities(s){return String(s).replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");}
+function renderRich(text){return text.replace(/<pre>([\s\S]*?)<\/pre>/g, (_, code) => `<pre>${escapeHtml(decodeEntities(code.trim()))}</pre>`).replace(/<code>([\s\S]*?)<\/code>/g, (_, code) => `<code>${escapeHtml(decodeEntities(code))}</code>`);}
+function renderFilters(){
+  const root=$("filters");
+  root.innerHTML="";
+  cats().forEach(cat=>{
+    const b=document.createElement("button");
+    b.textContent=cat;
+    b.className=cat===currentFilter ? "active" : "";
+    b.onclick=()=>{currentFilter=cat;render();};
+    root.appendChild(b);
+  });
+}
+function card(q,i){
+  const article=document.createElement("article");
+  article.className="card";
+  const hotClass=q.p==="높음" ? "hot" : q.p==="중간" ? "mid" : "";
+  article.innerHTML=`
+    <div class="head">
+      <div class="title">${i+1}. ${q.cat}</div>
+      <div class="meta"><span class="tag ${hotClass}">${q.p}</span><span class="tag">5지선다</span></div>
+    </div>
+    <div class="q">${renderRich(q.q)}</div>
+    <div class="choices"></div>
+    <div class="tools"><button type="button" class="grade-one">채점하기</button><button type="button" class="reveal">정답 표시</button></div>
+    <div class="explain">${escapeHtml(q.e)}</div>`;
+  const choices=article.querySelector(".choices");
+  q.c.forEach((text,ci)=>{
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="choice";
+    b.innerHTML=`${String.fromCharCode(65+ci)}. ${renderRich(text)}`;
+    b.onclick=()=>{selected.set(i,ci);mark(article,q,i);updateScore();};
+    choices.appendChild(b);
+  });
+  article.querySelector(".grade-one").onclick=()=>{revealed.add(i);mark(article,q,i);updateScore();};
+  article.querySelector(".reveal").onclick=()=>{revealed.add(i);mark(article,q,i);updateScore();};
+  if(revealed.has(i)||selected.has(i)) mark(article,q,i);
+  return article;
+}
+function mark(article,q,i){
+  const buttons=[...article.querySelectorAll(".choice")];
+  const val=selected.get(i);
+  buttons.forEach((b,ci)=>{
+    b.classList.remove("selected","correct","wrong");
+    if(selected.has(i)&&ci===val) b.classList.add("selected");
+    if(revealed.has(i)){
+      if(ci===q.a) b.classList.add("correct");
+      if(selected.has(i)&&ci===val&&ci!==q.a) b.classList.add("wrong");
+    }
+  });
+  article.querySelector(".explain").classList.toggle("open", revealed.has(i));
+}
+function updateScore(){
+  let answered=selected.size;
+  let correct=0;
+  selected.forEach((v,i)=>{if(QUESTIONS[i].a===v) correct++;});
+  $("score").textContent=`${correct} / ${answered} 선택, 총 ${QUESTIONS.length}문항`;
+  $("progressFill").style.width=`${Math.round(answered/QUESTIONS.length*100)}%`;
+}
+function gradeAll(){QUESTIONS.forEach((_,i)=>revealed.add(i));render();}
+function resetAll(){selected.clear();revealed.clear();render();}
+function render(){
+  renderFilters();
+  const root=$("quiz");
+  root.innerHTML="";
+  shownQuestions().forEach(({q,i})=>root.appendChild(card(q,i)));
+  updateScore();
+}
+$("gradeAll").onclick=gradeAll;
+$("showAll").onclick=gradeAll;
+$("resetAll").onclick=resetAll;
+render();
+</script>
+</body>
+</html>
