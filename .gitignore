@@ -3,3 +3,4 @@
 .tmp_edge_pdf
 .tmp_pdf_images
 .node_modules
+node_modules/
